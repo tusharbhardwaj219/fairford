@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Fair Ford Platform — Register</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="/frontend/css/registration.css">
+<!-- login page -->
+<link rel="icon" type="image/png" href=https://res.cloudinary.com/dp4yririh/image/upload/v1781166637/LOGO_ja5rle.png>
+   
+</head>
+<body>
+<div class="bg-mesh"></div>
+<div class="grid-lines"></div>
+
+<div class="page-wrap">
+
+  <!-- ─── LEFT SIDEBAR ─── -->
+  <div class="left-sidebar">
+    <div class="brand">
+      <div class="brand-logo"><a href="index.html"><img src=https://res.cloudinary.com/dp4yririh/image/upload/v1781166637/LOGO_ja5rle.png alt="fair ford logo" width="60px" height="60px"></a></div>
+      <div>
+        <div class="brand-name"><h1>Fair Ford</h1></div>
+        <div class="brand-sub">Pharma · EST. 2013</div>
+      </div>
+    </div>
+
+    <div class="steps-title">Registration Steps</div>
+    <div class="step-list" id="stepList">
+      <div class="step-item active" id="sl-1">
+        <div class="step-num">1</div>
+        <div class="step-info">
+          <div class="step-name">Select Role</div>
+          <div class="step-desc">Choose your partnership type</div>
+        </div>
+      </div>
+      <div class="step-item upcoming" id="sl-2">
+        <div class="step-num">2</div>
+        <div class="step-info">
+          <div class="step-name">Business Details</div>
+          <div class="step-desc">Company & contact information</div>
+        </div>
+      </div>
+      <div class="step-item upcoming" id="sl-3">
+        <div class="step-num">3</div>
+        <div class="step-info">
+          <div class="step-name">Licenses & Docs</div>
+          <div class="step-desc">Drug license & compliance docs</div>
+        </div>
+      </div>
+      <div class="step-item upcoming" id="sl-4">
+        <div class="step-num">4</div>
+        <div class="step-info">
+          <div class="step-name">Account Setup</div>
+          <div class="step-desc">Mobile OTP & password</div>
+        </div>
+      </div>
+      <div class="step-item upcoming" id="sl-5">
+        <div class="step-num">5</div>
+        <div class="step-info">
+          <div class="step-name">Review & Submit</div>
+          <div class="step-desc">Verify and submit application</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="benefits-title">Why Fair Ford?</div>
+    <div class="benefit-list">
+      <div class="benefit-item"><span class="benefit-icon"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-brick-wall-shield-icon lucide-brick-wall-shield"><path d="M12 9v1.258"/><path d="M16 3v5.46"/><path d="M21 9.118V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h5.75"/><path d="M22 17.5c0 2.499-1.75 3.749-3.83 4.474a.5.5 0 0 1-.335-.005c-2.085-.72-3.835-1.97-3.835-4.47V14a.5.5 0 0 1 .5-.499c1 0 2.25-.6 3.12-1.36a.6.6 0 0 1 .76-.001c.875.765 2.12 1.36 3.12 1.36a.5.5 0 0 1 .5.5z"/><path d="M3 15h7"/><path d="M3 9h12.142"/><path d="M8 15v6"/><path d="M8 3v6"/></svg></span>Escrow-based secure payment settlement</div>
+      <div class="benefit-item"><span class="benefit-icon"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bot-message-square-icon lucide-bot-message-square"><path d="M12 6V2H8"/><path d="M15 11v2"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="M20 16a2 2 0 0 1-2 2H8.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 4 20.286V8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2z"/><path d="M9 11v2"/></svg></span>AI demand forecasting & inventory alerts</div>
+      <div class="benefit-item"><span class="benefit-icon"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clipboard-clock-icon lucide-clipboard-clock"><path d="M16 14v2.2l1.6 1"/><path d="M16 4h2a2 2 0 0 1 2 2v.832"/><path d="M8 4H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h2"/><circle cx="16" cy="16" r="6"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg></span>Real-time SKU & batch tracking</div>
+      <div class="benefit-item"><span class="benefit-icon"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-hospital-icon lucide-hospital"><path d="M12 7v4"/><path d="M14 21v-3a2 2 0 0 0-4 0v3"/><path d="M14 9h-4"/><path d="M18 11h2a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-9a2 2 0 0 1 2-2h2"/><path d="M18 21V5a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16"/></svg></span>Direct hospital procurement access</div>
+      <div class="benefit-item"><span class="benefit-icon"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chart-area-icon lucide-chart-area"><path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="M7 11.207a.5.5 0 0 1 .146-.353l2-2a.5.5 0 0 1 .708 0l3.292 3.292a.5.5 0 0 0 .708 0l4.292-4.292a.5.5 0 0 1 .854.353V16a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1z"/></svg></span>Live analytics & GST-ready reports</div>
+      <div class="benefit-item"><span class="benefit-icon"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-earth-lock-icon lucide-earth-lock"><path d="M7 3.34V5a3 3 0 0 0 3 3"/><path d="M11 21.95V18a2 2 0 0 0-2-2 2 2 0 0 1-2-2v-1a2 2 0 0 0-2-2H2.05"/><path d="M21.54 15H17a2 2 0 0 0-2 2v4.54"/><path d="M12 2a10 10 0 1 0 9.54 13"/><path d="M20 6V4a2 2 0 1 0-4 0v2"/><rect width="8" height="5" x="14" y="6" rx="1"/></svg></span>Pan-India distribution network</div>
+    </div>
+
+    <div class="sidebar-footer">
+      © 2025 Fair Ford Pharma &nbsp;·&nbsp;
+      <a href="#">Privacy</a> &nbsp;·&nbsp; <a href="#">Terms</a>
+    </div>
+  </div>
+
+  <!-- ─── MAIN CONTENT ─── -->
+  <div class="main-content">
+
+    <!-- Top bar -->
+    <div class="top-bar">
+      <div class="top-bar-left">
+        <div class="page-badge"><div class="badge-dot"></div>Partnership Application</div>
+        <h1 class="page-title">Create your account</h1>
+        <p class="page-subtitle">Join India's largest pharmaceutical commerce network</p>
+      </div>
+      <div class="login-link">Already a partner? <a href="login&signup.html">Sign in →</a></div>
+    </div>
+
+    <!-- Progress bar -->
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="progressBar" style="width:20%"></div>
+    </div>
+
+    <!-- ════ STEP 1 — ROLE ════ -->
+    <div class="step-panel active" id="step1">
+      <div class="section-heading"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-target-icon lucide-target"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg> Select Your Partnership Role</div>
+
+      <div class="role-grid">
+        <div class="role-card" onclick="selectRole(this,'dist')">
+          <div class="role-check">✓</div>
+          <div class="role-card-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-warehouse-icon lucide-warehouse"><path d="M18 21V10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1v11"/><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 1.132-1.803l7.95-3.974a2 2 0 0 1 1.837 0l7.948 3.974A2 2 0 0 1 22 8z"/><path d="M6 13h12"/><path d="M6 17h12"/></svg></div>
+          <div class="role-card-name">Stockist</div>
+          <div class="role-card-desc">Wholesale pharma distribution & stock management</div>
+        </div>
+        <div class="role-card" onclick="selectRole(this,'ret')">
+          <div class="role-check">✓</div>
+          <div class="role-card-icon"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-store-icon lucide-store"><path d="M15 21v-5a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v5"/><path d="M17.774 10.31a1.12 1.12 0 0 0-1.549 0 2.5 2.5 0 0 1-3.451 0 1.12 1.12 0 0 0-1.548 0 2.5 2.5 0 0 1-3.452 0 1.12 1.12 0 0 0-1.549 0 2.5 2.5 0 0 1-3.77-3.248l2.889-4.184A2 2 0 0 1 7 2h10a2 2 0 0 1 1.653.873l2.895 4.192a2.5 2.5 0 0 1-3.774 3.244"/><path d="M4 10.95V19a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8.05"/></svg></div>
+          <div class="role-card-name">Retailer</div>
+          <div class="role-card-desc">Retail pharmacy, chemist shop & medicine outlet</div>
+        </div>
+        <div class="role-card" onclick="selectRole(this,'hosp')">
+          <div class="role-check">✓</div>
+          <div class="role-card-icon"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-hospital-icon lucide-hospital"><path d="M12 7v4"/><path d="M14 21v-3a2 2 0 0 0-4 0v3"/><path d="M14 9h-4"/><path d="M18 11h2a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-9a2 2 0 0 1 2-2h2"/><path d="M18 21V5a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16"/></svg></div>
+          <div class="role-card-name">Hospital /<br/>Institution</div>
+          <div class="role-card-desc">Hospital procurement, clinics & institutional buyers</div>
+        </div>
+        <div class="role-card" onclick="selectRole(this,'mfr')">
+          <div class="role-check">✓</div>
+          <div class="role-card-icon"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-factory-icon lucide-factory"><path d="M12 16h.01"/><path d="M16 16h.01"/><path d="M3 19a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8.5a.5.5 0 0 0-.769-.422l-4.462 2.844A.5.5 0 0 1 15 10.5v-2a.5.5 0 0 0-.769-.422L9.77 10.922A.5.5 0 0 1 9 10.5V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2z"/><path d="M8 16h.01"/></svg></div>
+          <div class="role-card-name">Manufacturer</div>
+          <div class="role-card-desc">Pharma brand, formulation manufacturer & lab</div>
+        </div>
+      </div>
+
+      <div id="roleError" style="color:var(--red);font-size:12px;font-weight:600;display:none;margin-bottom:12px;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-triangle-alert-icon lucide-triangle-alert"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg> Please select a partnership role to continue.
+      </div>
+
+      <div class="nav-btns">
+        <div class="step-counter">Step <strong>1</strong> of 5</div>
+        <button class="btn-next" onclick="goNext(1)">Continue &nbsp; →</button>
+      </div>
+    </div>
+
+    <!-- ════ STEP 2 — BUSINESS DETAILS ════ -->
+    <div class="step-panel" id="step2">
+      <div class="section-heading"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-briefcase-business-icon lucide-briefcase-business"><path d="M12 12h.01"/><path d="M16 6V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><path d="M22 13a18.15 18.15 0 0 1-20 0"/><rect width="20" height="14" x="2" y="6" rx="2"/></svg> Business Information</div>
+
+      <div class="form-grid">
+        <div class="field-group">
+          <label class="field-label">Business / Company Name <span class="req">*</span></label>
+          <div class="field-wrap">
+            <span class="field-icon"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-briefcase-business-icon lucide-briefcase-business"><path d="M12 12h.01"/><path d="M16 6V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><path d="M22 13a18.15 18.15 0 0 1-20 0"/><rect width="20" height="14" x="2" y="6" rx="2"/></svg></span>
+            <input type="text" id="bizName" placeholder="e.g. Sharma Medical Distributors"/>
+          </div>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Owner / Authorised Signatory <span class="req">*</span></label>
+          <div class="field-wrap">
+            <span class="field-icon"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user-icon lucide-user"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
+            <input type="text" id="ownerName" placeholder="Full legal name"/>
+          </div>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Business Email <span class="req">*</span></label>
+          <div class="field-wrap">
+            <span class="field-icon"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-mail-icon lucide-mail"><path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg></span>
+            <input type="email" id="bizEmail" placeholder="business@example.com"/>
+          </div>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Registered Mobile <span class="req">*</span></label>
+          <div class="field-wrap">
+            <span class="field-icon"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-smartphone-icon lucide-smartphone"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/></svg></span>
+            <input type="tel" id="bizMobile" placeholder="+91  98765 43210" maxlength="14"/>
+          </div>
+        </div>
+        <div class="field-group">
+          <label class="field-label">State <span class="req">*</span></label>
+          <div class="field-wrap">
+            <span class="field-icon"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-icon lucide-map"><path d="M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z"/><path d="M15 5.764v15"/><path d="M9 3.236v15"/></svg></span>
+            <select id="bizState">
+              <option value="">Select state</option>
+              <option>Andhra Pradesh</option><option>Assam</option><option>Bihar</option>
+              <option>Chhattisgarh</option><option>Delhi</option><option>Goa</option>
+              <option>Gujarat</option><option>Haryana</option><option>Himachal Pradesh</option>
+              <option>Jharkhand</option><option>Karnataka</option><option>Kerala</option>
+              <option>Madhya Pradesh</option><option>Maharashtra</option><option>Manipur</option>
+              <option>Meghalaya</option><option>Odisha</option><option>Punjab</option>
+              <option>Rajasthan</option><option>Tamil Nadu</option><option>Telangana</option>
+              <option>Uttar Pradesh</option><option>Uttarakhand</option><option>West Bengal</option>
+            </select>
+          </div>
+        </div>
+        <div class="field-group">
+          <label class="field-label">City / District <span class="req">*</span></label>
+          <div class="field-wrap">
+            <span class="field-icon"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-pin-icon lucide-map-pin"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg></span>
+            <input type="text" id="bizCity" placeholder="City or district name"/>
+          </div>
+        </div>
+        <div class="field-group">
+          <label class="field-label">PIN Code <span class="req">*</span></label>
+          <div class="field-wrap">
+            <span class="field-icon"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pin-icon lucide-pin"><path d="M12 17v5"/><path d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1z"/></svg></span>
+            <input type="text" id="bizPin" placeholder="6-digit PIN code" maxlength="6"/>
+          </div>
+        </div>
+        <div class="field-group">
+          <label class="field-label">GST Number</label>
+          <div class="field-wrap">
+            <span class="field-icon"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-scroll-text-icon lucide-scroll-text"><path d="M15 12h-5"/><path d="M15 8h-5"/><path d="M19 17V5a2 2 0 0 0-2-2H4"/><path d="M8 21h12a2 2 0 0 0 2-2v-1a1 1 0 0 0-1-1H11a1 1 0 0 0-1 1v1a2 2 0 1 1-4 0V5a2 2 0 1 0-4 0v2a1 1 0 0 0 1 1h3"/></svg></span>
+            <input type="text" id="bizGst" placeholder="e.g. 27AAACR5055K1ZV" maxlength="15"/>
+          </div>
+          <div class="field-hint">15-digit GST identification number</div>
+        </div>
+        <div class="field-group col-span-2">
+          <label class="field-label">Full Business Address <span class="req">*</span></label>
+          <div class="field-wrap">
+            <span class="field-icon"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-house-icon lucide-house"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></span>
+            <textarea id="bizAddress" placeholder="Shop/office number, street, area, landmark…" style="padding-top:12px"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="nav-btns">
+        <button class="btn-back" onclick="goBack(2)">← Back</button>
+        <div class="step-counter">Step <strong>2</strong> of 5</div>
+        <button class="btn-next" onclick="goNext(2)">Continue &nbsp; →</button>
+      </div>
+    </div>
+
+    <!-- ════ STEP 3 — LICENSES & DOCS ════ -->
+    <div class="step-panel" id="step3">
+      <div class="section-heading"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clipboard-list-icon lucide-clipboard-list"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></svg> Licenses & Compliance Documents</div>
+
+      <div class="form-grid">
+        <div class="field-group">
+          <label class="field-label">Drug License Number <span class="req">*</span></label>
+          <div class="field-wrap">
+            <span class="field-icon"></span>
+            <input type="text" id="dlNum" placeholder="e.g. DL-MH-2024-00123"/>
+          </div>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Drug License Expiry <span class="req">*</span></label>
+          <div class="field-wrap">
+            <span class="field-icon"></span>
+            <input type="text" id="dlExpiry" placeholder="DD / MM / YYYY" maxlength="14" oninput="formatDate(this)"/>
+          </div>
+        </div>
+        <div class="field-group" id="form20Field">
+          <label class="field-label">Form 20 / 21 License No.</label>
+          <div class="field-wrap">
+            <span class="field-icon"></span>
+            <input type="text" id="form20" placeholder="Schedule H/H1 license"/>
+          </div>
+        </div>
+        <div class="field-group">
+          <label class="field-label">PAN Number <span class="req">*</span></label>
+          <div class="field-wrap">
+            <span class="field-icon"></span>
+            <input type="text" id="panNum" placeholder="e.g. ABCDE1234F" maxlength="10"/>
+          </div>
+        </div>
+        <div class="field-group" id="fssaiField">
+          <label class="field-label">FSSAI License (if applicable)</label>
+          <div class="field-wrap">
+            <span class="field-icon"></span>
+            <input type="text" id="fssai" placeholder="14-digit FSSAI number" maxlength="14"/>
+          </div>
+        </div>
+        <div class="field-group" id="nabl">
+          <label class="field-label">ISO / NABL Cert No.</label>
+          <div class="field-wrap">
+            <span class="field-icon"></span>
+            <input type="text" id="isoNum" placeholder="Certification number"/>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-heading" style="margin-top:8px"> Document Uploads</div>
+
+      <div class="form-grid">
+        <div class="field-group">
+          <label class="field-label">Drug License (Both Parts) <span class="req">*</span></label>
+          <div class="upload-zone" id="uz1">
+            <input type="file" accept=".pdf,.jpg,.jpeg,.png" onchange="handleUpload(this,'uz1','uv1')"/>
+            <div class="upload-icon"></div>
+            <div class="upload-title" id="uv1">Click or drag to upload</div>
+            <div class="upload-sub">PDF, JPG, PNG — max 5MB</div>
+            <div class="upload-types">
+              <span class="upload-type-tag">PDF</span>
+              <span class="upload-type-tag">JPG</span>
+              <span class="upload-type-tag">PNG</span>
+            </div>
+          </div>
+        </div>
+        <div class="field-group">
+          <label class="field-label">GST Certificate <span class="req">*</span></label>
+          <div class="upload-zone" id="uz2">
+            <input type="file" accept=".pdf,.jpg,.jpeg,.png" onchange="handleUpload(this,'uz2','uv2')"/>
+            <div class="upload-icon"></div>
+            <div class="upload-title" id="uv2">Click or drag to upload</div>
+            <div class="upload-sub">PDF, JPG, PNG — max 5MB</div>
+            <div class="upload-types">
+              <span class="upload-type-tag">PDF</span>
+              <span class="upload-type-tag">JPG</span>
+            </div>
+          </div>
+        </div>
+        <div class="field-group">
+          <label class="field-label">PAN Card Copy <span class="req">*</span></label>
+          <div class="upload-zone" id="uz3">
+            <input type="file" accept=".pdf,.jpg,.jpeg,.png" onchange="handleUpload(this,'uz3','uv3')"/>
+            <div class="upload-icon"></div>
+            <div class="upload-title" id="uv3">Click or drag to upload</div>
+            <div class="upload-sub">PDF, JPG, PNG — max 5MB</div>
+          </div>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Cancelled Cheque / Bank Passbook</label>
+          <div class="upload-zone" id="uz4">
+            <input type="file" accept=".pdf,.jpg,.jpeg,.png" onchange="handleUpload(this,'uz4','uv4')"/>
+            <div class="upload-icon"></div>
+            <div class="upload-title" id="uv4">Click or drag to upload</div>
+            <div class="upload-sub">For bank settlement setup</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="nav-btns">
+        <button class="btn-back" onclick="goBack(3)">← Back</button>
+        <div class="step-counter">Step <strong>3</strong> of 5</div>
+        <button class="btn-next" onclick="goNext(3)">Continue &nbsp; →</button>
+      </div>
+    </div>
+
+    <!-- ════ STEP 4 — ACCOUNT SETUP ════ -->
+    <div class="step-panel" id="step4">
+      <div class="section-heading"> Account Setup</div>
+
+      <!-- Mobile OTP -->
+      <div class="form-grid cols-1" style="margin-bottom:28px">
+        <div class="field-group">
+          <label class="field-label">Verify Mobile Number <span class="req">*</span></label>
+          <div class="otp-row">
+            <div class="field-wrap" style="flex:1">
+              <span class="field-icon"></span>
+              <input type="tel" id="verifyMobile" placeholder="+91  98765 43210" maxlength="14"/>
+            </div>
+            <button class="btn-send-otp" id="sendOtpBtn" onclick="sendOtp()">Send OTP</button>
+          </div>
+          <div class="field-hint">OTP will be sent to your registered mobile number</div>
+        </div>
+      </div>
+
+      <div id="otpSection" style="display:none; margin-bottom:28px">
+        <label class="field-label" style="display:block; margin-bottom:14px">Enter 6-digit OTP <span class="req">*</span></label>
+        <div class="otp-digits">
+          <input class="otp-digit" type="text" maxlength="1" oninput="otpNext(this,0)" id="otp0"/>
+          <input class="otp-digit" type="text" maxlength="1" oninput="otpNext(this,1)" id="otp1"/>
+          <input class="otp-digit" type="text" maxlength="1" oninput="otpNext(this,2)" id="otp2"/>
+          <input class="otp-digit" type="text" maxlength="1" oninput="otpNext(this,3)" id="otp3"/>
+          <input class="otp-digit" type="text" maxlength="1" oninput="otpNext(this,4)" id="otp4"/>
+          <input class="otp-digit" type="text" maxlength="1" oninput="otpNext(this,5)" id="otp5"/>
+        </div>
+        <div style="text-align:center; margin-top:10px">
+          <span style="font-size:12px; color:var(--text-dim)">Didn't receive? </span>
+          <button onclick="sendOtp()" style="background:none;border:none;color:var(--cyan);font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:700;cursor:pointer">Resend OTP</button>
+        </div>
+      </div>
+
+      <div class="section-heading"> Set Password</div>
+
+      <div class="form-grid">
+        <div class="field-group">
+          <label class="field-label">Create Password <span class="req">*</span></label>
+          <div class="field-wrap">
+            <span class="field-icon"></span>
+            <input type="password" id="pw1" placeholder="Min. 8 characters" oninput="checkStrength(this.value)"/>
+            <button type="button" class="pw-toggle" onclick="togglePw('pw1',this)">Show</button>
+          </div>
+          <div class="pw-strength">
+            <div class="pw-bars">
+              <div class="pw-bar" id="bar1"></div>
+              <div class="pw-bar" id="bar2"></div>
+              <div class="pw-bar" id="bar3"></div>
+              <div class="pw-bar" id="bar4"></div>
+            </div>
+            <div class="pw-label" id="pwLabel">Enter a password</div>
+          </div>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Confirm Password <span class="req">*</span></label>
+          <div class="field-wrap">
+            <span class="field-icon"></span>
+            <input type="password" id="pw2" placeholder="Re-enter password"/>
+            <button type="button" class="pw-toggle" onclick="togglePw('pw2',this)">Show</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bank details -->
+      <div class="section-heading"> Bank & Settlement Details</div>
+      <div class="form-grid">
+        <div class="field-group">
+          <label class="field-label">Account Holder Name <span class="req">*</span></label>
+          <div class="field-wrap">
+            <span class="field-icon"></span>
+            <input type="text" id="accName" placeholder="As per bank records"/>
+          </div>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Bank Account Number <span class="req">*</span></label>
+          <div class="field-wrap">
+            <span class="field-icon"></span>
+            <input type="text" id="accNum" placeholder="Account number"/>
+          </div>
+        </div>
+        <div class="field-group">
+          <label class="field-label">IFSC Code <span class="req">*</span></label>
+          <div class="field-wrap">
+            <span class="field-icon"></span>
+            <input type="text" id="ifsc" placeholder="e.g. SBIN0001234" maxlength="11"/>
+          </div>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Bank Name</label>
+          <div class="field-wrap">
+            <span class="field-icon"></span>
+            <input type="text" id="bankName" placeholder="e.g. State Bank of India"/>
+          </div>
+        </div>
+      </div>
+
+      <div class="nav-btns">
+        <button class="btn-back" onclick="goBack(4)">← Back</button>
+        <div class="step-counter">Step <strong>4</strong> of 5</div>
+        <button class="btn-next" onclick="goNext(4)">Review Application &nbsp; →</button>
+      </div>
+    </div>
+
+    <!-- ════ STEP 5 — REVIEW ════ -->
+    <div class="step-panel" id="step5">
+      <div class="section-heading"> Review Your Application</div>
+
+      <div class="review-section">
+        <div class="review-section-title">
+          Partnership Role
+          <button class="review-edit-btn" onclick="gotoStep(1)">Edit</button>
+        </div>
+        <div class="review-grid">
+          <div class="review-item">
+            <div class="review-key">Role Type</div>
+            <div class="review-val" id="rv-role">—</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="review-section">
+        <div class="review-section-title">
+          Business Details
+          <button class="review-edit-btn" onclick="gotoStep(2)">Edit</button>
+        </div>
+        <div class="review-grid">
+          <div class="review-item"><div class="review-key">Business Name</div><div class="review-val" id="rv-bizName">—</div></div>
+          <div class="review-item"><div class="review-key">Owner Name</div><div class="review-val" id="rv-ownerName">—</div></div>
+          <div class="review-item"><div class="review-key">Email</div><div class="review-val" id="rv-bizEmail">—</div></div>
+          <div class="review-item"><div class="review-key">Mobile</div><div class="review-val" id="rv-bizMobile">—</div></div>
+          <div class="review-item"><div class="review-key">State</div><div class="review-val" id="rv-bizState">—</div></div>
+          <div class="review-item"><div class="review-key">City</div><div class="review-val" id="rv-bizCity">—</div></div>
+          <div class="review-item"><div class="review-key">GST Number</div><div class="review-val" id="rv-bizGst">—</div></div>
+          <div class="review-item"><div class="review-key">PIN Code</div><div class="review-val" id="rv-bizPin">—</div></div>
+        </div>
+      </div>
+
+      <div class="review-section">
+        <div class="review-section-title">
+          Licenses
+          <button class="review-edit-btn" onclick="gotoStep(3)">Edit</button>
+        </div>
+        <div class="review-grid">
+          <div class="review-item"><div class="review-key">Drug License No.</div><div class="review-val" id="rv-dlNum">—</div></div>
+          <div class="review-item"><div class="review-key">Expiry Date</div><div class="review-val" id="rv-dlExpiry">—</div></div>
+          <div class="review-item"><div class="review-key">PAN Number</div><div class="review-val" id="rv-panNum">—</div></div>
+        </div>
+      </div>
+
+      <div class="review-section">
+        <div class="review-section-title">
+          Bank Details
+          <button class="review-edit-btn" onclick="gotoStep(4)">Edit</button>
+        </div>
+        <div class="review-grid">
+          <div class="review-item"><div class="review-key">Account Holder</div><div class="review-val" id="rv-accName">—</div></div>
+          <div class="review-item"><div class="review-key">IFSC Code</div><div class="review-val" id="rv-ifsc">—</div></div>
+          <div class="review-item"><div class="review-key">Bank</div><div class="review-val" id="rv-bankName">—</div></div>
+        </div>
+      </div>
+
+      <div class="declaration-box">
+        <div class="declaration-title"> Declaration</div>
+        <div class="declaration-text">
+          I hereby declare that all information provided in this application is true, accurate and complete to the best of my knowledge. I understand that Fair Ford Platform reserves the right to verify all submitted details and reject the application if any information is found to be false or misleading. I agree to comply with all applicable drug laws, GST regulations and Fair Ford Platform's Terms of Service.
+        </div>
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:12px; margin-bottom:8px">
+        <label class="checkbox-group">
+          <input type="checkbox" id="chk1"/>
+          <span class="checkbox-label">I agree to Fair Ford Platform's <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></span>
+        </label>
+        <label class="checkbox-group">
+          <input type="checkbox" id="chk2"/>
+          <span class="checkbox-label">I confirm all submitted documents are valid, current and legally owned by my business</span>
+        </label>
+        <label class="checkbox-group">
+          <input type="checkbox" id="chk3"/>
+          <span class="checkbox-label">I consent to receive communication from Fair Ford via SMS, email and WhatsApp regarding my application</span>
+        </label>
+      </div>
+
+      <div class="nav-btns">
+        <button class="btn-back" onclick="goBack(5)">← Back</button>
+        <div class="step-counter">Step <strong>5</strong> of 5</div>
+        <button class="btn-next" onclick="submitForm()" id="submitBtn">
+          🚀 &nbsp; Submit Application
+        </button>
+      </div>
+    </div>
+
+    <!-- ════ SUCCESS ════ -->
+    <div class="success-screen" id="successScreen">
+      <div class="success-icon">✓</div>
+      <h2 class="success-title">Application Submitted!</h2>
+      <p class="success-sub">Your Fair Ford partnership application has been received. Our team will verify your documents and contact you within <strong style="color:#0d1e3c">2–3 business days</strong>.</p>
+      <div class="success-ref" id="successRef">Application Ref: FF-2025-00000</div>
+      <div class="success-actions">
+        <button class="btn-primary-success" onclick="window.location='login&signup.html'">Go to Sign In →</button>
+        <button class="btn-sec-success" onclick="location.reload()">Register Another</button>
+      </div>
+    </div>
+
+  </div><!-- /main-content -->
+</div><!-- /page-wrap -->
+
+<!-- Live badge -->
+<div class="floaty">
+  <div class="floaty-dot"></div>
+  <div class="floaty-text"><strong>12</strong>new partners joined today</div>
+</div>
+
+<script src="/frontend/js/registration.js"></script>
+
+</body>
+</html>

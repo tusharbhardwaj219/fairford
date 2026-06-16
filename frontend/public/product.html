@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- SEO -->
+    <title>Fair Ford- product</title>
+    <meta name="description"
+        content="Browse verified WHO-GMP certified pharmaceutical products for retailers, distributors and stockists. Filter by category, brand, price, stock and rating." />
+    <meta name="keywords"
+        content="pharma marketplace, B2B pharmaceuticals, wholesale medicines, distributor pricing, tablets, capsules, syrups, injections" />
+    <meta property="og:title" content="MediBridge — B2B Pharma Marketplace" />
+    <meta property="og:type" content="website"/>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="/frontend/css/style.css" />
+    <link rel="stylesheet" href="/frontend/css/product.css" />
+
+    <link rel="icon" type="image/png" href=https://res.cloudinary.com/dp4yririh/image/upload/v1781166637/LOGO_ja5rle.png>
+</head>
+<body>
+    <!-- Header injected by common.js -->
+    <div id="site-header"></div>
+    <main class="container">
+        <!-- Page heading + breadcrumb -->
+        <div class="page-head">
+            <nav class="breadcrumb" aria-label="Breadcrumb">
+                <a href="#">Home</a><span class="sep">/</span>
+                <span class="current">Products</span>
+            </nav>
+            <h1>Pharmaceutical Products</h1>
+            <p>Source verified, WHO-GMP certified </p>
+        </div>
+
+        <div class="shop-layout">
+            <!-- ===== STICKY FILTER SIDEBAR ===== -->
+            <aside class="sidebar" id="sidebar" aria-label="Product filters">
+                <div class="filter-card">
+                    <div class="filter-head">
+                        <h3>Filters</h3>
+                        <a href="#" class="reset-link" id="reset-top">Reset all</a>
+                    </div>
+
+                    <div class="filter-scroll">
+                        <!-- Search -->
+                        <div class="fgroup">
+                            <div class="flabel">Search Product</div>
+                            <div class="search-box" id="search-wrap"></div>
+                        </div>
+
+                        <!-- Category -->
+                        <div class="fgroup">
+                            <div class="flabel">Category</div>
+                            <div id="filter-category"></div>
+                        </div>
+
+                        <!-- Brand -->
+                        <div class="fgroup">
+                            <div class="flabel">Brand</div>
+                            <div id="filter-brand"></div>
+                        </div>
+
+                        <!-- Price -->
+                        <div class="fgroup">
+                            <div class="flabel">Price Range (₹)</div>
+                            <div class="price-inputs">
+                                <div class="pinput"><label>Min</label><input type="number" id="price-min" min="0" />
+                                </div>
+                                <span class="dash">—</span>
+                                <div class="pinput"><label>Max</label><input type="number" id="price-max" min="0" />
+                                </div>
+                            </div>
+                            <div class="range-wrap">
+                                <div class="range-track"></div>
+                                <div class="range-fill" id="range-fill"></div>
+                                <input type="range" id="range-lo" />
+                                <input type="range" id="range-hi" />
+                            </div>
+                            <div class="range-out"><span id="out-lo">₹0</span><span id="out-hi">₹0</span></div>
+                        </div>
+
+                        <!-- Stock -->
+                        <div class="fgroup">
+                            <div class="flabel">Stock Status</div>
+                            <div id="filter-stock"></div>
+                        </div>
+
+                        <!-- Rating -->
+                        <div class="fgroup">
+                            <div class="flabel">Customer Rating</div>
+                            <div id="filter-rating"></div>
+                        </div>
+                    </div>
+
+                    <div class="filter-actions">
+                        <button class="btn btn-ghost" id="clear-filters">Clear Filters</button>
+                        <button class="btn btn-primary" id="apply-filters">Apply Filters</button>
+                    </div>
+                </div>
+            </aside>
+            <!-- ===== PRODUCTS GRID ===== -->
+            <section>
+                <div class="results-head">
+                    <div class="count-txt"><b id="result-count">0</b> products found</div>
+                    <div class="results-tools">
+                        <button class="btn btn-ghost filter-toggle" id="open-filters" aria-label="Toggle filters">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+                            Filters
+                        </button>
+                        <select class="sort-select" id="sort-select" aria-label="Sort products">
+                            <option value="featured">Sort: Featured</option>
+                            <option value="price-asc">Price: Low to High</option>
+                            <option value="price-desc">Price: High to Low</option>
+                            <option value="rating">Top Rated</option>
+                            <option value="name">Name: A–Z</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="active-chips" id="active-chips"></div>
+
+                <div class="product-grid" id="product-grid" aria-live="polite"></div>
+            </section>
+        </div>
+
+        <div class="filter-backdrop" id="filter-backdrop"></div>
+    </main>
+
+    <!-- Footer injected by common.js -->
+    <div id="site-footer"></div>
+
+    <script src="/frontend/js/api.js"></script>
+    <script src="/frontend/js/data.js"></script>
+    <script src="/frontend/js/common.js"></script>
+    <script src="/frontend/js/product.js"></script>
+</body>
+</html>

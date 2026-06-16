@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- SEO (title/description are enriched by JS once the product loads) -->
+  <title>Fair Ford - Product Details</title>
+  <meta name="description" id="meta-desc" content="Detailed pharmaceutical product information: pricing, composition, specifications, distributor details and delivery." />
+  <meta property="og:type" content="product" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/frontend/css/style.css" />
+  <link rel="stylesheet" href="/frontend/css/product.css" />
+  <link rel="icon" type="image/png" href=https://res.cloudinary.com/dp4yririh/image/upload/v1781166637/LOGO_ja5rle.png>
+</head>
+
+<body>
+  <div id="site-header"></div>
+
+  <main class="container detail-wrap">
+    <!-- Loading skeleton (replaced once product resolves) -->
+    <div id="detail-skeleton">
+      <div class="sk sk-line w40" style="height:14px;max-width:320px;margin:20px 0"></div>
+      <div class="hero">
+        <div><div class="sk" style="aspect-ratio:1/1;border-radius:22px"></div>
+          <div style="display:flex;gap:12px;margin-top:14px">
+            <div class="sk" style="width:76px;height:76px;border-radius:13px"></div>
+            <div class="sk" style="width:76px;height:76px;border-radius:13px"></div>
+            <div class="sk" style="width:76px;height:76px;border-radius:13px"></div>
+          </div>
+        </div>
+        <div>
+          <div class="sk sk-line w40"></div>
+          <div class="sk sk-line w80" style="height:30px;margin-top:14px"></div>
+          <div class="sk sk-line w60"></div>
+          <div class="sk" style="height:120px;border-radius:18px;margin-top:22px"></div>
+          <div class="sk" style="height:200px;border-radius:18px;margin-top:18px"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rendered content target -->
+    <div id="detail-root" hidden></div>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <!-- Lightbox for image zoom -->
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true">
+    <div class="lb-inner" id="lb-inner">
+      <button class="lb-close" id="lb-close" aria-label="Close">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <script src="/frontend/js/api.js"></script>
+  <script src="/frontend/js/data.js"></script>
+  <script src="/frontend/js/common.js"></script>
+  <script src="/frontend/js/productdetail.js"></script>
+</body>
+</html>
