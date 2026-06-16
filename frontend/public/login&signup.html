@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fair Ford Pharmaceuticals — B2B Portal</title>
+  <link rel="stylesheet" href="/frontend/css/login&signup.css" />
+  <link rel="icon" type="image/png" href=https://res.cloudinary.com/dp4yririh/image/upload/v1781166637/LOGO_ja5rle.png>
+  
+  <link
+    href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap"
+    rel="stylesheet" />
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+    rel="stylesheet">
+
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet" />
+</head>
+
+<body>
+
+  <div class="page-wrap">
+
+    <!-- ────── LEFT PANEL ────── -->
+    <div class="left-panel">
+
+      <!-- India map (behind content) -->
+      <div class="india-map-wrap">
+        <img src=https://res.cloudinary.com/dp4yririh/image/upload/v1781167477/map_pbjiwr.png alt="India Network Map" class="india-map-img" />
+      </div>
+
+      <div class="brand">
+        <div class="brand-logo"><a href="index.html"><img src=https://res.cloudinary.com/dp4yririh/image/upload/v1781166637/LOGO_ja5rle.png alt="fair ford logo" width="50px"  height="50px"></a></div>
+        <div class="brand-text">
+          <span class="brand-name">Fair Ford Platform</span>
+          <span class="brand-sub">Pharma · EST. 2013</span>
+        </div>
+      </div>
+
+      <div class="hero-content">
+        <div class="hero-badge">
+          <div class="badge-dot"></div>   
+          India's #1 Pharma Commerce Ecosystem
+        </div>
+
+        <h1 class="hero-headline">
+          One Platform.<br />
+          <span class="grad">Every Healthcare</span><br />
+          Segment Connected.
+        </h1>
+        <div class="headline-bar"></div>
+        
+        <p class="hero-desc">
+          From manufacturers to patients — Fair Ford digitally unites distributors, stockists, retail chemists,
+          hospitals and institutions across India with real-time inventory, smart settlement & AI-powered analytics.
+        </p>
+
+        <div class="stat-row">
+          <div class="stat-item">
+            <i class="ri-group-line stat-icon"></i>
+            <div class="stat-val">700+</div>
+            <div class="stat-label">Distributors</div>
+          </div>
+          <div class="stat-item">
+            <i class="ri-store-line stat-icon"></i>
+            <div class="stat-val">100K+</div>
+            <div class="stat-label">Retailers</div>
+          </div>
+          <div class="stat-item">
+            <i class="ri-hospital-line stat-icon"></i>
+            <div class="stat-val">240+</div>
+            <div class="stat-label">Hospitals</div>
+          </div>
+          <div class="stat-item">
+            <i class="ri-user-line stat-icon"></i>
+            <div class="stat-val">1.2M+</div>
+            <div class="stat-label">Patients</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="left-footer">
+        <span>© 2025 Fair Ford Pharma</span>
+        <span class="sep">·</span>
+        <a href="#">Privacy Policy</a>
+        <span class="sep">·</span>
+        <a href="#">Terms of Use</a>
+        <span class="sep">·</span>
+        <a href="#">CDSCO Compliant</a>
+      </div>
+    </div>
+
+    <!-- ────── RIGHT PANEL ────── -->
+    <div class="right-panel">
+      <div class="form-container">
+
+        <div class="form-header">
+          <div id="contextTag" class="context-tag tag-dist"><i class="ri-shopping-bag-line"></i> DISTRIBUTOR / STOCKIST
+          </div>
+          <h2 class="form-title">Welcome back</h2>
+          <p class="form-subtitle">Sign in to access your Fair Ford dashboard and manage your operations.</p>
+        </div>
+
+        <!-- ROLE SELECTOR -->
+        <div class="role-selector">
+          <button class="role-btn active" onclick="selectRole(this,'dist')" id="role-dist">
+            <i class="ri-store-2-line role-icon"></i>
+            <span class="role-btn-label">Distributor /<br />Stockist</span>
+            <span class="role-btn-sub">Wholesale</span>
+          </button>
+          <button class="role-btn" onclick="selectRole(this,'ret')" id="role-ret">
+            <i class="ri-price-tag-3-line role-icon"></i>
+            <span class="role-btn-label">Retailer /<br />Chemist</span>
+            <span class="role-btn-sub">Pharmacy</span>
+          </button>
+          <button class="role-btn" onclick="selectRole(this,'hosp')" id="role-hosp">
+            <i class="ri-hospital-line role-icon"></i>
+            <span class="role-btn-label">Hospital /<br />Institution</span>
+            <span class="role-btn-sub">Bulk buyer</span>
+          </button>
+          <button class="role-btn" onclick="selectRole(this,'mfr')" id="role-mfr">
+            <i class="ri-building-2-line role-icon"></i>
+            <span class="role-btn-label">Manufacturer</span>
+            <span class="role-btn-sub">Brand</span>
+          </button>
+        </div>
+
+        <!-- FORM -->
+        <form id="authForm" onsubmit="handleLogin(event)">
+          <!-- Auth status message -->
+          <div id="authMessage" class="auth-msg" style="display:none;"></div>
+
+          <div class="field-group">
+            <label class="field-label">Email Address</label>
+            <div class="field-wrap">
+              <i class="ri-mail-line field-icon"></i>
+              <input type="email" id="email" placeholder="you@company.com" autocomplete="email" required />
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">Password</label>
+            <div class="field-wrap">
+              <i class="ri-lock-line field-icon"></i>
+              <input type="password" id="password" placeholder="••••••••••" autocomplete="current-password" required />
+              <button type="button" class="pw-toggle" onclick="togglePw()" data-visible="false">
+                <i class="ri-eye-line"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="row-2">
+            <label class="remember">
+              <input type="checkbox" id="rememberMe" /> Keep me signed in
+            </label>
+            <a href="#" class="forgot">Forgot password?</a>
+          </div>
+
+          <button type="submit" class="btn-signin" id="signinBtn">
+            Sign in as Distributor →
+          </button>
+        </form>
+
+        <div class="register-row">
+          New to Fair Ford? <a href="registration.html">Create Account →</a>
+        </div>
+
+        <div class="trust-row">
+          <div class="trust-item"><i class="ri-lock-2-line"></i> SSL Encrypted</div>
+          <div class="trust-item"><i class="ri-shield-check-line"></i> CDSCO Compliant</div>
+          <div class="trust-item"><i class="ri-verified-badge-line"></i> GST Verified</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Live badge -->
+  <div class="floaty">
+    <div class="floaty-dot"></div>
+    <div class="floaty-text"><strong>&nbsp; &nbsp;2,481</strong> orders processed today &nbsp;·&nbsp; ₹48.2L GMV</div>
+  </div>
+
+  <script src="/frontend/js/login&signup.js"></script>
+</body>
+
+</html>
