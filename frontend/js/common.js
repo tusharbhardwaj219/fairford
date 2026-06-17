@@ -456,7 +456,7 @@ function renderHeader(active) {
     <a href="uphaar.html" class="drawer-link drawer-link--promo">Uphaar<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></a>
     <div class="drawer-section-title">Account</div>
     <a href="#" class="drawer-link">Wishlist<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></a>
-    <a href="#" class="drawer-link">My Profile<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></a>
+    <a href="#" class="drawer-link" id="drawerProfileLink">My Profile<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></a>
   </nav>
   <div class="drawer-footer">
     <button class="drawer-cta" id="drawerLoginBtn" type="button" onclick="window.location.href='login&signup.html'">
@@ -538,6 +538,28 @@ function initHeader() {
   }
   logoutNav  && logoutNav.addEventListener('click', doLogout);
   logoutDraw && logoutDraw.addEventListener('click', doLogout);
+
+  // Account / profile button → role-based dashboard redirect
+  function goToDashboard() {
+    var userStr = localStorage.getItem('ff_user');
+    if (!userStr) { window.location.href = 'login&signup.html'; return; }
+    try {
+      var user = JSON.parse(userStr);
+      if (user.role === 'dist')     window.location.href = 'distributor.html';
+      else if (user.role === 'ret') window.location.href = 'retailer.html';
+      else                          window.location.href = 'index.html';
+    } catch (e) {
+      window.location.href = 'login&signup.html';
+    }
+  }
+
+  var accountBtn      = document.querySelector('[data-action="account"]');
+  var drawerProfileLink = document.getElementById('drawerProfileLink');
+  accountBtn      && accountBtn.addEventListener('click', goToDashboard);
+  drawerProfileLink && drawerProfileLink.addEventListener('click', function (e) {
+    e.preventDefault();
+    goToDashboard();
+  });
 
   // Sync cart/wishlist badge counts
   store.syncCounts();
@@ -742,7 +764,7 @@ function renderFooter() {
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20" style="flex-shrink:0;margin-top:3px"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
             <div>
               <p class="contact-label">Address</p>
-              <p class="contact-value" style="text-transform:lowercase;">KHEWAT NO-755, KHATON NO-782, M NO-139, KILA NO-28, VILLAGE ANANGPUR, FARIDABAD, HARYANA, 121003</p>
+              <p class="contact-value" style="text-transform:lowercase;">1st,2nd,3rd and 4th floors, Fair Ford Tower,Gali No-07, Main Road, Anangpur Village, Opposite Mount Kailash Factory, Faridabad- 121003 (Haryana)</p>
             </div>
           </div>
           <div class="contact-item">
