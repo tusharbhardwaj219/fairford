@@ -958,3 +958,26 @@ const welcomeMessages = [
 
 const randomIndex = Math.floor(Math.random() * welcomeMessages.length);
 console.log(`💡 Tip: ${welcomeMessages[randomIndex]}`);
+
+// Profile / account button → role-based dashboard redirect
+(function () {
+  function goToDashboard() {
+    var userStr = localStorage.getItem('ff_user');
+    if (!userStr) { window.location.href = 'login&signup.html'; return; }
+    try {
+      var user = JSON.parse(userStr);
+      if (user.role === 'dist')     window.location.href = 'distributor.html';
+      else if (user.role === 'ret') window.location.href = 'retailer.html';
+      else                          window.location.href = 'index.html';
+    } catch (e) { window.location.href = 'login&signup.html'; }
+  }
+  function wire() {
+    var accountBtn = document.querySelector('[data-action="account"]');
+    var drawerLink = document.getElementById('drawerProfileLink');
+    accountBtn && accountBtn.addEventListener('click', goToDashboard);
+    drawerLink && drawerLink.addEventListener('click', function (e) { e.preventDefault(); goToDashboard(); });
+  }
+  document.readyState === 'loading'
+    ? document.addEventListener('DOMContentLoaded', wire)
+    : wire();
+})();

@@ -107,7 +107,7 @@ async function handleLogin(e) {
     btn.style.boxShadow  = '0 4px 22px rgba(18,184,134,0.45)';
 
     setTimeout(function () {
-      window.location.replace(getPostLoginRedirect());
+      window.location.replace(data.redirectTo || getPostLoginRedirect());
     }, 600);
 
   } catch (err) {
