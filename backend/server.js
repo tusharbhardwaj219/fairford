@@ -118,18 +118,27 @@ app.get('/api/health', (req, res) => {
 });
 
 // Import Route Controllers
-const authRoutes       = require('./routes/authRoutes');
-const newsletterRoutes = require('./routes/newsletter');
-const productRoutes    = require('./routes/productRoutes');
-const categoryRoutes   = require('./routes/categoryRoutes');
-const contactRoutes    = require('./routes/contactRoutes');
+const authRoutes         = require('./routes/authRoutes');
+const newsletterRoutes   = require('./routes/newsletter');
+const productRoutes      = require('./routes/productRoutes');
+const categoryRoutes     = require('./routes/categoryRoutes');
+const contactRoutes      = require('./routes/contactRoutes');
+const distributorRoutes  = require('./routes/distributorRoutes');
+const retailerRoutes     = require('./routes/retailerRoutes');
+const dashboardApiRoutes = require('./routes/dashboardApiRoutes');
 
 // Mount Routes
-app.use('/api/auth',       authLimiter, authRoutes);
-app.use('/api/newsletter', newsletterRoutes);
-app.use('/api/products',   productRoutes);
-app.use('/api/categories', categoryRoutes);
-app.use('/api/contact',    contactRoutes);
+// Dashboard panel routes must come BEFORE product/retailer routers so that
+// specific paths like /api/products/top and /api/retailer (root) are matched
+// first; unmatched paths fall through to the existing routers.
+app.use('/api',             dashboardApiRoutes);
+app.use('/api/auth',        authLimiter, authRoutes);
+app.use('/api/newsletter',  newsletterRoutes);
+app.use('/api/products',    productRoutes);
+app.use('/api/categories',  categoryRoutes);
+app.use('/api/contact',     contactRoutes);
+app.use('/api/distributor', distributorRoutes);
+app.use('/api/retailer',    retailerRoutes);
 
 // ============ STATIC FILES ============
 

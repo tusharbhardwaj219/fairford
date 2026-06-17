@@ -53,11 +53,16 @@ const login = async (req, res) => {
 
     const token = generateToken({ id: user._id, email: user.email, role: user.role });
 
+    const redirectTo = user.role === 'dist' ? '/distributor.html'
+                     : user.role === 'ret'  ? '/retailer.html'
+                     : '/index.html';
+
     return res.status(200).json({
       success: true,
       message: 'Login successful',
       token,
-      user: user.toSafe()
+      user: user.toSafe(),
+      redirectTo
     });
   } catch (err) {
     console.error('[login]', err);
