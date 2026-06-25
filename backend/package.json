@@ -1,16 +1,19 @@
 {
-  "name": "homepage",
-  "version": "1.0.0",
-  "description": "",
+  "name": "fairford-pharma-backend",
+  "version": "2.0.0",
+  "description": "Fair Ford Pharmaceuticals B2B Platform Backend",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "nodemon server.js",
+    "seed": "node seed.js",
+    "seed:fresh": "node seed.js --fresh",
+    "set-admin": "node setAdmin.js"
   },
+  "type": "commonjs",
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
   "dependencies": {
     "bcryptjs": "^3.0.3",
     "cloudinary": "^1.41.3",
@@ -22,18 +25,17 @@
     "express-mongo-sanitize": "^2.2.0",
     "express-rate-limit": "^8.5.2",
     "express-validator": "^7.3.2",
-    "fs": "^0.0.1-security",
     "helmet": "^8.2.0",
     "jsonwebtoken": "^9.0.3",
-    "mangodb": "^1.0.0",
-    "mongodb": "^7.2.0",
     "mongoose": "^9.6.3",
     "multer": "^2.1.1",
     "multer-storage-cloudinary": "^4.0.0",
     "nodemailer": "^8.0.10",
-    "path": "^0.12.7",
     "slugify": "^1.6.9",
     "swagger-jsdoc": "^6.3.0",
     "swagger-ui-express": "^5.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.0"
   }
 }

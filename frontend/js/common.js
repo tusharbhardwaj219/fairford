@@ -545,8 +545,7 @@ function initHeader() {
     if (!userStr) { window.location.href = 'login&signup.html'; return; }
     try {
       var user = JSON.parse(userStr);
-      if (user.role === 'dist')     window.location.href = 'distributor.html';
-      else if (user.role === 'ret') window.location.href = 'retailer.html';
+      if (user.role === 'ret')      window.location.href = 'retailer.html';
       else                          window.location.href = 'index.html';
     } catch (e) {
       window.location.href = 'login&signup.html';
@@ -675,9 +674,21 @@ function initPanels() {
     if (!isNaN(v)) store.updateCartQty(inp.getAttribute('data-qid'), v);
   });
 
-  // Cart foot — checkout button
+  // Cart foot — checkout button. Ordering happens on the retailer page, which
+  // shares the same 'ff_cart' so the cart carries over. Guests are sent to login.
   document.getElementById('ff-cart-foot').addEventListener('click', function(e) {
-    if (e.target.closest('.fbtn-checkout')) toast('Checkout coming soon!');
+    if (!e.target.closest('.fbtn-checkout')) return;
+    var token   = localStorage.getItem('ff_token');
+    var userStr = localStorage.getItem('ff_user');
+    if (token && userStr) {
+      try {
+        var u = JSON.parse(userStr);
+        if (u.role === 'ret') { window.location.href = 'retailer.html'; return; }
+      } catch (err) {}
+    }
+    localStorage.setItem('ff_redirect', 'retailer.html');
+    toast('Please sign in as a retailer to place an order.');
+    setTimeout(function () { window.location.href = 'login&signup.html'; }, 900);
   });
 
   // Wishlist body — move to cart + remove (event delegation)

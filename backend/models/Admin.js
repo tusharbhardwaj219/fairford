@@ -39,6 +39,16 @@ const adminSchema = new mongoose.Schema(
     lastLogin: {
       type: Date,
       default: null
+    },
+    // Security: Track failed login attempts for brute force protection
+    loginAttempts: {
+      type: Number,
+      default: 0
+    },
+    // Lock account until this timestamp (brute force protection)
+    lockUntil: {
+      type: Date,
+      default: null
     }
   },
   {
@@ -47,22 +57,51 @@ const adminSchema = new mongoose.Schema(
 );
 
 // Hash password before saving
-adminSchema.pre('save', async function (next) {
+adminSchema.pre('save', async function () {
   // Only hash if password is modified
-  if (!this.isModified('password')) return next();
-
-  try {
-    const salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt);
-    next();
-  } catch (error) {
-    next(error);
-  }
+  if (!this.isModified('password')) return;
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
 });
 
-// Method to compare password
+/**
+ * Method to compare password
+ */
 adminSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
+};
+
+/**
+ * Check if account is locked due to failed login attempts
+ * @returns {boolean} true if account is locked
+ */
+adminSchema.methods.isLocked = function () {
+  return this.lockUntil && this.lockUntil > new Date();
+};
+
+/**
+ * Record a failed login attempt
+ * Lock account after 5 failed attempts for 30 minutes
+ */
+adminSchema.methods.recordFailedLogin = async function () {
+  this.loginAttempts += 1;
+
+  // Lock account after 5 failed attempts
+  if (this.loginAttempts >= 5) {
+    // Lock for 30 minutes
+    this.lockUntil = new Date(Date.now() + 30 * 60 * 1000);
+  }
+
+  return this.save({ validateBeforeSave: false });
+};
+
+/**
+ * Reset login attempts on successful login
+ */
+adminSchema.methods.resetLoginAttempts = async function () {
+  this.loginAttempts = 0;
+  this.lockUntil = null;
+  return this.save({ validateBeforeSave: false });
 };
 
 module.exports = mongoose.model('Admin', adminSchema);

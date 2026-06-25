@@ -1,12 +1,14 @@
 const router = require('express').Router();
-const { getDashboard, getProfile, updateProfile, getProducts } = require('../controllers/retailerController');
+const { getProfile, updateProfile, getProducts } = require('../controllers/retailerController');
 const { verifyToken, authorizeRoles } = require('../middleware/authMiddleware');
 
-const retOnly = [verifyToken, authorizeRoles('ret')];
+// Profile + product browsing are allowed before KYC activation so a retailer can
+// complete their shop address while pending. Ordering itself is gated by
+// requireActive on POST /api/orders.
+const retAuth = [verifyToken, authorizeRoles('ret')];
 
-router.get('/dashboard', ...retOnly, getDashboard);
-router.get('/profile',   ...retOnly, getProfile);
-router.put('/profile',   ...retOnly, updateProfile);
-router.get('/products',  ...retOnly, getProducts);
+router.get('/profile',  ...retAuth, getProfile);
+router.put('/profile',  ...retAuth, updateProfile);
+router.get('/products', ...retAuth, getProducts);
 
 module.exports = router;

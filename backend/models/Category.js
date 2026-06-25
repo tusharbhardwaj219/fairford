@@ -47,11 +47,10 @@ const categorySchema = new mongoose.Schema(
 );
 
 // Create slug from category name before saving
-categorySchema.pre('save', function (next) {
+categorySchema.pre('save', function () {
   if (this.isModified('categoryName')) {
     this.categorySlug = slugify(this.categoryName, { lower: true });
   }
-  next();
 });
 
 // Static method to get active categories
