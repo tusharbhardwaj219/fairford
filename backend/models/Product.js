@@ -151,7 +151,7 @@ const productSchema = new mongoose.Schema(
   }
 );
 
-productSchema.pre('save', function (next) {
+productSchema.pre('save', function () {
   if (this.isModified('name')) {
     this.slug = slugify(this.name, { lower: true });
   }
@@ -162,13 +162,11 @@ productSchema.pre('save', function (next) {
   } else {
     this.stockStatus = 'In Stock';
   }
-  next();
 });
 
-productSchema.pre(/^find/, function (next) {
-  if (this.options._recursed) return next();
+productSchema.pre(/^find/, function () {
+  if (this.options._recursed) return;
   this.populate({ path: 'category', select: 'categoryName categorySlug' });
-  next();
 });
 
 productSchema.statics.getFeaturedProducts = function (limit = 8) {
