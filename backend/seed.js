@@ -10,8 +10,11 @@ const Order               = require('./models/Order');
 const Scheme              = require('./models/Scheme');
 const Admin               = require('./models/Admin');
 const WalletTransaction   = require('./models/WalletTransaction');
+<<<<<<< HEAD
 const DistributorDispatch = require('./models/DistributorDispatch');
 const DistributorReturn   = require('./models/DistributorReturn');
+=======
+>>>>>>> 1c0e9db7d24427e2c280575a9120a80d6904ac37
 
 const FRESH = process.argv.includes('--fresh');
 
@@ -101,8 +104,11 @@ async function seed() {
       Scheme.deleteMany({}),
       Admin.deleteMany({}),
       WalletTransaction.deleteMany({}),
+<<<<<<< HEAD
       DistributorDispatch.deleteMany({}),
       DistributorReturn.deleteMany({}),
+=======
+>>>>>>> 1c0e9db7d24427e2c280575a9120a80d6904ac37
     ]);
     console.log('✓   Collections cleared\n');
   }
@@ -276,6 +282,7 @@ async function seed() {
   await WalletTransaction.insertMany(txns);
   console.log(`✓  (${txns.length})`);
 
+<<<<<<< HEAD
   // ── Distributor Dispatches ─────────────────────────────────────────────────
   process.stdout.write('    Dispatches …          ');
   const p = prodDocs; // shorthand
@@ -324,6 +331,8 @@ async function seed() {
     console.log(`✓  (skipped — already seeded; use --fresh to reset)`);
   }
 
+=======
+>>>>>>> 1c0e9db7d24427e2c280575a9120a80d6904ac37
   // ── Summary ────────────────────────────────────────────────────────────────
   console.log('\n' + '─'.repeat(42));
   console.log('✅  Seed complete!\n');
@@ -335,8 +344,11 @@ async function seed() {
   console.log('  Schemes             :', schemeDocs.length);
   console.log('  Admin               :', 1);
   console.log('  Wallet transactions :', txns.length);
+<<<<<<< HEAD
   console.log('  Dispatches          :', dispatchDocs.length);
   console.log('  Returns             :', returnDocs.length);
+=======
+>>>>>>> 1c0e9db7d24427e2c280575a9120a80d6904ac37
   console.log('\n  Login credentials');
   console.log('  ─────────────────────────────────────────');
   console.log('  Admin        admin@medibridge.in   / Admin@2024');
