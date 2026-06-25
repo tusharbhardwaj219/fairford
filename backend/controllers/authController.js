@@ -1,116 +1,256 @@
-const bcrypt     = require('bcryptjs');
-const User        = require('../models/User');
-const Distributor = require('../models/Distributor');
-const Retailer    = require('../models/Retailer');
-const cloudinary  = require('../config/cloudinary');
-const { generateToken } = require('../config/jwt');
+const bcrypt           = require('bcryptjs');
+const jwt              = require('jsonwebtoken');
+const Distributor      = require('../models/Distributor');
+const Retailer         = require('../models/Retailer');
+const Admin            = require('../models/Admin');
+const cloudinary       = require('../config/cloudinary');
+const generateToken    = require('../utils/generateToken');
+const { addToBlacklist } = require('../utils/tokenBlacklist');
 
-// Returns the right Mongoose model for the given role
+/**
+ * Get appropriate model based on user role
+ */
 function modelForRole(role) {
-  if (role === 'dist') return Distributor;
-  if (role === 'ret')  return Retailer;
-  return User; // hosp, mfr, or unknown → general users collection
+  if (role === 'dist')  return Distributor;
+  if (role === 'ret')   return Retailer;
+  if (role === 'admin') return Admin;
+  return null;
 }
 
-// ── POST /api/auth/signup ─────────────────────────────────────────────────────
-const signup = async (req, res) => {
+/**
+ * POST /api/auth/signup
+ * Register a new user (distributor or retailer)
+ * Validation is done in middleware (validateSignup)
+ */
+const signup = async (req, res, next) => {
   try {
-    const { name, email, password, role } = req.body;
+    const { name, email, password, role, phone } = req.body;
+
+    // Only retailers self-register. Distributors/stockists are onboarded by an admin.
+    if (role !== 'ret') {
+      return res.status(400).json({
+        success: false,
+        message: 'Self sign-up is available for retailers only.'
+      });
+    }
+
+    // Get appropriate model for role
     const Model = modelForRole(role);
+    if (!Model) {
+      return res.status(400).json({ success: false, message: 'Invalid role' });
+    }
 
-    if (await Model.findOne({ email: email.toLowerCase() }))
-      return res.status(409).json({ success: false, message: 'Email is already registered' });
+    // Check if email already registered
+    const existingUser = await Model.findOne({ email: email.toLowerCase() });
+    if (existingUser) {
+      return res.status(409).json({
+        success: false,
+        message: 'Email is already registered'
+      });
+    }
 
-    const hashed  = await bcrypt.hash(password, 10);
-    const newUser = await Model.create({ name, email, password: hashed, role });
-    const token   = generateToken({ id: newUser._id, email: newUser.email, role: newUser.role });
+    // Prepare user data
+    const userData = {
+      name: name.trim(),
+      email: email.toLowerCase(),
+      password,
+      role,
+      phone
+    };
+
+    // Retailers are no longer tied to a single distributor — each order is routed
+    // to the nearest serviceable distributor/stockist at checkout (routingService).
+
+    // Create user
+    const newUser = await Model.create(userData);
+
+    // Generate token
+    const token = generateToken(newUser._id, newUser.role);
 
     return res.status(201).json({
       success: true,
-      message: 'Account created successfully',
+      message: 'Account created successfully. Awaiting KYC approval.',
       token,
-      user: newUser.toSafe()
+      user: newUser.toSafe ? newUser.toSafe() : { _id: newUser._id, name: newUser.name, email: newUser.email, role: newUser.role }
     });
   } catch (err) {
-    console.error('[signup]', err);
-    return res.status(500).json({ success: false, message: 'Internal server error' });
+    console.error('[auth:signup]', err);
+    next(err);
   }
 };
 
-// ── POST /api/auth/login ──────────────────────────────────────────────────────
-const login = async (req, res) => {
+/**
+ * POST /api/auth/login
+ * Authenticate user and return JWT token
+ * Includes brute force protection with account lockout after failed attempts
+ */
+const login = async (req, res, next) => {
   try {
-    const { email, password, role } = req.body;
-    const Model = modelForRole(role);
+    const { email, password } = req.body;
+    const normalizedEmail = (email || '').toLowerCase().trim();
 
-    const user = await Model.findOne({ email: email.toLowerCase() });
-    if (!user)
-      return res.status(401).json({ success: false, message: 'Invalid email or password' });
+    // Role-agnostic lookup: find the account by email across all identity
+    // collections so a single login form works for retailers and admins alike.
+    // Any `role` sent by the client is only a hint and is not required.
+    let user = null;
+    for (const Model of [Retailer, Admin, Distributor]) {
+      user = await Model.findOne({ email: normalizedEmail }).select('+password');
+      if (user) break;
+    }
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid email or password'
+      });
+    }
 
-    const match = await bcrypt.compare(password, user.password);
-    if (!match)
-      return res.status(401).json({ success: false, message: 'Invalid email or password' });
+    // Check if account is locked due to failed login attempts
+    if (user.isLocked && user.isLocked()) {
+      const lockTimeRemaining = Math.ceil((user.lockUntil - new Date()) / 60000); // minutes
+      return res.status(429).json({
+        success: false,
+        message: `Account temporarily locked due to multiple failed login attempts. Please try again in ${lockTimeRemaining} minutes.`
+      });
+    }
 
-    const token = generateToken({ id: user._id, email: user.email, role: user.role });
+    // Verify password
+    const isPasswordMatch = await bcrypt.compare(password, user.password);
+    if (!isPasswordMatch) {
+      // Record failed login attempt
+      if (user.recordFailedLogin) {
+        await user.recordFailedLogin();
+      }
 
-    const redirectTo = user.role === 'dist' ? '/distributor.html'
-                     : user.role === 'ret'  ? '/retailer.html'
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid email or password'
+      });
+    }
+
+    // Password is correct - reset login attempts
+    if (user.resetLoginAttempts) {
+      await user.resetLoginAttempts();
+    }
+
+    // Update last login timestamp
+    user.lastLogin = new Date();
+    await user.save({ validateBeforeSave: false });
+
+    // Generate token
+    const token = generateToken(user._id, user.role);
+
+    // Determine redirect URL based on role. Distributors no longer have a dashboard.
+    const redirectTo = user.role === 'ret' ? '/retailer.html'
+                     : (user.role === 'admin' || user.role === 'superadmin') ? '/superadmin.html'
                      : '/index.html';
 
     return res.status(200).json({
       success: true,
       message: 'Login successful',
       token,
-      user: user.toSafe(),
+      user: user.toSafe ? user.toSafe() : { _id: user._id, name: user.name, email: user.email, role: user.role },
       redirectTo
     });
   } catch (err) {
-    console.error('[login]', err);
-    return res.status(500).json({ success: false, message: 'Internal server error' });
+    console.error('[auth:login]', err);
+    next(err);
   }
 };
 
-// ── GET /api/auth/profile (protected) ────────────────────────────────────────
-const getProfile = async (req, res) => {
+/**
+ * GET /api/auth/profile
+ * Get current authenticated user profile
+ */
+const getProfile = async (req, res, next) => {
   try {
     const Model = modelForRole(req.user.role);
-    const user  = await Model.findById(req.user.id);
-    if (!user)
-      return res.status(404).json({ success: false, message: 'User not found' });
+    if (!Model) {
+      return res.status(400).json({ success: false, message: 'Invalid role' });
+    }
 
-    return res.status(200).json({ success: true, user: user.toSafe() });
+    const user = await Model.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    return res.status(200).json({
+      success: true,
+      user: user.toSafe ? user.toSafe() : user
+    });
   } catch (err) {
-    console.error('[profile]', err);
-    return res.status(500).json({ success: false, message: 'Internal server error' });
+    console.error('[auth:profile]', err);
+    next(err);
   }
 };
 
-// ── POST /api/auth/logout ─────────────────────────────────────────────────────
-const logout = (_req, res) =>
-  res.status(200).json({ success: true, message: 'Logged out successfully' });
+/**
+ * POST /api/auth/logout
+ * Logout user by invalidating their token
+ * Token is added to blacklist so it cannot be reused
+ */
+const logout = (req, res, next) => {
+  try {
+    // Get token from authorization header
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const token = authHeader.split(' ')[1];
 
-// ── PUT /api/auth/profile/image (protected) ───────────────────────────────────
-const updateProfileImage = async (req, res) => {
+      // Decode token to get expiration time
+      try {
+        const decoded = jwt.decode(token);
+        if (decoded && decoded.exp) {
+          // Add token to blacklist with its expiration time
+          const expiresAt = new Date(decoded.exp * 1000);
+          addToBlacklist(token, expiresAt);
+        }
+      } catch (decodeErr) {
+        console.warn('[auth:logout] Could not decode token:', decodeErr.message);
+      }
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'Logged out successfully'
+    });
+  } catch (err) {
+    console.error('[auth:logout]', err);
+    next(err);
+  }
+};
+
+/**
+ * PUT /api/auth/profile/image
+ * Update user profile image
+ */
+const updateProfileImage = async (req, res, next) => {
   try {
     if (!req.file) {
-      return res.status(400).json({ success: false, message: 'No image file provided' });
+      return res.status(400).json({
+        success: false,
+        message: 'No image file provided'
+      });
     }
 
-    // Only User model stores profileImage; Distributor/Retailer are plain schemas
     const Model = modelForRole(req.user.role);
-    const user  = await Model.findById(req.user.id);
+    const user = await Model.findById(req.user.id);
+
     if (!user) {
+      // Clean up uploaded file if user not found
       await cloudinary.uploader.destroy(req.file.filename).catch(() => {});
-      return res.status(404).json({ success: false, message: 'User not found' });
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
     }
 
-    // Delete old profile image from Cloudinary if it exists
+    // Remove old profile image from Cloudinary if exists
     if (user.profileImage && user.profileImage.public_id) {
       await cloudinary.uploader.destroy(user.profileImage.public_id).catch(() => {});
     }
 
+    // Update profile image
     user.profileImage = {
-      url:       req.file.path,
+      url: req.file.path,
       public_id: req.file.filename
     };
     await user.save();
@@ -118,17 +258,15 @@ const updateProfileImage = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: 'Profile image updated successfully',
-      data: {
-        url:       user.profileImage.url,
-        public_id: user.profileImage.public_id
-      }
+      data: user.profileImage
     });
   } catch (err) {
+    // Clean up uploaded file on error
     if (req.file) {
       await cloudinary.uploader.destroy(req.file.filename).catch(() => {});
     }
-    console.error('[updateProfileImage]', err);
-    return res.status(500).json({ success: false, message: 'Internal server error' });
+    console.error('[auth:updateProfileImage]', err);
+    next(err);
   }
 };
 
