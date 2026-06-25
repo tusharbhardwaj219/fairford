@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Distributor Inventory — Fair Ford Pharmaceuticals</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/frontend/css/distributor-inventory.css">
+</head>
+<body>
+
+<!-- Page Loader -->
+<div id="pageLoader">
+  <div class="loader-logo">
+    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
+  </div>
+  <div class="loader-spinner"></div>
+  <span class="loader-text">Loading Inventory Dashboard…</span>
+</div>
+
+<!-- Toast Container -->
+<div id="toastContainer"></div>
+
+<!-- ═══════════════════ HEADER ═══════════════════ -->
+<header class="header">
+  <div class="header-left">
+    <img src="LOGO.png" alt="Fair Ford" class="header-logo" onerror="this.style.display='none'">
+    <div class="header-title">
+      <h1>Distributor Inventory Dashboard</h1>
+      <p>Track product dispatch &amp; returns between company and distributors</p>
+    </div>
+  </div>
+  <div class="header-right">
+    <a href="/superadmin.html" class="btn btn-ghost btn-sm">← Admin Panel</a>
+    <div class="header-user">
+      <div class="header-avatar" id="adminAvatar">A</div>
+      <span class="header-user-name" id="adminName">Admin</span>
+    </div>
+    <button class="btn btn-outline btn-sm" onclick="handleLogout()">Logout</button>
+  </div>
+</header>
+
+<!-- ═══════════════════ TAB NAVIGATION ═══════════════════ -->
+<nav class="tab-nav">
+  <button class="tab-btn active" data-tab="overview">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+    Overview
+  </button>
+  <button class="tab-btn" data-tab="inventory">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+    Inventory
+  </button>
+  <button class="tab-btn" data-tab="dispatches">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    Dispatches
+  </button>
+  <button class="tab-btn" data-tab="returns">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg>
+    Returns
+  </button>
+</nav>
+
+<!-- ═══════════════════ MAIN CONTENT ═══════════════════ -->
+<main class="main-content">
+
+  <!-- ────────── OVERVIEW TAB ────────── -->
+  <section id="tab-overview" class="tab-panel active">
+
+    <!-- KPI Cards -->
+    <div class="kpi-grid" id="kpiGrid">
+      <div class="kpi-card kpi-blue"><div class="skeleton skel-kpi"></div></div>
+      <div class="kpi-card kpi-teal"><div class="skeleton skel-kpi"></div></div>
+      <div class="kpi-card kpi-orange"><div class="skeleton skel-kpi"></div></div>
+      <div class="kpi-card kpi-purple"><div class="skeleton skel-kpi"></div></div>
+    </div>
+
+    <!-- Stats + Notifications -->
+    <div class="stats-grid">
+      <!-- Top Dispatches (quick-view) -->
+      <div>
+        <div class="section-hdr">
+          <div><h2>Recent Dispatches</h2><p>Last 5 dispatch records</p></div>
+          <button class="btn btn-outline btn-sm" onclick="switchTab('dispatches')">View All</button>
+        </div>
+        <div class="table-card" id="recentDispatchesCard">
+          <div class="table-wrapper">
+            <table>
+              <thead><tr>
+                <th>Product</th>
+                <th>Distributor</th>
+                <th>Invoice</th>
+                <th>Qty Sent</th>
+                <th>Date</th>
+              </tr></thead>
+              <tbody id="recentDispatchesTbody">
+                <tr><td colspan="5"><div class="skeleton skel-row"></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notifications -->
+      <div>
+        <div class="section-hdr">
+          <div><h2>Alerts &amp; Notifications</h2><p>Stock alerts and activity</p></div>
+          <span class="notif-count" id="notifCount">0</span>
+        </div>
+        <div class="notif-panel">
+          <div class="notif-list" id="notifList">
+            <div class="notif-item"><div class="skeleton skel-row" style="width:100%;height:40px"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ────────── INVENTORY TAB ────────── -->
+  <section id="tab-inventory" class="tab-panel">
+
+    <div class="section-hdr">
+      <div>
+        <h2>Inventory Overview</h2>
+        <p>Remaining stock = Total Dispatched − Total Returned (Approved)</p>
+      </div>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="filter-bar">
+      <div class="search-wrap">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        <input type="text" class="filter-input" id="invSearch" placeholder="Search product, batch, distributor…">
+      </div>
+      <select class="filter-select" id="invDistFilter">
+        <option value="">All Distributors</option>
+      </select>
+      <div class="filter-chips">
+        <button class="chip active" data-status="">All</button>
+        <button class="chip" data-status="in-stock">In Stock</button>
+        <button class="chip" data-status="low-stock">Low Stock</button>
+        <button class="chip" data-status="no-stock">No Stock</button>
+      </div>
+      <button class="btn-clear-filter" onclick="clearInvFilters()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        Clear
+      </button>
+    </div>
+
+    <!-- Action Bar -->
+    <div class="action-bar">
+      <span class="result-count" id="invResultCount"><strong>0</strong> records</span>
+      <div class="export-btns">
+        <button class="btn btn-ghost btn-sm" onclick="exportCSV()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          CSV
+        </button>
+        <button class="btn btn-ghost btn-sm" onclick="exportExcel()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Excel
+        </button>
+        <button class="btn btn-ghost btn-sm" onclick="window.print()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+          Print
+        </button>
+      </div>
+    </div>
+
+    <!-- Inventory Table -->
+    <div class="table-card">
+      <div class="table-wrapper">
+        <table id="inventoryTable">
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Batch No.</th>
+              <th>Distributor</th>
+              <th>Sent Qty</th>
+              <th>Returned Qty</th>
+              <th>Remaining Qty</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="inventoryTbody">
+            <tr><td colspan="8"><div class="skeleton skel-row"></div></td></tr>
+            <tr><td colspan="8"><div class="skeleton skel-row"></div></td></tr>
+            <tr><td colspan="8"><div class="skeleton skel-row"></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="pagination-bar" id="invPagination"></div>
+    </div>
+  </section>
+
+  <!-- ────────── DISPATCHES TAB ────────── -->
+  <section id="tab-dispatches" class="tab-panel">
+
+    <div class="section-hdr">
+      <div><h2>Dispatch Records</h2><p>Products sent from company to distributors</p></div>
+      <button class="btn btn-primary" onclick="openDispatchModal()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Add Dispatch
+      </button>
+    </div>
+
+    <!-- Filter Bar for Dispatches -->
+    <div class="filter-bar">
+      <div class="search-wrap">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        <input type="text" class="filter-input" id="dispSearch" placeholder="Search product, invoice, batch…">
+      </div>
+      <select class="filter-select" id="dispDistFilter">
+        <option value="">All Distributors</option>
+      </select>
+      <div class="filter-date-group">
+        <span>From</span>
+        <input type="date" class="date-input" id="dispDateFrom">
+        <span>To</span>
+        <input type="date" class="date-input" id="dispDateTo">
+      </div>
+    </div>
+
+    <div class="table-card">
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Distributor</th>
+              <th>Invoice No.</th>
+              <th>Batch No.</th>
+              <th>Qty Sent</th>
+              <th>Dispatch Date</th>
+              <th>Remarks</th>
+            </tr>
+          </thead>
+          <tbody id="dispatchesTbody">
+            <tr><td colspan="7"><div class="skeleton skel-row"></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="pagination-bar" id="dispPagination"></div>
+    </div>
+  </section>
+
+  <!-- ────────── RETURNS TAB ────────── -->
+  <section id="tab-returns" class="tab-panel">
+
+    <div class="section-hdr">
+      <div><h2>Return Records</h2><p>Products returned by distributors to company</p></div>
+      <button class="btn btn-primary" onclick="openReturnModal()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Add Return
+      </button>
+    </div>
+
+    <!-- Filter Bar for Returns -->
+    <div class="filter-bar">
+      <div class="search-wrap">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        <input type="text" class="filter-input" id="retSearch" placeholder="Search product, batch, distributor…">
+      </div>
+      <select class="filter-select" id="retDistFilter">
+        <option value="">All Distributors</option>
+      </select>
+      <select class="filter-select" id="retStatusFilter">
+        <option value="">All Statuses</option>
+        <option value="Pending">Pending</option>
+        <option value="Approved">Approved</option>
+        <option value="Rejected">Rejected</option>
+      </select>
+      <div class="filter-date-group">
+        <span>From</span>
+        <input type="date" class="date-input" id="retDateFrom">
+        <span>To</span>
+        <input type="date" class="date-input" id="retDateTo">
+      </div>
+    </div>
+
+    <div class="table-card">
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Distributor</th>
+              <th>Batch No.</th>
+              <th>Qty Returned</th>
+              <th>Return Reason</th>
+              <th>Return Date</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="returnsTbody">
+            <tr><td colspan="8"><div class="skeleton skel-row"></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="pagination-bar" id="retPagination"></div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ═══════════════════ PRODUCT DETAIL DRAWER ═══════════════════ -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+<aside class="drawer" id="productDrawer" role="dialog" aria-modal="true">
+  <div class="drawer-hdr">
+    <h2>Product Detail</h2>
+    <button class="drawer-close" onclick="closeDrawer()" aria-label="Close">✕</button>
+  </div>
+  <div class="drawer-body" id="drawerBody">
+    <div class="empty-state">
+      <div class="empty-icon">📦</div>
+      <h3>Loading…</h3>
+    </div>
+  </div>
+</aside>
+
+<!-- ═══════════════════ ADD DISPATCH MODAL ═══════════════════ -->
+<div class="modal-overlay" id="dispatchModal">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="dispatchModalTitle">
+    <div class="modal-hdr">
+      <h2>
+        <span class="modal-icon blue">📤</span>
+        <span id="dispatchModalTitle">Add Dispatch Record</span>
+      </h2>
+      <button class="drawer-close" onclick="closeDispatchModal()">✕</button>
+    </div>
+    <form class="modal-body" id="dispatchForm" onsubmit="submitDispatch(event)">
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="dDistributor">Distributor <span class="req">*</span></label>
+          <select class="form-control" id="dDistributor" required>
+            <option value="">Select distributor…</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="dProduct">Product <span class="req">*</span></label>
+          <select class="form-control" id="dProduct" required>
+            <option value="">Select product…</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="dBatch">Batch Number <span class="req">*</span></label>
+          <input type="text" class="form-control" id="dBatch" placeholder="e.g. B001" required>
+        </div>
+        <div class="form-group">
+          <label for="dQty">Quantity Sent <span class="req">*</span></label>
+          <input type="number" class="form-control" id="dQty" placeholder="e.g. 300" min="1" required>
+        </div>
+        <div class="form-group">
+          <label for="dInvoice">Invoice Number <span class="req">*</span></label>
+          <input type="text" class="form-control" id="dInvoice" placeholder="e.g. INV-001" required>
+        </div>
+        <div class="form-group">
+          <label for="dDate">Dispatch Date <span class="req">*</span></label>
+          <input type="date" class="form-control" id="dDate" required>
+        </div>
+        <div class="form-group form-col-2">
+          <label for="dRemarks">Remarks</label>
+          <textarea class="form-control" id="dRemarks" placeholder="Optional notes…" rows="2"></textarea>
+        </div>
+      </div>
+    </form>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeDispatchModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="submitDispatch(event)" id="dispatchSubmitBtn">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Save Dispatch
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ ADD RETURN MODAL ═══════════════════ -->
+<div class="modal-overlay" id="returnModal">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="returnModalTitle">
+    <div class="modal-hdr">
+      <h2>
+        <span class="modal-icon orange">↩️</span>
+        <span id="returnModalTitle">Add Return Record</span>
+      </h2>
+      <button class="drawer-close" onclick="closeReturnModal()">✕</button>
+    </div>
+    <form class="modal-body" id="returnForm" onsubmit="submitReturn(event)">
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="rDistributor">Distributor <span class="req">*</span></label>
+          <select class="form-control" id="rDistributor" required>
+            <option value="">Select distributor…</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="rProduct">Product <span class="req">*</span></label>
+          <select class="form-control" id="rProduct" required>
+            <option value="">Select product…</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="rBatch">Batch Number <span class="req">*</span></label>
+          <input type="text" class="form-control" id="rBatch" placeholder="e.g. B001" required>
+        </div>
+        <div class="form-group">
+          <label for="rQty">Quantity Returned <span class="req">*</span></label>
+          <input type="number" class="form-control" id="rQty" placeholder="e.g. 15" min="1" required>
+        </div>
+        <div class="form-group">
+          <label for="rReason">Return Reason <span class="req">*</span></label>
+          <select class="form-control" id="rReason" required>
+            <option value="">Select reason…</option>
+            <option>Damaged</option>
+            <option>Expired</option>
+            <option>Near Expiry</option>
+            <option>Wrong Product</option>
+            <option>Leakage</option>
+            <option>Packaging Damage</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="rDate">Return Date <span class="req">*</span></label>
+          <input type="date" class="form-control" id="rDate" required>
+        </div>
+        <div class="form-group">
+          <label for="rStatus">Return Status</label>
+          <select class="form-control" id="rStatus">
+            <option value="Pending">Pending</option>
+            <option value="Approved">Approved</option>
+            <option value="Rejected">Rejected</option>
+          </select>
+        </div>
+        <div class="form-group form-col-2">
+          <label for="rRemarks">Remarks</label>
+          <textarea class="form-control" id="rRemarks" placeholder="Optional notes…" rows="2"></textarea>
+        </div>
+      </div>
+    </form>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeReturnModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="submitReturn(event)" id="returnSubmitBtn">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Save Return
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- SheetJS for Excel export -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="/frontend/js/distributor-inventory.js"></script>
+</body>
+</html>

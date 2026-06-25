@@ -98,4 +98,74 @@ const sendUserAutoReply = async (name, email) => {
     });
 };
 
-module.exports = { sendAdminNotification, sendUserAutoReply };
+/**
+ * Notify the distributor / stockist that an order has been routed to them.
+ * Non-blocking by contract: callers should `.catch()` so a mail failure never
+ * fails the order. Skips silently when SMTP credentials are not configured.
+ */
+const sendDistributorOrderNotification = async (distributor, order, retailer) => {
+    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+        console.warn('[email] EMAIL_USER/EMAIL_PASS not set — skipping distributor order notification');
+        return;
+    }
+    if (!distributor || !distributor.email) return;
+
+    const transporter = createTransporter();
+    const inr = (n) => `₹${Number(n || 0).toLocaleString('en-IN')}`;
+    const addr = order.deliveryAddress || (retailer && retailer.shopAddress) || {};
+    const addrLine = [addr.street, addr.city, addr.state, addr.pincode].filter(Boolean).join(', ');
+
+    const rows = (order.items || []).map((i) => `
+        <tr>
+          <td style="padding:8px;border-bottom:1px solid #eee;">${i.productName}</td>
+          <td style="padding:8px;border-bottom:1px solid #eee;text-align:center;">${i.quantity}</td>
+          <td style="padding:8px;border-bottom:1px solid #eee;text-align:right;">${inr(i.totalPrice)}</td>
+        </tr>`).join('');
+
+    await transporter.sendMail({
+        from: `"Fair Ford Pharmaceuticals" <${process.env.EMAIL_USER}>`,
+        to: distributor.email,
+        subject: `New order ${order.orderNumber} routed to you — please fulfil`,
+        html: `
+            <div style="font-family:Arial,sans-serif;padding:20px;background:#f4f4f4;">
+              <div style="background:#fff;padding:30px;border-radius:8px;max-width:640px;margin:0 auto;">
+                <h2 style="color:#0F4C81;border-bottom:2px solid #0F4C81;padding-bottom:10px;margin-top:0;">
+                  New Order Routed to You
+                </h2>
+                <p style="color:#555;">Hello ${distributor.businessName || distributor.name || 'Partner'},</p>
+                <p style="color:#555;line-height:1.7;">
+                  Order <strong>${order.orderNumber}</strong> has been routed to you for delivery.
+                  Please arrange last-mile delivery to the retailer below.
+                </p>
+
+                <h3 style="color:#0F4C81;font-size:15px;margin:24px 0 6px;">Deliver to</h3>
+                <p style="margin:2px 0;color:#333;">
+                  <strong>${(retailer && (retailer.shopName || retailer.name)) || 'Retailer'}</strong><br>
+                  ${addrLine || 'Address on file'}<br>
+                  ${(retailer && retailer.phone) ? 'Phone: ' + retailer.phone : ''}
+                </p>
+
+                <table style="width:100%;border-collapse:collapse;margin-top:18px;">
+                  <thead>
+                    <tr>
+                      <th style="padding:8px;text-align:left;border-bottom:2px solid #0F4C81;color:#555;">Product</th>
+                      <th style="padding:8px;text-align:center;border-bottom:2px solid #0F4C81;color:#555;">Qty</th>
+                      <th style="padding:8px;text-align:right;border-bottom:2px solid #0F4C81;color:#555;">Amount</th>
+                    </tr>
+                  </thead>
+                  <tbody>${rows}</tbody>
+                </table>
+
+                <p style="text-align:right;margin-top:14px;font-size:16px;color:#0F4C81;">
+                  <strong>Total: ${inr(order.totalAmount)}</strong>
+                </p>
+                <div style="margin-top:16px;padding:10px 14px;background:#fff8e6;border-left:4px solid #f59e0b;border-radius:4px;color:#7a5a00;font-size:14px;">
+                  Payment: <strong>Cash on delivery</strong> — collect from the retailer on hand-off.
+                </div>
+              </div>
+            </div>
+        `,
+    });
+};
+
+module.exports = { sendAdminNotification, sendUserAutoReply, sendDistributorOrderNotification };
