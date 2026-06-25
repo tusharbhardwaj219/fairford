@@ -8,7 +8,9 @@ const roles = {
   mfr:  { tag: '<i class="ri-building-2-line"></i> MANUFACTURER',             tagClass: 'tag-mfr',  btn: 'Sign in as Manufacturer →'}
 };
 
-let activeRole = 'dist';
+// Retailer is the only self-service role. Distributors/stockists are onboarded
+// by an admin; hospital/manufacturer roles are not used.
+let activeRole = 'ret';
 
 function selectRole(btn, role) {
   document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
@@ -96,8 +98,9 @@ async function handleLogin(e) {
       return;
     }
 
-    // Store token + user info
-    const userData = Object.assign({}, data.user || {}, { role: activeRole });
+    // Store token + user info. Use the account's REAL role from the response
+    // (login is role-agnostic now), falling back to the selected role.
+    const userData = Object.assign({}, data.user || {}, { role: (data.user && data.user.role) || activeRole });
     localStorage.setItem('ff_token', data.token);
     localStorage.setItem('ff_user',  JSON.stringify(userData));
 

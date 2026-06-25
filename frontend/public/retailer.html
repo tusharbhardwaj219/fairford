@@ -3,436 +3,95 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Fair Ford — Retailer Panel</title>
- 
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet" />
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <link rel="stylesheet" href="/frontend/css/retailer.css">
+  <title>Fair Ford — Retailer</title>
+  <link rel="stylesheet" href="/frontend/css/retailer.css" />
 </head>
 <body>
-<div class="shell">
+  <header class="rt-header">
+    <div class="rt-brand">Fair Ford Pharma <small>Retailer ordering</small></div>
+    <div class="rt-user">
+      <span id="rtUserName">…</span>
+      <button class="rt-logout" id="rtLogout">Logout</button>
+    </div>
+  </header>
 
-  <!-- ═══════════════════════════════════════════════════════════
-       SIDEBAR
-  ════════════════════════════════════════════════════════════ -->
-  <nav class="sidebar">
+  <main class="rt-wrap">
+    <!-- KYC / status banner -->
+    <div class="rt-banner warn" id="rtBanner">
+      Your account is <strong>pending approval</strong>. You can browse and set your address,
+      but you can place orders only after an admin activates your account.
+    </div>
 
-    <!-- Brand -->
-    <div class="sidebar-brand">
-      <div class="brand-row">
-        <div class="brand-logo"><img src="LOGO.png" alt="Fair Ford Logo" height="40" width="40"></div>
-        <div>
-          <div class="brand-name">Fair Ford</div>
-          <div class="brand-sub">Retailer Panel</div>
+    <!-- Shop & delivery address (drives order routing) -->
+    <section class="rt-card">
+      <h2>Shop &amp; delivery address <span class="sub">orders are routed to the nearest distributor by your pincode</span></h2>
+      <div class="rt-form-row">
+        <div class="rt-field" style="flex:1 1 220px;">
+          <label for="afShop">Shop name</label>
+          <input id="afShop" type="text" placeholder="Shop name" />
+        </div>
+        <div class="rt-field" style="flex:1 1 220px;">
+          <label for="afStreet">Street</label>
+          <input id="afStreet" type="text" placeholder="Street / area" />
+        </div>
+        <div class="rt-field">
+          <label for="afCity">City</label>
+          <input id="afCity" type="text" placeholder="City" />
+        </div>
+        <div class="rt-field">
+          <label for="afState">State</label>
+          <input id="afState" type="text" placeholder="State" />
+        </div>
+        <div class="rt-field">
+          <label for="afPincode">Pincode</label>
+          <input id="afPincode" type="text" inputmode="numeric" maxlength="6" placeholder="6-digit" />
+        </div>
+        <div class="rt-field" style="flex:0 0 auto; justify-content:flex-end;">
+          <label>&nbsp;</label>
+          <button class="btn btn-primary" id="afSave">Save address</button>
         </div>
       </div>
-      <div class="brand-tag">Apollo Pharmacy · Mumbai</div>
-    </div>
+    </section>
 
-    <!-- KYC Status chip -->
-    <div class="kyc-chip">
-      <span class="kyc-dot"></span>
-      <span class="kyc-label">KYC Verified</span>
-      <span class="kyc-id">ID: RET-00421</span>
-    </div>
-
-    <!-- Nav -->
-    <div class="sidebar-nav">
-
-      <div class="nav-item active" data-nav="Dashboard"><span class="ni">⊞</span><span class="nav-label">Dashboard</span></div>
-
-      <div class="nav-item expandable" data-nav="My Orders" data-group="orders">
-        <span class="ni"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-package-icon lucide-package"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M12 22V12"/><polyline points="3.29 7 12 12 20.71 7"/><path d="m7.5 4.27 9 5.15"/></svg></span><span class="nav-label">My Orders</span>
-        <span class="arrow open" id="arrow-orders">▼</span>
-      </div>
-      <div class="nav-children" id="group-orders">
-        <div class="nav-child" data-nav="Place Order">Place Order</div>
-        <div class="nav-child" data-nav="Order History">Order History</div>
-        <div class="nav-child" data-nav="Track Orders">Track Orders</div>
-        <div class="nav-child" data-nav="Return Requests">Return Requests</div>
-      </div>
-
-      <div class="nav-item expandable" data-nav="Products" data-group="products">
-        <span class="ni"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-box-icon lucide-box"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg></span><span class="nav-label">Products</span>
-        <span class="arrow" id="arrow-products">▼</span>
-      </div>
-      <div class="nav-children hidden" id="group-products">
-        <div class="nav-child" data-nav="Browse Catalogue">Browse Catalogue</div>
-        <div class="nav-child" data-nav="Saved Lists">Saved Lists</div>
-        <!-- <div class="nav-child" data-nav="Expiry Tracker">Expiry Tracker</div> -->
-        <div class="nav-child" data-nav="Price List">Price List</div>
-      </div>
-      <div class="nav-item expandable" data-nav="Wallet" data-group="wallet">
-        <span class="ni"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M18.0049 6.99979H21.0049C21.5572 6.99979 22.0049 7.4475 22.0049 7.99979V19.9998C22.0049 20.5521 21.5572 20.9998 21.0049 20.9998H3.00488C2.4526 20.9998 2.00488 20.5521 2.00488 19.9998V3.99979C2.00488 3.4475 2.4526 2.99979 3.00488 2.99979H18.0049V6.99979ZM4.00488 8.99979V18.9998H20.0049V8.99979H4.00488ZM4.00488 4.99979V6.99979H16.0049V4.99979H4.00488ZM15.0049 12.9998H18.0049V14.9998H15.0049V12.9998Z"></path></svg></span><span class="nav-label">Wallet & Statements</span>
-        <span class="arrow" id="arrow-wallet">▼</span>
-      </div>
-      <div class="nav-children hidden" id="group-wallet">
-        <div class="nav-child" data-nav="Browse Catalogue">Wallet Recharge</div>
-        <div class="nav-child" data-nav="Saved Lists">outstanding Dues</div>
-        
-        <div class="nav-child" data-nav="Price List">Payment History</div>
-      </div>
-      <div class="nav-item" data-nav="Payments"><span class="ni"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M20 22H4C3.44772 22 3 21.5523 3 21V3C3 2.44772 3.44772 2 4 2H20C20.5523 2 21 2.44772 21 3V21C21 21.5523 20.5523 22 20 22ZM19 20V4H5V20H19ZM8 9H16V11H8V9ZM8 13H16V15H8V13Z"></path></svg></span><span class="nav-label">Payments &amp; Ledger</span></div>
-      <!-- <div class="nav-item" data-nav="Prescriptions"><span class="ni">📄</span><span class="nav-label">Prescriptions</span></div> -->
-      <div class="nav-item" data-nav="Schemes"><span class="ni"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M15.0049 2.00281C17.214 2.00281 19.0049 3.79367 19.0049 6.00281C19.0049 6.73184 18.8098 7.41532 18.4691 8.00392L23.0049 8.00281V10.0028H21.0049V20.0028C21.0049 20.5551 20.5572 21.0028 20.0049 21.0028H4.00488C3.4526 21.0028 3.00488 20.5551 3.00488 20.0028V10.0028H1.00488V8.00281L5.54065 8.00392C5.19992 7.41532 5.00488 6.73184 5.00488 6.00281C5.00488 3.79367 6.79574 2.00281 9.00488 2.00281C10.2001 2.00281 11.2729 2.52702 12.0058 3.35807C12.7369 2.52702 13.8097 2.00281 15.0049 2.00281ZM11.0049 10.0028H5.00488V19.0028H11.0049V10.0028ZM19.0049 10.0028H13.0049V19.0028H19.0049V10.0028ZM9.00488 4.00281C7.90031 4.00281 7.00488 4.89824 7.00488 6.00281C7.00488 7.05717 7.82076 7.92097 8.85562 7.99732L9.00488 8.00281H11.0049V6.00281C11.0049 5.00116 10.2686 4.1715 9.30766 4.02558L9.15415 4.00829L9.00488 4.00281ZM15.0049 4.00281C13.9505 4.00281 13.0867 4.81869 13.0104 5.85355L13.0049 6.00281V8.00281H15.0049C16.0592 8.00281 16.923 7.18693 16.9994 6.15207L17.0049 6.00281C17.0049 4.89824 16.1095 4.00281 15.0049 4.00281Z"></path></svg></span><span class="nav-label">UPHAAR Schemes</span></div>
-
-      <!-- <div class="nav-item" data-nav="Wallet"><span class="ni"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M18.0049 6.99979H21.0049C21.5572 6.99979 22.0049 7.4475 22.0049 7.99979V19.9998C22.0049 20.5521 21.5572 20.9998 21.0049 20.9998H3.00488C2.4526 20.9998 2.00488 20.5521 2.00488 19.9998V3.99979C2.00488 3.4475 2.4526 2.99979 3.00488 2.99979H18.0049V6.99979ZM4.00488 8.99979V18.9998H20.0049V8.99979H4.00488ZM4.00488 4.99979V6.99979H16.0049V4.99979H4.00488ZM15.0049 12.9998H18.0049V14.9998H15.0049V12.9998Z"></path></svg></span><span class="nav-label"> Wallet & Statements</span></div> -->
-
-      
-      <!-- <div class="nav-item" data-nav="Distributor"><span class="ni">🚚</span><span class="nav-label">Ai Insightss</span></div> -->
-       <!-- <div class="nav-item" data-nav="Prescriptions"><span class="ni">📄</span><span class="nav-label">Territory Map</span></div> -->
-      <div class="nav-item" data-nav="Reports"><span class="ni"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clipboard-list-icon lucide-clipboard-list"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></svg></span><span class="nav-label">Reports</span></div>
-      <div class="nav-item" data-nav="Support"><span class="ni"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-headset-icon lucide-headset"><path d="M3 11h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-5Zm0 0a9 9 0 1 1 18 0m0 0v5a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3Z"/><path d="M21 16v2a4 4 0 0 1-4 4h-5"/></svg></span><span class="nav-label">Support</span></div>
-      <div class="nav-item" data-nav="Settings"><span class="ni"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-wrench-icon lucide-wrench"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.106-3.105c.32-.322.863-.22.983.218a6 6 0 0 1-8.259 7.057l-7.91 7.91a1 1 0 0 1-2.999-3l7.91-7.91a6 6 0 0 1 7.057-8.259c.438.12.54.662.219.984z"/></svg></span><span class="nav-label">Settings</span></div>
-
-    </div>
-
-    <!-- Distributor info box -->
-    <div class="dist-box">
-      <div class="dist-label">MY DISTRIBUTOR</div>
-      <div class="dist-name">MedCore Distributors</div>
-      <div class="dist-meta"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-pin-icon lucide-map-pin"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg> Andheri East, Mumbai</div>
-      <div class="dist-meta"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-phone-icon lucide-phone"><path d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384"/></svg> +91 98200 44312</div>
-      <button class="dist-order-btn" id="quickOrderBtn"> Quick Order</button>
-    </div>
-
-  </nav>
-
-  <!-- ═══════════════════════════════════════════════════════════
-       MAIN
-  ════════════════════════════════════════════════════════════ -->
-  <div class="main">
-
-    <!-- TOP BAR -->
-    <header class="topbar">
-      <div class="search-wrap">
-        <span class="si"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search-icon lucide-search"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg></span>
-        <input type="text" id="searchInput" placeholder="Search medicines, orders, invoices..." />
-      </div>
-
-      <div class="topbar-spacer"></div>
-
-      <!-- Credit Limit -->
-      <div class="credit-chip">
-        <span style="font-size:14px"></span>
-        <div>
-          <div class="chip-label">CREDIT LIMIT</div>
-          <div class="chip-value">₹2,00,000</div>
+    <div class="rt-grid">
+      <!-- Products -->
+      <section class="rt-card">
+        <h2>Products</h2>
+        <input class="rt-search" id="rtSearch" type="search" placeholder="Search medicines by name or brand…" />
+        <div class="rt-products" id="rtProducts">
+          <p class="rt-empty">Loading products…</p>
         </div>
-      </div>
-
-      <!-- Wallet -->  
-      <div class="wallet-chip">
-        <span style="font-size:14px"></span>
-        <div>
-          <div class="chip-label">WALLET</div>
-          <div class="chip-value">₹18,450</div>
-        </div>
-      </div>
-
-      <!-- Notif -->
-      <div class="icon-btn" id="notifBtn">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bell-ring-icon lucide-bell-ring"><path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="M22 8c0-2.3-.8-4.3-2-6"/><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/><path d="M4 2C2.8 3.7 2 5.7 2 8"/></svg>
-        <div class="notif-dot">5</div>
-      </div>
+      </section>
 
       <!-- Cart -->
-      <div class="icon-btn" id="cartBtn">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shopping-cart-icon lucide-shopping-cart"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
-        <div class="notif-dot" style="background:#2563eb">3</div>
-      </div>
-
-      <!-- User -->
-      <div class="user-chip">
-        <div class="user-av">AP</div>
-        <div>
-          <div class="user-name">Apollo Pharmacy</div>
-          <div class="user-role">Retailer · Mumbai</div>
+      <section class="rt-card rt-cart">
+        <h2>Your cart</h2>
+        <div id="rtCartBody">
+          <p class="rt-empty">Your cart is empty.</p>
         </div>
-      </div>
-    </header>
-
-    <!-- BODY -->
-    <div class="body">
-
-      <!-- Welcome Row -->
-      <div class="welcome-row">
-        <div>
-          <div class="welcome-title">Good morning, Apollo Pharmacy! </div>
-          <div class="welcome-sub" id="dateSubtitle">Here's your store overview for today</div>
+        <div class="rt-totals" id="rtTotals" style="display:none;">
+          <div><span>Subtotal</span><span id="ttSub">₹0</span></div>
+          <div><span>GST (12%)</span><span id="ttGst">₹0</span></div>
+          <div class="grand"><span>Total</span><span id="ttGrand">₹0</span></div>
         </div>
-        <div class="tb-btns">
-          <button class="btn btn-outline" id="downloadInvoiceBtn"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download-icon lucide-download"><path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/></svg> Download Invoice</button>
-          <button class="btn btn-primary" id="placeOrderBtn"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shopping-cart-icon lucide-shopping-cart"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg> Place Order</button>
-        </div>
-      </div>
-
-      <!-- STAT CARDS -->
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-top"><span class="stat-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-package-icon lucide-package"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M12 22V12"/><polyline points="3.29 7 12 12 20.71 7"/><path d="m7.5 4.27 9 5.15"/></svg></span><span class="stat-badge pos">↑ 23%</span></div>
-          <div class="stat-value">148</div>
-          <div class="stat-label">Orders This Month</div>
-          <div class="stat-sub">+23% vs last month</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-top"><span class="stat-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-wallet-icon lucide-wallet"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></svg></span><span class="stat-badge pos">↑ 18%</span></div>
-          <div class="stat-value">₹4,82,360</div>
-          <div class="stat-label">Total Purchases (May)</div>
-          <div class="stat-sub">Wholesale value</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-top"><span class="stat-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-triangle-alert-icon lucide-triangle-alert"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg></span><span class="stat-badge neg">↑ 5%</span></div>
-          <div class="stat-value">₹48,200</div>
-          <div class="stat-label">Outstanding Due</div>
-          <div class="stat-sub">Due in 7 days</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-top"><span class="stat-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-gift-icon lucide-gift"><path d="M12 7v14"/><path d="M20 11v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8"/><path d="M7.5 7a1 1 0 0 1 0-5A4.8 8 0 0 1 12 7a4.8 8 0 0 1 4.5-5 1 1 0 0 1 0 5"/><rect x="3" y="7" width="18" height="4" rx="1"/></svg></span><span class="stat-badge pos">NEW</span></div>
-          <div class="stat-value">4</div>
-          <div class="stat-label">Active Schemes</div>
-          <div class="stat-sub">Savings: ₹6,240</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-top"><span class="stat-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-icon lucide-file"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"/><path d="M14 2v5a1 1 0 0 0 1 1h5"/></svg></span><span class="stat-badge pos">↑ 9%</span></div>
-          <div class="stat-value">312</div>
-          <div class="stat-label">Prescriptions Filed</div>
-          <div class="stat-sub">This month</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-top"><span class="stat-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-credit-card-icon lucide-credit-card"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg></span><span class="stat-badge" style="background:#ede9fe;color:#4c1d95">ACTIVE</span></div>
-          <div class="stat-value">₹1,51,800</div>
-          <div class="stat-label">Credit Available</div>
-          <div class="stat-sub">of ₹2,00,000 limit</div>
-        </div>
-      </div>
-
-      <!-- QUICK ACTIONS ROW -->
-      <div class="quick-actions-row">
-        <div class="quick-actions-title">Quick Actions</div>
-        <div class="quick-actions-grid" id="quickActionsGrid"></div>
-      </div>
-
-      <!-- MAIN GRID -->
-      <div class="main-grid">
-
-        <!-- LEFT COLUMN -->
-        <div class="left-col">
-
-          <!-- Purchase Trend Chart -->
-          <div class="card card-pad">
-            <div class="chart-header">
-              <div>
-                <div class="card-title">Purchase Trend</div>
-                <div class="card-sub">Monthly spend — last 6 months</div>
-              </div>
-              <div style="display:flex;gap:12px;align-items:center">
-                <span class="legend-dot" style="background:#2563eb"></span><span class="legend-txt">Purchases</span>
-                <span class="legend-dot" style="background:#10b981;border-style:dashed"></span><span class="legend-txt">Payments</span>
-              </div>
-            </div>
-            <div class="chart-wrap"><canvas id="purchaseChart"></canvas></div>
-          </div>
-
-          <!-- Recent Orders Table -->
-          <div class="card card-pad" style="margin-top:14px">
-            <div class="tbl-header">
-              <div>
-                <div class="card-title">Recent Orders</div>
-                <div class="card-sub">Your last 6 orders</div>
-              </div>
-              <div style="display:flex;gap:10px;align-items:center">
-                <div class="filter-tabs" id="orderFilterTabs">
-                  <button class="ftab active" data-filter="all">All</button>
-                  <button class="ftab" data-filter="Pending">Pending</button>
-                  <button class="ftab" data-filter="Dispatched">Dispatched</button>
-                  <button class="ftab" data-filter="Delivered">Delivered</button>
-                </div>
-                <a class="view-all">View All →</a>
-              </div>
-            </div>
-            <table class="ot">
-              <thead>
-                <tr>
-                  <th>Order ID</th>
-                  <th>Items</th>
-                  <th>Amount</th>
-                  <th>Status</th>
-                  <th>Delivery</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody id="ordersBody"></tbody>
-            </table>
-          </div>
-
-        </div>
-
-        <!-- RIGHT COLUMN -->
-        <div class="right-col">
-
-          <!-- Outstanding & Payment -->
-          <div class="card card-pad">
-            <div class="card-title" style="margin-bottom:4px"> Payment Summary</div>
-            <div class="card-sub" style="margin-bottom:14px">Current ledger snapshot</div>
-
-            <div class="pay-row">
-              <div class="pay-item" style="border-left:3px solid #ef4444">
-                <div class="pay-label">Total Outstanding</div>
-                <div class="pay-value" style="color:#ef4444">₹48,200</div>
-              </div>
-              <div class="pay-item" style="border-left:3px solid #f59e0b">
-                <div class="pay-label">Overdue (15d+)</div>
-                <div class="pay-value" style="color:#f59e0b">₹12,800</div>
-              </div>
-            </div>
-            <div class="pay-row" style="margin-top:8px">
-              <div class="pay-item" style="border-left:3px solid #10b981">
-                <div class="pay-label">Paid This Month</div>
-                <div class="pay-value" style="color:#10b981">₹3,34,160</div>
-              </div>
-              <div class="pay-item" style="border-left:3px solid #2563eb">
-                <div class="pay-label">Escrow Balance</div>
-                <div class="pay-value" style="color:#2563eb">₹18,450</div>
-              </div>
-            </div>
-
-            <!-- Credit Bar -->
-            <div style="margin-top:14px">
-              <div style="display:flex;justify-content:space-between;margin-bottom:5px">
-                <span style="font-size:11px;color:var(--muted)">Credit Used</span>
-                <span style="font-size:11px;font-weight:700;font-family:var(--mono)">₹48,200 / ₹2,00,000</span>
-              </div>
-              <div class="progress-track">
-                <div class="progress-fill" style="width:24%;background:linear-gradient(90deg,#2563eb,#7c3aed)"></div>
-              </div>
-              <div style="font-size:10px;color:var(--muted);margin-top:4px">24% of credit limit used · ₹1,51,800 available</div>
-            </div>
-
-            <button class="pay-now-btn" id="payNowBtn"> Pay Now</button>
-          </div>
-
-          <!-- Expiry Alerts -->
-          <div class="card card-pad" style="margin-top:14px">
-            <div class="tbl-header">
-              <div>
-                <div class="card-title"> Expiry Alerts</div>
-                <div class="card-sub">Stock expiring soon</div>
-              </div>
-              <a class="view-all">Manage →</a>
-            </div>
-            <div id="expiryList"></div>
-          </div>
-
-          <!-- Active Schemes -->
-          <div class="card card-pad" style="margin-top:14px">
-            <div class="tbl-header">
-              <div>
-                <div class="card-title"> My Active Schemes</div>
-                <div class="card-sub">UPHAAR benefits</div>
-              </div>
-              <a class="view-all">View All →</a>
-            </div>
-            <div id="schemesList"></div>
-          </div>
-
-        </div>
-      </div>
-
-      <!-- BOTTOM ROW — Top Products + Prescription + AI -->
-      <div class="bottom-grid">
-
-        <!-- Top Purchased Products -->
-        <div class="card card-pad">
-          <div class="tbl-header">
-            <div>
-              <div class="card-title"> Top Purchased Products</div>
-              <div class="card-sub">Most ordered — May 2026</div>
-            </div>
-            <a class="view-all">Reorder All →</a>
-          </div>
-          <div id="topProductsList"></div>
-        </div>
-
-        <!-- Prescription Summary -->
-        <div class="card card-pad">
-          <div class="card-title" style="margin-bottom:4px"> Prescription Management</div>
-          <div class="card-sub" style="margin-bottom:16px">AI-verified Rx tracker</div>
-          <div class="rx-grid" id="rxGrid"></div>
-          <div style="margin-top:14px">
-            <div class="card-title" style="font-size:12px;margin-bottom:10px">Recent Prescriptions</div>
-            <div id="rxList"></div>
-          </div>
-        </div>
-
-        <!-- AI Insights -->
-        <div class="card card-pad">
-          <div class="tbl-header">
-            <div>
-              <div class="card-title"> AI Insights</div>
-              <div class="card-sub">Personalised for your store</div>
-            </div>
-            <span class="ai-badge">AI POWERED</span>
-          </div>
-          <div id="aiAlertsList"></div>
-
-          <!-- Spend by Category Donut -->
-          <div style="margin-top:16px">
-            <div class="card-title" style="font-size:12px;margin-bottom:10px">Spend by Category</div>
-            <div class="donut-wrap"><canvas id="categoryChart"></canvas></div>
-            <div id="categoryLegend" style="margin-top:10px"></div>
-          </div>
-        </div>
-
-      </div>
-
-    </div><!-- /body -->
-  </div><!-- /main -->
-</div><!-- /shell -->
-
-<!-- PLACE ORDER MODAL -->
-<div class="modal-overlay hidden" id="orderModal">
-  <div class="modal">
-    <div class="modal-header">
-      <div class="modal-title"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shopping-cart-icon lucide-shopping-cart"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg> Place New Order</div>
-      <button class="modal-close" id="modalClose">✕</button>
+        <button class="btn btn-primary" id="rtPlace" style="width:100%; margin-top:14px; display:none;">
+          Place order · Cash on delivery
+        </button>
+        <p class="cod-note" id="rtCodNote" style="display:none;">No online payment — pay the distributor on delivery.</p>
+      </section>
     </div>
-    <div class="modal-body">
-      <div class="form-group">
-        <label class="form-label">Search Medicine / Product</label>
-        <input type="text" class="form-input" id="productSearch" placeholder="e.g. Paracetamol 500mg..." />
-      </div>
-      <div id="productSuggestions" class="suggestions-box hidden"></div>
-      <div class="form-group">
-        <label class="form-label">Selected Items</label>
-        <div id="cartItems" class="cart-items-box">
-          <div class="cart-empty">No items added yet.</div>
-        </div>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Delivery Priority</label>
-        <div class="radio-group">
-          <label class="radio-opt"><input type="radio" name="priority" value="standard" checked /> Standard (2-3 days)</label>
-          <label class="radio-opt"><input type="radio" name="priority" value="express" /> Express (Same day)</label>
-          <label class="radio-opt"><input type="radio" name="priority" value="urgent" /> Urgent (4 hrs)</label>
-        </div>
-      </div>
-      <div class="modal-total" id="modalTotal">
-        <span>Order Total</span><span class="total-val">₹0.00</span>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-outline" id="modalCancel">Cancel</button>
-      <button class="btn btn-primary" id="modalConfirm"> Confirm Order</button>
-    </div>
-  </div>
-</div>
 
-<!-- SUCCESS TOAST -->
-<div class="toast hidden" id="toast"> Order placed successfully!</div>
+    <!-- Orders -->
+    <section class="rt-card">
+      <h2>My orders</h2>
+      <div id="rtOrders">
+        <p class="rt-empty">Loading orders…</p>
+      </div>
+    </section>
+  </main>
 
-<script src="/frontend/js/retailer.js"></script>
+  <div class="rt-toast" id="rtToast"></div>
+
+  <script src="/frontend/js/retailer.js"></script>
 </body>
 </html>

@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fair Ford Pharmaceuticals — Super Admin Portal</title>
+<script>
+  // Auth gate — only an authenticated admin/superadmin may view this dashboard.
+  (function () {
+    try {
+      var u = JSON.parse(localStorage.getItem('ff_user') || '{}');
+      if (!localStorage.getItem('ff_token') || (u.role !== 'admin' && u.role !== 'superadmin')) {
+        window.location.replace('/admin.html');
+      }
+    } catch (e) { window.location.replace('/admin.html'); }
+  })();
+</script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<link rel="stylesheet" href="/frontend/css/superadmin.css">
+</head>
+<body>
+
+<div id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+<!-- ═══════════ SIDEBAR ═══════════ -->
+<nav id="sidebar">
+  <div class="sb-brand">
+    <div class="sb-logo">
+      <div class="sb-logo-icon">
+        <a href="#"><img src="LOGO.png" alt="fair ford logo" height="36" width="36"></a>
+      </div>
+      <div>
+        <div class="sb-logo-text">Fair Ford</div>
+        <div class="sb-logo-sub">Super Admin</div>
+      </div>
+    </div>
+    <button class="sb-close" onclick="closeSidebar()" title="Close menu">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+    </button>
+  </div>
+
+  <div class="sb-section">Main</div>
+  <a class="sb-item active" data-tooltip="Dashboard" onclick="showPage('dashboard')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/></svg>
+    <span class="sb-item-label">Dashboard</span>
+  </a>
+
+  <div class="sb-section">Users</div>
+  <a class="sb-item" data-tooltip="User Approvals" onclick="showPage('approvals')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+    <span class="sb-item-label">User Approvals</span>
+    <span class="sb-badge" id="approval-badge">3</span>
+  </a>
+  <a class="sb-item" data-tooltip="Distributors" onclick="showPage('distributors')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+    <span class="sb-item-label">Distributors</span>
+  </a>
+  <a class="sb-item" data-tooltip="Retailers" onclick="showPage('retailers')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 6h18l-2 9H5L3 6z"/><circle cx="9" cy="20" r="1"/><circle cx="17" cy="20" r="1"/><path d="M3 6l-1-3H1"/></svg>
+    <span class="sb-item-label">Retailers</span>
+  </a>
+  <a class="sb-item" data-tooltip="Products" onclick="showPage('products')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M2 17h20"/><path d="M5 21h14"/></svg>
+    <span class="sb-item-label">Products</span>
+  </a>
+
+  <div class="sb-section">Finance</div>
+  <a class="sb-item" data-tooltip="Pricing Control" onclick="showPage('pricing')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.5h4a1.5 1.5 0 010 3h-3a1.5 1.5 0 000 3h4"/></svg>
+    <span class="sb-item-label">Pricing Control</span>
+  </a>
+  <a class="sb-item" data-tooltip="Wallet Settlements" onclick="showPage('wallet')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M16 12a2 2 0 000 4h4v-4h-4z"/><path d="M2 10h20"/></svg>
+    <span class="sb-item-label">Wallet Settlements</span>
+  </a>
+
+  <div class="sb-section">Inventory</div>
+  <a class="sb-item" data-tooltip="Scheme Management" onclick="showPage('schemes')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+    <span class="sb-item-label">Scheme Management</span>
+  </a>
+  <a class="sb-item" data-tooltip="Inventory Visibility" onclick="showPage('inventory')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><path d="M3.27 6.96L12 12.01l8.73-5.05M12 22.08V12"/></svg>
+    <span class="sb-item-label">Inventory Visibility</span>
+  </a>
+
+  <div class="sb-section">Insights</div>
+  <a class="sb-item" data-tooltip="Analytics" onclick="showPage('analytics')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+    <span class="sb-item-label">Analytics</span>
+  </a>
+  <a class="sb-item" data-tooltip="Reports" onclick="showPage('reports')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+    <span class="sb-item-label">Reports</span>
+  </a>
+  <a class="sb-item" data-tooltip="Dist. Mapping" onclick="showPage('dist-mapping')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"/></svg>
+    <span class="sb-item-label">Dist. Mapping</span>
+  </a>
+
+  <div class="sb-section">System</div>
+  <a class="sb-item" data-tooltip="Settings" onclick="showPage('settings')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+    <span class="sb-item-label">Settings</span>
+  </a>
+
+  <div class="sb-bottom">
+    <div class="sb-user">
+      <div class="sb-avatar">SA</div>
+      <div class="sb-user-texts">
+        <div class="sb-user-name">Super Admin</div>
+        <div class="sb-user-role">Fair Ford Pharma</div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══════════ MAIN ═══════════ -->
+<div id="main">
+
+  <!-- TOPBAR -->
+  <header id="topbar">
+    <button id="sidebarToggle" class="tb-btn" aria-label="Open sidebar" title="Menu" onclick="toggleSidebar()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+    </button>
+    <div class="topbar-search">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#A09BBF" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      <input id="global-search" placeholder="Search medicines, orders, retailers…" oninput="globalSearch(this.value)">
+    </div>
+    <div class="topbar-actions">
+      <button class="tb-btn" title="Notifications" onclick="showPage('approvals')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+        <span class="tb-badge"></span>
+      </button>
+      <button class="tb-btn" title="Reports" onclick="showPage('reports')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+      </button>
+      <div class="tb-profile">
+        <div class="sb-avatar" style="width:28px;height:28px;font-size:11px">SA</div>
+        <div>
+          <div class="tb-pname">Super Admin</div>
+          <div class="tb-prole">Platform Manager</div>
+        </div>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#A09BBF" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+      </div>
+    </div>
+  </header>
+
+  <!-- ══════ PAGE: DASHBOARD ══════ -->
+  <div class="page active" id="pg-dashboard">
+    <div class="hero">
+      <div>
+        <div class="hero-title">Fair Ford Platform — Super Admin Control Center</div>
+        <div class="hero-sub" id="hero-sub">Loading platform status…</div>
+        <div class="hero-meta">
+          <span class="hero-pill">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;vertical-align:-1px;margin-right:4px"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            Live
+          </span>
+          <span class="hero-pill">v3.4.1</span>
+          <span class="hero-pill">99.8% Uptime</span>
+        </div>
+      </div>
+      <div class="hero-actions">
+        <button class="btn btn-white" onclick="showPage('approvals')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          Approve Users
+        </button>
+        <button class="btn btn-outline" onclick="showPage('reports')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Full Report
+        </button>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat-card c1">
+        <div class="stat-icon s1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2a10 10 0 100 20A10 10 0 0012 2z"/><path d="M12 6v6l4 2"/></svg></div>
+        <div class="stat-label">Platform GMV (May)</div>
+        <div class="stat-val">₹1,56,00,000</div>
+        <div class="stat-change up"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 15l-6-6-6 6"/></svg>+28% vs Apr</div>
+      </div>
+      <div class="stat-card c2">
+        <div class="stat-icon s2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg></div>
+        <div class="stat-label">Active Distributors</div>
+        <div class="stat-val" id="stat-distributors">—</div>
+        <div class="stat-change up"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 15l-6-6-6 6"/></svg>+7 this month</div>
+      </div>
+      <div class="stat-card c3">
+        <div class="stat-icon s3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+        <div class="stat-label">Active Retailers</div>
+        <div class="stat-val" id="stat-retailers">—</div>
+        <div class="stat-change up"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 15l-6-6-6 6"/></svg>+203 this month</div>
+      </div>
+      <div class="stat-card c4">
+        <div class="stat-icon s4"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M16 12a2 2 0 000 4h4v-4h-4z"/><path d="M2 10h20"/></svg></div>
+        <div class="stat-label">Pending Approvals</div>
+        <div class="stat-val" id="stat-pending">—</div>
+        <div class="stat-change down"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>Needs attention</div>
+      </div>
+    </div>
+
+    <!-- Alert -->
+    <div class="alert" id="dashboard-alert">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D97B0A" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      <span><strong id="alert-text">Pending user approvals</strong> require your attention before end of business.</span>
+      <a href="#" onclick="showPage('approvals')">Review Now →</a>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Platform GMV Trend</span>
+          <button class="btn btn-ghost btn-sm" onclick="exportReport('gmv')">Export CSV</button>
+        </div>
+        <div class="card-body">
+          <div style="position:relative;height:180px"><canvas id="gmvChart"></canvas></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">Wallet Settlement Status</span></div>
+        <div class="card-body">
+          <div style="display:flex;align-items:center;gap:24px">
+            <div style="position:relative;width:100px;height:100px;flex-shrink:0"><canvas id="walletDonut"></canvas></div>
+            <div style="flex:1">
+              <div class="legend-row"><span class="legend-dot" style="background:#0FA86A"></span><span style="flex:1;color:var(--text-2)">Settled</span><strong>74%</strong></div>
+              <div class="legend-row"><span class="legend-dot" style="background:#5B3EE8"></span><span style="flex:1;color:var(--text-2)">Escrow</span><strong>16%</strong></div>
+              <div class="legend-row"><span class="legend-dot" style="background:#E24B4A"></span><span style="flex:1;color:var(--text-2)">Pending</span><strong>10%</strong></div>
+              <div class="settle-bar" onclick="showPage('wallet')">Initiate Settlement</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pending + State Performance -->
+    <div class="grid-2" style="margin-bottom:20px">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Pending Approvals</span>
+          <span class="badge badge-red" id="pending-badge-count">Loading…</span>
+        </div>
+        <div><div id="pa-list"></div></div>
+        <div class="card-footer">
+          <a href="#" onclick="showPage('approvals')" style="font-size:13px;color:var(--pri);text-decoration:none;font-weight:500">View All Approvals →</a>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">State-wise Performance</span>
+          <button class="btn btn-ghost btn-sm" onclick="showPage('analytics')">Analytics</button>
+        </div>
+        <div class="card-body" id="state-perf"></div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="grid-4">
+      <div class="qa-card" onclick="showPage('pricing')">
+        <div class="qa-icon qi1"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.5h4a1.5 1.5 0 010 3h-3a1.5 1.5 0 000 3h4"/></svg></div>
+        <div class="qa-title">Pricing Control</div>
+        <div class="qa-sub">Set wholesale & retail rates by trade</div>
+      </div>
+      <div class="qa-card" onclick="showPage('schemes')">
+        <div class="qa-icon qi2"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l3 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+        <div class="qa-title">Scheme Management</div>
+        <div class="qa-sub">Create and manage UPHAR schemes</div>
+      </div>
+      <div class="qa-card" onclick="showPage('inventory')">
+        <div class="qa-icon qi3"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><path d="M3.27 6.96L12 12.01l8.73-5.05M12 22.08V12"/></svg></div>
+        <div class="qa-title">Inventory Visibility</div>
+        <div class="qa-sub">View all distribution warehouse stock</div>
+      </div>
+      <div class="qa-card" onclick="showPage('dist-mapping')">
+        <div class="qa-icon qi4"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"/></svg></div>
+        <div class="qa-title">Dist. Retailer Mapping</div>
+        <div class="qa-sub">Assign distributors to retailer territories</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════ PAGE: USER APPROVALS ══════ -->
+  <div class="page" id="pg-approvals">
+    <div class="pg-header">
+      <div>
+        <div class="pg-title">User Approvals</div>
+        <div class="pg-sub">Review and approve distributor & retailer registrations</div>
+      </div>
+      <button class="btn btn-pri" onclick="bulkApprove()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        Approve All Pending
+      </button>
+    </div>
+    <div class="tabs" id="approvals-tabs">
+      <div class="tab active" onclick="filterApprovals(this,'all')">All</div>
+      <div class="tab" onclick="filterApprovals(this,'pending')">Pending</div>
+      <div class="tab" onclick="filterApprovals(this,'approved')">Approved</div>
+      <div class="tab" onclick="filterApprovals(this,'rejected')">Rejected</div>
+    </div>
+    <div class="card">
+      <div class="tbl-wrap">
+        <table class="data">
+          <thead><tr><th>User / Company</th><th>Type</th><th>Region</th><th>Submitted</th><th>Docs</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="approvals-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════ PAGE: DISTRIBUTORS ══════ -->
+  <div class="page" id="pg-distributors">
+    <div class="pg-header">
+      <div>
+        <div class="pg-title">Distributors</div>
+        <div class="pg-sub">Manage all active distributor accounts</div>
+      </div>
+    </div>
+    <div class="stats-row" style="grid-template-columns:repeat(3,1fr);margin-bottom:20px">
+      <div class="stat-card c1"><div class="stat-icon s1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg></div><div class="stat-label">Total Distributors</div><div class="stat-val" id="dist-total">—</div></div>
+      <div class="stat-card c2"><div class="stat-icon s2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div><div class="stat-label">Active This Month</div><div class="stat-val" id="dist-active">—</div></div>
+      <div class="stat-card c3"><div class="stat-icon s3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 20V10M12 20V4M6 20v-6"/></svg></div><div class="stat-label">Avg. Monthly GMV</div><div class="stat-val" id="dist-avg-gmv">—</div></div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Distributor List</span>
+        <div style="display:flex;gap:10px">
+          <input id="dist-search" class="form-input" placeholder="Search distributor…" style="width:200px" oninput="filterDistributors()">
+          <select id="dist-state-filter" class="form-input" style="width:130px" onchange="filterDistributors()">
+            <option value="">All States</option>
+            <option>Maharashtra</option><option>Karnataka</option><option>Delhi NCR</option>
+            <option>Uttar Pradesh</option><option>Telangana</option>
+          </select>
+        </div>
+      </div>
+      <div class="tbl-wrap">
+        <table class="data">
+          <thead><tr><th>Distributor</th><th>State</th><th>Retailers Mapped</th><th>May GMV</th><th>Outstanding</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="dist-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════ PAGE: RETAILERS ══════ -->
+  <div class="page" id="pg-retailers">
+    <div class="pg-header">
+      <div>
+        <div class="pg-title">Retailers</div>
+        <div class="pg-sub" id="ret-sub">Retail partners across India</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Retailer Directory</span>
+        <div style="display:flex;gap:8px">
+          <input id="ret-search" class="form-input" placeholder="Search retailer…" style="width:200px" oninput="filterRetailers()">
+          <select id="ret-state-filter" class="form-input" style="width:130px" onchange="filterRetailers()"><option value="">All States</option></select>
+          <select id="ret-type-filter" class="form-input" style="width:130px" onchange="filterRetailers()">
+            <option value="">All Types</option>
+            <option>Medical Store</option><option>Hospital</option><option>Pharmacy</option><option>Chain Pharmacy</option>
+          </select>
+        </div>
+      </div>
+      <div class="tbl-wrap">
+        <table class="data">
+          <thead><tr><th>Retailer</th><th>City / State</th><th>Type</th><th>Assigned Dist.</th><th>Monthly Orders</th><th>Last Order</th><th>Status &amp; Actions</th></tr></thead>
+          <tbody id="ret-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════ PAGE: PRODUCTS ══════ -->
+  <div class="page" id="pg-products">
+    <div class="pg-header">
+      <div><div class="pg-title">Product Management</div><div class="pg-sub">Manage pharmaceutical inventory and product catalog</div></div>
+      <button class="btn btn-pri" onclick="openProductModal()">+ Add Product</button>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Product Catalog</span>
+        <div style="display:flex;gap:8px">
+          <input id="prod-search" class="form-input" placeholder="Search product…" style="width:200px" oninput="filterProducts()">
+          <select id="prod-cat-filter" class="form-input" style="width:130px" onchange="filterProducts()">
+            <option value="">All Categories</option>
+            <option>Antibiotics</option><option>Analgesics</option><option>Vitamins</option><option>Cardiac</option><option>Antifungals</option>
+          </select>
+          <select id="prod-status-filter" class="form-input" style="width:120px" onchange="filterProducts()">
+            <option value="">All Status</option><option>active</option><option>inactive</option>
+          </select>
+        </div>
+      </div>
+      <div class="tbl-wrap">
+        <table class="data">
+          <thead><tr><th>Product Name</th><th>SKU</th><th>Category</th><th>MRP</th><th>Manufacturer</th><th>Stock</th><th>Status</th><th>Added Date</th><th>Actions</th></tr></thead>
+          <tbody id="prod-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════ PAGE: PRICING CONTROL ══════ -->
+  <div class="page" id="pg-pricing">
+    <div class="pg-header">
+      <div><div class="pg-title">Pricing Control</div><div class="pg-sub">Set wholesale & retail margins by trade category</div></div>
+      <button class="btn btn-pri" onclick="document.getElementById('pricingForm').requestSubmit()">Save Changes</button>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header"><span class="card-title">Price Rule Engine</span></div>
+        <form id="pricingForm" onsubmit="savePricingRule(event)">
+          <div class="card-body">
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">Product Category</label>
+                <select class="form-input" name="pricing-cat">
+                  <option value="Antibiotics">Antibiotics</option><option value="Analgesics">Analgesics</option>
+                  <option value="Vitamins">Vitamins</option><option value="Antifungals">Antifungals</option>
+                  <option value="Cardiac">Cardiac</option>
+                </select>
+              </div>
+              <div class="form-group"><label class="form-label">Trade Channel</label>
+                <select class="form-input" name="pricing-channel">
+                  <option value="Distributor → Retailer">Distributor → Retailer</option>
+                  <option value="Direct → Hospital">Direct → Hospital</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">MRP (₹)</label><input class="form-input" name="pricing-mrp" value="250" type="number" min="0" step="0.01"></div>
+              <div class="form-group"><label class="form-label">Distributor Margin %</label><input class="form-input" name="pricing-dist" value="12" type="number" min="0" max="100"></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">Retailer Margin %</label><input class="form-input" name="pricing-retail" value="18" type="number" min="0" max="100"></div>
+              <div class="form-group"><label class="form-label">GST Rate</label>
+                <select class="form-input" name="pricing-gst">
+                  <option value="12%">12%</option><option value="5%">5%</option><option value="18%">18%</option><option value="0%">0%</option>
+                </select>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-pri" style="width:100%">Apply Rule</button>
+          </div>
+        </form>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">Active Price Rules</span></div>
+        <div class="tbl-wrap">
+          <table class="data">
+            <thead><tr><th>Category</th><th>Dist. %</th><th>Retail %</th><th>GST</th><th>Status</th></tr></thead>
+            <tbody id="pricing-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════ PAGE: WALLET SETTLEMENTS ══════ -->
+  <div class="page" id="pg-wallet">
+    <div class="pg-header">
+      <div><div class="pg-title">Wallet Settlements</div><div class="pg-sub">Manage distributor wallet balances and settlements</div></div>
+      <button class="btn btn-pri" onclick="bulkSettlement()">Initiate Bulk Settlement</button>
+    </div>
+    <div class="stats-row" style="grid-template-columns:repeat(3,1fr)">
+      <div class="stat-card c2"><div class="stat-icon s2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg></div><div class="stat-label">Total Settled</div><div class="stat-val">₹94.72L</div></div>
+      <div class="stat-card c1"><div class="stat-icon s1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M16 12a2 2 0 000 4h4v-4h-4z"/></svg></div><div class="stat-label">In Escrow</div><div class="stat-val">₹20.48L</div></div>
+      <div class="stat-card c4"><div class="stat-icon s4"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg></div><div class="stat-label">Pending / Overdue</div><div class="stat-val">₹12.80L</div></div>
+    </div>
+    <div class="card" style="margin-top:20px">
+      <div class="card-header"><span class="card-title">Settlement Queue</span></div>
+      <div class="tbl-wrap">
+        <table class="data">
+          <thead><tr><th>Distributor</th><th>Invoice #</th><th>Amount</th><th>Due Date</th><th>Status</th><th>Action</th></tr></thead>
+          <tbody id="wallet-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════ PAGE: SCHEME MANAGEMENT ══════ -->
+  <div class="page" id="pg-schemes">
+    <div class="pg-header">
+      <div><div class="pg-title">Scheme Management</div><div class="pg-sub">Create and manage UPHAR promotional schemes</div></div>
+      <button class="btn btn-pri" onclick="focusSchemeForm()">+ New Scheme</button>
+    </div>
+    <div class="grid-3" id="schemes-list"></div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">Create New Scheme</span></div>
+      <form id="schemeForm" onsubmit="publishScheme(event)">
+        <div class="card-body">
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Scheme Name *</label><input class="form-input" name="scheme-name" placeholder="e.g. Monsoon Antibiotics Drive" required></div>
+            <div class="form-group"><label class="form-label">Scheme Type</label>
+              <select class="form-input" name="scheme-type">
+                <option value="Buy X Get Y Free">Buy X Get Y Free</option>
+                <option value="Flat Discount %">Flat Discount %</option>
+                <option value="Extra Margin">Extra Margin</option>
+                <option value="Cashback">Cashback</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Applicable Category</label>
+              <select class="form-input" name="scheme-cat">
+                <option value="All Products">All Products</option>
+                <option value="Antibiotics">Antibiotics</option><option value="Analgesics">Analgesics</option>
+                <option value="Cardiac">Cardiac</option><option value="Vitamins">Vitamins</option>
+                <option value="Antifungals">Antifungals</option>
+              </select>
+            </div>
+            <div class="form-group"><label class="form-label">Target Channel</label>
+              <select class="form-input" name="scheme-channel">
+                <option value="Retailer">Retailer</option>
+                <option value="Distributor">Distributor</option>
+                <option value="Both">Both</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Start Date *</label><input class="form-input" type="date" name="scheme-start" required></div>
+            <div class="form-group"><label class="form-label">End Date *</label><input class="form-input" type="date" name="scheme-end" required></div>
+          </div>
+          <button type="submit" class="btn btn-pri">Publish Scheme</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ══════ PAGE: INVENTORY ══════ -->
+  <div class="page" id="pg-inventory">
+    <div class="pg-header">
+      <div><div class="pg-title">Inventory Visibility</div><div class="pg-sub">Real-time stock across all distribution warehouses</div></div>
+      <button class="btn btn-ghost" onclick="exportInventoryCSV()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Export CSV
+      </button>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Warehouse Stock Summary</span>
+        <input id="inv-search" class="form-input" placeholder="Search product…" style="width:220px" oninput="filterInventory()">
+      </div>
+      <div class="tbl-wrap">
+        <table class="data">
+          <thead><tr><th>Product Name</th><th>SKU</th><th>Category</th><th>Total Stock</th><th>Reserved</th><th>Available</th><th>Reorder Level</th><th>Status</th></tr></thead>
+          <tbody id="inv-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════ PAGE: ANALYTICS ══════ -->
+  <div class="page" id="pg-analytics">
+    <div class="pg-header">
+      <div><div class="pg-title">Analytics</div><div class="pg-sub">Platform performance & business insights</div></div>
+      <select class="form-input" style="width:140px"><option>May 2026</option><option>Apr 2026</option><option>Q1 2026</option></select>
+    </div>
+    <div class="grid-2" style="margin-bottom:20px">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Revenue Trend (6 Months)</span>
+          <button class="btn btn-ghost btn-sm" onclick="exportReport('gmv')">Export</button>
+        </div>
+        <div class="card-body"><div style="position:relative;height:200px"><canvas id="revChart"></canvas></div></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">Category Split (GMV)</span></div>
+        <div class="card-body">
+          <div style="display:flex;align-items:center;gap:20px">
+            <div style="position:relative;width:120px;height:120px;flex-shrink:0"><canvas id="catDonut"></canvas></div>
+            <div style="flex:1;font-size:13px">
+              <div class="legend-row"><span class="legend-dot" style="background:#5B3EE8"></span><span style="flex:1;color:var(--text-2)">Antibiotics</span><strong>34%</strong></div>
+              <div class="legend-row"><span class="legend-dot" style="background:#0FA86A"></span><span style="flex:1;color:var(--text-2)">Cardiac</span><strong>22%</strong></div>
+              <div class="legend-row"><span class="legend-dot" style="background:#D97B0A"></span><span style="flex:1;color:var(--text-2)">Vitamins</span><strong>18%</strong></div>
+              <div class="legend-row"><span class="legend-dot" style="background:#E24B4A"></span><span style="flex:1;color:var(--text-2)">Analgesics</span><strong>14%</strong></div>
+              <div class="legend-row"><span class="legend-dot" style="background:#A09BBF"></span><span style="flex:1;color:var(--text-2)">Others</span><strong>12%</strong></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">State-wise Performance</span></div>
+      <div class="card-body" id="analytics-states"></div>
+    </div>
+  </div>
+
+  <!-- ══════ PAGE: REPORTS ══════ -->
+  <div class="page" id="pg-reports">
+    <div class="pg-header">
+      <div><div class="pg-title">Reports</div><div class="pg-sub">Generate and download platform reports</div></div>
+    </div>
+    <div class="grid-3">
+      <div class="card" style="cursor:pointer">
+        <div class="card-body" style="display:flex;flex-direction:column;gap:12px;align-items:flex-start">
+          <div class="stat-icon s1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/></svg></div>
+          <div><strong style="font-size:14px">GMV Report</strong><div style="font-size:12px;color:var(--text-2);margin-top:2px">Monthly platform revenue summary</div></div>
+          <button class="btn btn-ghost btn-sm" onclick="exportReport('gmv')">Download CSV</button>
+        </div>
+      </div>
+      <div class="card" style="cursor:pointer">
+        <div class="card-body" style="display:flex;flex-direction:column;gap:12px;align-items:flex-start">
+          <div class="stat-icon s2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg></div>
+          <div><strong style="font-size:14px">User Acquisition</strong><div style="font-size:12px;color:var(--text-2);margin-top:2px">Distributors & retailers report</div></div>
+          <button class="btn btn-ghost btn-sm" onclick="exportReport('users')">Download CSV</button>
+        </div>
+      </div>
+      <div class="card" style="cursor:pointer">
+        <div class="card-body" style="display:flex;flex-direction:column;gap:12px;align-items:flex-start">
+          <div class="stat-icon s3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M16 12a2 2 0 000 4h4v-4h-4z"/></svg></div>
+          <div><strong style="font-size:14px">Settlement Report</strong><div style="font-size:12px;color:var(--text-2);margin-top:2px">Wallet & payment reconciliation</div></div>
+          <button class="btn btn-ghost btn-sm" onclick="exportReport('settlement')">Download CSV</button>
+        </div>
+      </div>
+      <div class="card" style="cursor:pointer">
+        <div class="card-body" style="display:flex;flex-direction:column;gap:12px;align-items:flex-start">
+          <div class="stat-icon s4"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg></div>
+          <div><strong style="font-size:14px">Inventory Report</strong><div style="font-size:12px;color:var(--text-2);margin-top:2px">Stock levels across warehouses</div></div>
+          <button class="btn btn-ghost btn-sm" onclick="exportReport('inventory')">Download CSV</button>
+        </div>
+      </div>
+      <div class="card" style="cursor:pointer">
+        <div class="card-body" style="display:flex;flex-direction:column;gap:12px;align-items:flex-start">
+          <div class="stat-icon s1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l3 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+          <div><strong style="font-size:14px">Scheme Performance</strong><div style="font-size:12px;color:var(--text-2);margin-top:2px">Scheme redemption analytics</div></div>
+          <button class="btn btn-ghost btn-sm" onclick="exportReport('schemes')">Download CSV</button>
+        </div>
+      </div>
+      <div class="card" style="cursor:pointer">
+        <div class="card-body" style="display:flex;flex-direction:column;gap:12px;align-items:flex-start">
+          <div class="stat-icon s2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 010 20"/></svg></div>
+          <div><strong style="font-size:14px">State-wise Report</strong><div style="font-size:12px;color:var(--text-2);margin-top:2px">Regional performance breakdown</div></div>
+          <button class="btn btn-ghost btn-sm" onclick="exportReport('states')">Download CSV</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════ PAGE: DIST MAPPING ══════ -->
+  <div class="page" id="pg-dist-mapping">
+    <div class="pg-header">
+      <div><div class="pg-title">Distributor-Retailer Mapping</div><div class="pg-sub">Assign and manage territory mapping</div></div>
+      <button class="btn btn-pri" onclick="openMappingModal()">+ New Mapping</button>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">Mapping Table</span>
+        <input id="map-search" class="form-input" placeholder="Search mapping…" style="width:200px" oninput="filterMappings()">
+      </div>
+      <div class="tbl-wrap">
+        <table class="data">
+          <thead><tr><th>Distributor</th><th>State</th><th>District</th><th>Retailers Mapped</th><th>Coverage %</th><th>Last Updated</th><th>Actions</th></tr></thead>
+          <tbody id="mapping-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════ PAGE: SETTINGS ══════ -->
+  <div class="page" id="pg-settings">
+    <div class="pg-header">
+      <div><div class="pg-title">Platform Settings</div><div class="pg-sub">Configure system-wide parameters</div></div>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header"><span class="card-title">General Settings</span></div>
+        <form id="settingsForm" onsubmit="saveSettings(event)">
+          <div class="card-body">
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">Platform Name</label><input class="form-input" name="setting-name" value="Fair Ford Pharmaceuticals"></div>
+              <div class="form-group"><label class="form-label">Currency</label>
+                <select class="form-input" name="setting-currency"><option value="INR">INR (₹)</option><option value="USD">USD ($)</option></select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">GST Number</label><input class="form-input" name="setting-gst" value="27AABCF1234G1Z5"></div>
+              <div class="form-group"><label class="form-label">Timezone</label>
+                <select class="form-input" name="setting-timezone"><option value="Asia/Kolkata">Asia/Kolkata (IST)</option></select>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-pri">Save Settings</button>
+          </div>
+        </form>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">Notification Preferences</span></div>
+        <div class="card-body" style="display:flex;flex-direction:column;gap:16px">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div><div style="font-size:13px;font-weight:500">New User Approvals</div><div style="font-size:12px;color:var(--text-2)">Notify when new users need review</div></div>
+            <div class="toggle on" onclick="toggleNotification(this)" data-key="notif_approvals"><div class="toggle-knob"></div></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div><div style="font-size:13px;font-weight:500">Settlement Due Alerts</div><div style="font-size:12px;color:var(--text-2)">48h before settlement deadline</div></div>
+            <div class="toggle on" onclick="toggleNotification(this)" data-key="notif_settlement"><div class="toggle-knob"></div></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div><div style="font-size:13px;font-weight:500">Low Stock Alerts</div><div style="font-size:12px;color:var(--text-2)">When items hit reorder level</div></div>
+            <div class="toggle off" onclick="toggleNotification(this)" data-key="notif_stock"><div class="toggle-knob"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<!-- ═════════ PRODUCT MODAL ═════════ -->
+<div id="productModal" class="modal" onclick="event.target===this&&closeProductModal()">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 id="productFormTitle">Add New Product</h2>
+      <button class="modal-close" onclick="closeProductModal()">×</button>
+    </div>
+    <form id="productForm" onsubmit="event.preventDefault(); saveProduct();">
+      <input type="hidden" id="productId">
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Product Name *</label><input class="form-input" name="product-name" placeholder="e.g., Amoxicillin 500mg" required></div>
+        <div class="form-group"><label class="form-label">SKU *</label><input class="form-input" name="product-sku" placeholder="e.g., AMX-500" required></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Category *</label>
+          <select class="form-input" name="product-cat" required>
+            <option value="">Select Category</option>
+            <option value="Antibiotics">Antibiotics</option><option value="Analgesics">Analgesics</option>
+            <option value="Vitamins">Vitamins</option><option value="Cardiac">Cardiac</option>
+            <option value="Antifungals">Antifungals</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">MRP (₹) *</label><input class="form-input" name="product-mrp" type="number" placeholder="250" required></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Manufacturer</label><input class="form-input" name="product-mfr" placeholder="Fair Ford Pharma"></div>
+        <div class="form-group"><label class="form-label">Stock Quantity</label><input class="form-input" name="product-stock" type="number" placeholder="0"></div>
+      </div>
+      <div class="form-group"><label class="form-label">Description</label><textarea class="form-input" name="product-desc" placeholder="Product description" style="resize:vertical;min-height:80px"></textarea></div>
+      <div class="form-group"><label class="form-label">Status</label>
+        <select class="form-input" name="product-status">
+          <option value="active">Active</option><option value="inactive">Inactive</option>
+        </select>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" onclick="closeProductModal()">Cancel</button>
+        <button type="submit" id="submitBtn" class="btn btn-pri">Add Product</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ═════════ DISTRIBUTOR MODAL ═════════ -->
+<div id="distributorModal" class="modal" onclick="event.target===this&&closeDistributorModal()">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 id="distFormTitle">Add Distributor</h2>
+      <button class="modal-close" onclick="closeDistributorModal()">×</button>
+    </div>
+    <form id="distributorForm" onsubmit="event.preventDefault(); saveDistributor();">
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Distributor Name *</label><input class="form-input" name="dist-name" placeholder="e.g., RK Pharma Distributors" required></div>
+        <div class="form-group"><label class="form-label">State *</label><input class="form-input" name="dist-state" placeholder="e.g., Maharashtra" required></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">May GMV</label><input class="form-input" name="dist-may-gmv" placeholder="e.g., ₹10L"></div>
+        <div class="form-group"><label class="form-label">Outstanding</label><input class="form-input" name="dist-outstanding" placeholder="e.g., ₹0"></div>
+      </div>
+      <div class="form-group"><label class="form-label">Status</label>
+        <select class="form-input" name="dist-status">
+          <option value="active">Active</option><option value="suspended">Suspended</option><option value="inactive">Inactive</option>
+        </select>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" onclick="closeDistributorModal()">Cancel</button>
+        <button type="submit" id="distSubmitBtn" class="btn btn-pri">Add Distributor</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ═════════ RETAILER MODAL ═════════ -->
+<div id="retailerModal" class="modal" onclick="event.target===this&&closeRetailerModal()">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 id="retFormTitle">Add Retailer</h2>
+      <button class="modal-close" onclick="closeRetailerModal()">×</button>
+    </div>
+    <form id="retailerForm" onsubmit="event.preventDefault(); saveRetailer();">
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Retailer Name *</label><input class="form-input" name="ret-name" placeholder="e.g., Apollo Pharmacy" required></div>
+        <div class="form-group"><label class="form-label">City / State *</label><input class="form-input" name="ret-city" placeholder="e.g., Mumbai, MH" required></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Type</label>
+          <select class="form-input" name="ret-type">
+            <option value="Medical Store">Medical Store</option><option value="Pharmacy">Pharmacy</option>
+            <option value="Chain Pharmacy">Chain Pharmacy</option><option value="Hospital">Hospital</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">Assigned Distributor</label><input class="form-input" name="ret-distributor" placeholder="e.g., RK Pharma"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Monthly Orders</label><input class="form-input" name="ret-monthly-orders" type="number" placeholder="0"></div>
+        <div class="form-group"><label class="form-label">Status</label>
+          <select class="form-input" name="ret-status">
+            <option value="active">Active</option><option value="inactive">Inactive</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" onclick="closeRetailerModal()">Cancel</button>
+        <button type="submit" id="retSubmitBtn" class="btn btn-pri">Add Retailer</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ═════════ DIST MAPPING MODAL ═════════ -->
+<div id="mappingModal" class="modal" onclick="event.target===this&&closeMappingModal()">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 id="mappingFormTitle">New Mapping</h2>
+      <button class="modal-close" onclick="closeMappingModal()">×</button>
+    </div>
+    <form id="mappingForm" onsubmit="event.preventDefault(); saveMapping();">
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Distributor *</label><input class="form-input" name="map-distributor" placeholder="e.g., RK Pharma Distributors" required></div>
+        <div class="form-group"><label class="form-label">State *</label><input class="form-input" name="map-state" placeholder="e.g., Maharashtra" required></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">District / Area</label><input class="form-input" name="map-district" placeholder="e.g., Mumbai, Thane"></div>
+        <div class="form-group"><label class="form-label">Retailers Mapped</label><input class="form-input" name="map-retailers" type="number" placeholder="0"></div>
+      </div>
+      <div class="form-group"><label class="form-label">Coverage %</label><input class="form-input" name="map-coverage" type="number" min="0" max="100" placeholder="0"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" onclick="closeMappingModal()">Cancel</button>
+        <button type="submit" id="mappingSubmitBtn" class="btn btn-pri">Create Mapping</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ═════════ DISTRIBUTOR PROFILE MODAL ═════════ -->
+<div id="distProfileModal" class="modal" onclick="event.target===this&&closeDistProfile()">
+  <div class="modal-content profile-modal-content" id="distProfileContent">
+    <div style="padding:48px;text-align:center;color:var(--text-3)">Loading…</div>
+  </div>
+</div>
+
+<!-- ═════════ RETAILER PROFILE MODAL ═════════ -->
+<div id="retProfileModal" class="modal" onclick="event.target===this&&closeRetProfile()">
+  <div class="modal-content profile-modal-content" id="retProfileContent">
+    <div style="padding:48px;text-align:center;color:var(--text-3)">Loading…</div>
+  </div>
+</div>
+
+<!-- Toast container -->
+<div id="toast-container"></div>
+
+<!-- Login request notification popup -->
+<div id="login-notif" class="login-notif">
+  <div class="login-notif-icon">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5B3EE8" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+  </div>
+  <div style="flex:1;min-width:0">
+    <div class="login-notif-title">New Login Request</div>
+    <div id="login-notif-msg" class="login-notif-sub">A user is requesting access</div>
+  </div>
+  <button class="btn btn-pri btn-sm" onclick="reviewLoginRequest()">Review</button>
+  <button class="modal-close" style="position:static;font-size:18px;margin-left:4px" onclick="dismissLoginNotif()">×</button>
+</div>
+
+<script src="/frontend/js/superadmin.js"></script>
+</body>
+</html>

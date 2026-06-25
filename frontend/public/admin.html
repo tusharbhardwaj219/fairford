@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fair Ford — Admin</title>
+  <link rel="stylesheet" href="/frontend/css/admin.css" />
+</head>
+<body>
+
+  <!-- ── LOGIN ── -->
+  <div class="ad-login-screen" id="adLogin">
+    <div class="ad-login-card">
+      <h1>Admin sign in</h1>
+      <p>Fair Ford Pharma — operations panel</p>
+      <div class="ad-msg err" id="adLoginMsg"></div>
+      <div class="ad-field" style="margin-bottom:12px;">
+        <label for="adEmail">Email</label>
+        <input class="ad-input" id="adEmail" type="email" placeholder="admin@medibridge.in" />
+      </div>
+      <div class="ad-field" style="margin-bottom:18px;">
+        <label for="adPass">Password</label>
+        <input class="ad-input" id="adPass" type="password" placeholder="••••••••" />
+      </div>
+      <button class="btn btn-primary" id="adLoginBtn" style="width:100%;">Sign in</button>
+    </div>
+  </div>
+
+  <!-- ── APP ── -->
+  <div id="adApp" style="display:none;">
+    <header class="ad-header">
+      <div class="ad-brand">Fair Ford Pharma <small>Admin / ops panel</small></div>
+      <div><span id="adWho" style="margin-right:14px;font-size:14px;"></span><button class="ad-logout" id="adLogout">Logout</button></div>
+    </header>
+
+    <main class="ad-wrap">
+      <!-- Metrics -->
+      <div class="ad-metrics" id="adMetrics"></div>
+
+      <!-- Tabs -->
+      <div class="ad-tabs">
+        <button class="ad-tab active" data-tab="orders">Orders</button>
+        <button class="ad-tab" data-tab="retailers">Retailers (KYC)</button>
+        <button class="ad-tab" data-tab="distributors">Distributors</button>
+      </div>
+
+      <!-- Orders -->
+      <section class="ad-panel active" id="panel-orders">
+        <div class="ad-card">
+          <div class="ad-filter">
+            <strong>Filter:</strong>
+            <select class="ad-select" id="ordFilter">
+              <option value="all">All</option>
+              <option value="pending">Pending</option>
+              <option value="approved">Approved</option>
+              <option value="dispatched">Dispatched</option>
+              <option value="delivered">Delivered</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+            <button class="btn btn-ghost btn-sm" id="ordRefresh">Refresh</button>
+          </div>
+          <div style="overflow-x:auto;"><table class="ad-table" id="ordTable"></table></div>
+        </div>
+      </section>
+
+      <!-- Retailers -->
+      <section class="ad-panel" id="panel-retailers">
+        <div class="ad-card">
+          <div class="ad-filter">
+            <strong>Filter:</strong>
+            <select class="ad-select" id="retFilter">
+              <option value="all">All</option>
+              <option value="pending">Pending KYC</option>
+              <option value="active">Active</option>
+              <option value="suspended">Suspended</option>
+            </select>
+            <button class="btn btn-ghost btn-sm" id="retRefresh">Refresh</button>
+          </div>
+          <div style="overflow-x:auto;"><table class="ad-table" id="retTable"></table></div>
+        </div>
+      </section>
+
+      <!-- Distributors -->
+      <section class="ad-panel" id="panel-distributors">
+        <div class="ad-card">
+          <h2>Add distributor / stockist</h2>
+          <div class="ad-msg" id="distAddMsg"></div>
+          <div class="form-grid">
+            <div class="ad-field"><label>Name *</label><input class="ad-input" id="dNew_name" /></div>
+            <div class="ad-field"><label>Email *</label><input class="ad-input" id="dNew_email" type="email" /></div>
+            <div class="ad-field"><label>Business name</label><input class="ad-input" id="dNew_business" /></div>
+            <div class="ad-field"><label>Phone</label><input class="ad-input" id="dNew_phone" /></div>
+            <div class="ad-field"><label>City</label><input class="ad-input" id="dNew_city" /></div>
+            <div class="ad-field"><label>Pincode</label><input class="ad-input" id="dNew_pincode" /></div>
+            <div class="ad-field"><label>Serviceable cities (comma-sep)</label><input class="ad-input" id="dNew_territory" placeholder="Mumbai, Thane" /></div>
+            <div class="ad-field"><label>Serviceable pincodes (comma-sep)</label><input class="ad-input" id="dNew_pincodes" placeholder="400050, 400028" /></div>
+          </div>
+          <button class="btn btn-primary" id="distAddBtn" style="margin-top:14px;">Create distributor</button>
+        </div>
+
+        <div class="ad-card">
+          <h2>Distributors</h2>
+          <div id="distList"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="ad-toast" id="adToast"></div>
+  <script src="/frontend/js/admin.js"></script>
+</body>
+</html>

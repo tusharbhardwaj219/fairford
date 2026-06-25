@@ -1,0 +1,102 @@
+/* =====================================================================
+   admin.css — Fair Ford Pharma admin / ops panel
+   Orders fulfilment · retailer KYC · distributor routing coverage
+   ===================================================================== */
+
+:root {
+  --primary: #0F4C81;
+  --primary-dark: #0b3a63;
+  --bg: #f4f6f9;
+  --card: #ffffff;
+  --border: #e3e8ef;
+  --text: #1f2937;
+  --muted: #6b7280;
+  --green: #1D9E75; --green-bg: #e1f5ee;
+  --amber: #b7791f; --amber-bg: #fff8e6;
+  --blue-bg: #e6f1fb;
+  --red: #d85a30;   --red-bg: #faece7;
+}
+* { box-sizing: border-box; }
+body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); }
+
+/* Header */
+.ad-header { display: flex; align-items: center; justify-content: space-between; background: var(--primary); color: #fff; padding: 14px 24px; }
+.ad-brand { font-size: 18px; font-weight: 700; }
+.ad-brand small { display: block; font-size: 11px; font-weight: 400; opacity: .8; }
+.ad-logout { background: rgba(255,255,255,.15); color: #fff; border: 1px solid rgba(255,255,255,.35); padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 13px; }
+
+.ad-wrap { max-width: 1180px; margin: 0 auto; padding: 22px 18px 60px; }
+
+/* Login */
+.ad-login-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+.ad-login-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 30px; width: 100%; max-width: 380px; }
+.ad-login-card h1 { font-size: 20px; color: var(--primary); margin: 0 0 4px; }
+.ad-login-card p { color: var(--muted); font-size: 13px; margin: 0 0 20px; }
+
+/* Metrics */
+.ad-metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-bottom: 22px; }
+.ad-metric { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; }
+.ad-metric .v { font-size: 24px; font-weight: 800; color: var(--primary); }
+.ad-metric .l { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+/* Tabs */
+.ad-tabs { display: flex; gap: 6px; margin-bottom: 16px; flex-wrap: wrap; }
+.ad-tab { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 9px 18px; cursor: pointer; font-size: 14px; font-weight: 600; color: var(--muted); }
+.ad-tab.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+.ad-panel { display: none; }
+.ad-panel.active { display: block; }
+
+.ad-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 18px; margin-bottom: 18px; }
+.ad-card h2 { margin: 0 0 14px; font-size: 16px; color: var(--primary); }
+
+/* Filters */
+.ad-filter { display: flex; gap: 10px; align-items: center; margin-bottom: 14px; flex-wrap: wrap; }
+select, input { font-family: inherit; }
+.ad-select, .ad-input { padding: 8px 11px; border: 1px solid var(--border); border-radius: 7px; font-size: 14px; }
+.ad-input:focus, .ad-select:focus { outline: none; border-color: var(--primary); }
+
+/* Tables */
+.ad-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+.ad-table th { text-align: left; padding: 9px 10px; border-bottom: 2px solid var(--border); color: var(--muted); font-weight: 600; white-space: nowrap; }
+.ad-table td { padding: 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+.ad-table tr:last-child td { border-bottom: none; }
+.ad-muted { color: var(--muted); font-size: 12px; }
+
+/* Buttons */
+.btn { border: none; border-radius: 7px; padding: 7px 13px; font-size: 13px; cursor: pointer; font-weight: 600; }
+.btn-primary { background: var(--primary); color: #fff; }
+.btn-primary:hover { background: var(--primary-dark); }
+.btn-primary:disabled { opacity: .55; cursor: not-allowed; }
+.btn-green { background: var(--green-bg); color: var(--green); }
+.btn-danger { background: var(--red-bg); color: var(--red); }
+.btn-ghost { background: #eef2f7; color: var(--primary); }
+.btn-sm { padding: 5px 10px; font-size: 12px; }
+.btn-row { display: flex; gap: 6px; flex-wrap: wrap; }
+
+/* Badges */
+.badge { font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; text-transform: capitalize; white-space: nowrap; }
+.badge.pending { background: var(--amber-bg); color: var(--amber); }
+.badge.approved, .badge.dispatched, .badge.active { background: var(--blue-bg); color: var(--primary); }
+.badge.delivered { background: var(--green-bg); color: var(--green); }
+.badge.cancelled, .badge.returned, .badge.suspended { background: var(--red-bg); color: var(--red); }
+
+/* Distributor cards */
+.ad-dist { border: 1px solid var(--border); border-radius: 10px; padding: 14px; margin-bottom: 12px; }
+.ad-dist-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+.ad-dist-name { font-weight: 700; font-size: 15px; }
+.ad-dist-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-top: 12px; }
+.ad-field { display: flex; flex-direction: column; gap: 4px; }
+.ad-field label { font-size: 12px; color: var(--muted); }
+.ad-field input, .ad-field select { padding: 8px 10px; border: 1px solid var(--border); border-radius: 7px; font-size: 13px; }
+.form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
+
+.ad-empty { color: var(--muted); font-size: 14px; text-align: center; padding: 22px 0; }
+.ad-msg { font-size: 13px; padding: 9px 12px; border-radius: 7px; margin-bottom: 12px; display: none; }
+.ad-msg.show { display: block; }
+.ad-msg.err { background: var(--red-bg); color: var(--red); }
+.ad-msg.ok { background: var(--green-bg); color: var(--green); }
+
+/* Toast */
+.ad-toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(120%); background: #111827; color: #fff; padding: 12px 20px; border-radius: 8px; font-size: 14px; z-index: 50; transition: transform .3s ease; }
+.ad-toast.show { transform: translateX(-50%) translateY(0); }

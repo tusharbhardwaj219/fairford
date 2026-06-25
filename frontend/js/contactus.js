@@ -863,8 +863,7 @@ function _renderWishlist() {
     if (!userStr) { window.location.href = 'login&signup.html'; return; }
     try {
       var user = JSON.parse(userStr);
-      if (user.role === 'dist')     window.location.href = 'distributor.html';
-      else if (user.role === 'ret') window.location.href = 'retailer.html';
+      if (user.role === 'ret')      window.location.href = 'retailer.html';
       else                          window.location.href = 'index.html';
     } catch (e) { window.location.href = 'login&signup.html'; }
   }
