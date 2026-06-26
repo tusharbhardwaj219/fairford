@@ -164,16 +164,16 @@ function validateStep4() {
   const pw1 = document.getElementById('pw1') ? document.getElementById('pw1').value : '';
   const pw2 = document.getElementById('pw2') ? document.getElementById('pw2').value : '';
 
-  if (!pw1 || pw1.length < 8) {
-    fieldErr('pw1', 'Password must be at least 8 characters'); ok = false;
+  if (!pw1 || pw1.length < 12) {
+    fieldErr('pw1', 'Password must be at least 12 characters'); ok = false;
   } else if (!/[A-Z]/.test(pw1)) {
     fieldErr('pw1', 'Password must contain at least one uppercase letter'); ok = false;
   } else if (!/[a-z]/.test(pw1)) {
     fieldErr('pw1', 'Password must contain at least one lowercase letter'); ok = false;
   } else if (!/[0-9]/.test(pw1)) {
     fieldErr('pw1', 'Password must contain at least one number'); ok = false;
-  } else if (!/[^A-Za-z0-9]/.test(pw1)) {
-    fieldErr('pw1', 'Password must contain at least one special character (@#$%^&*!...)'); ok = false;
+  } else if (!/[@$!%*?&]/.test(pw1)) {
+    fieldErr('pw1', 'Password must contain at least one special character (@$!%*?&)'); ok = false;
   } else {
     clearErr('pw1');
   }

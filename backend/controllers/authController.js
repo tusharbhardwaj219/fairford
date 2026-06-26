@@ -24,7 +24,12 @@ function modelForRole(role) {
  */
 const signup = async (req, res, next) => {
   try {
-    const { name, email, password, role, phone } = req.body;
+    const {
+      name, email, password, role,
+      phone, mobile,
+      businessName, drugLicenseNumber, gstNumber, panNumber,
+      state, city, address, pincode
+    } = req.body;
 
     // Only retailers self-register. Distributors/stockists are onboarded by an admin.
     if (role !== 'ret') {
@@ -49,13 +54,22 @@ const signup = async (req, res, next) => {
       });
     }
 
-    // Prepare user data
+    // Prepare user data — map frontend field names to the Retailer schema
     const userData = {
       name: name.trim(),
       email: email.toLowerCase(),
       password,
       role,
-      phone
+      phone: mobile || phone,
+      shopName: businessName,
+      drugLicenseNumber,
+      gstNumber,
+      shopAddress: {
+        street: address,
+        city,
+        state,
+        pincode
+      }
     };
 
     // Retailers are no longer tied to a single distributor — each order is routed
