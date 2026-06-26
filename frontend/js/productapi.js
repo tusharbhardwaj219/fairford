@@ -8,11 +8,28 @@
 // <script src="api.js"></script>
 
 document.addEventListener('DOMContentLoaded', function () {
-  console.log('MediBridge Products Page Loaded');
+  /* ---- Auth guard: redirect to login if not logged in ---- */
+  const _rawToken = localStorage.getItem('ff_token');
+  const _rawUser  = localStorage.getItem('ff_user');
+  if (!_rawToken || !_rawUser) {
+    localStorage.removeItem('ff_token');
+    localStorage.removeItem('ff_user');
+    localStorage.setItem('ff_redirect', 'product.html');
+    window.location.replace('login&signup.html');
+    return;
+  }
+
+  /* ---- Determine user role for pricing ---- */
+  let _user = {};
+  try { _user = JSON.parse(_rawUser); } catch (e) {}
+  const USER_ROLE = (_user.role || 'ret').toLowerCase();
+  const IS_DIST = USER_ROLE === 'dist';
 
   /* ---- Inject shared chrome ---- */
   document.getElementById('site-header').innerHTML = renderHeader('products');
   document.getElementById('site-footer').innerHTML = renderFooter();
+  initHeader();
+  initFooter();
 
   const CATEGORIES = [];
   const STOCK_OPTS = ["In Stock", "Low Stock", "Out of Stock"];
@@ -324,9 +341,25 @@ document.addEventListener('DOMContentLoaded', function () {
   const grid = document.getElementById('product-grid');
 
   function cardHTML(p) {
-    const save = Math.round(((p.mrp - p.retailerPrice) / p.mrp) * 100);
-    const out = p.stockStatus === "Out of Stock";
+    const price  = IS_DIST ? p.distributorPrice : p.retailerPrice;
+    const out    = p.stockStatus === "Out of Stock";
     const wished = store.wishlist.indexOf(p._id) >= 0;
+
+    let pricingHTML;
+    if (IS_DIST) {
+      const save = (p.mrp && p.mrp > 0) ? Math.round(((p.mrp - price) / p.mrp) * 100) : 0;
+      pricingHTML = `
+        <div class="price-block">
+          <span class="retail" title="Distributor Price">${inr(price).replace('.00', '')}</span>
+          <span class="mrp">MRP ${inr(p.mrp).replace('.00', '')}</span>
+          ${save > 0 ? `<span class="save">${save}% OFF</span>` : ''}
+        </div>`;
+    } else {
+      pricingHTML = `
+        <div class="price-block">
+          <span class="retail" title="Retailer Price">${inr(price).replace('.00', '')}</span>
+        </div>`;
+    }
 
     return `<article class="card" data-id="${p._id}">
       <button class="wish ${wished ? 'active' : ''}" data-wish="${p._id}" aria-label="Add to wishlist">${ICONS.heart}</button>
@@ -342,12 +375,8 @@ document.addEventListener('DOMContentLoaded', function () {
         <div class="meta-row">
           <span>${p.packSize}</span><span class="dot"></span><span>${p.strength}</span>
         </div>
-        <div class="rating-row">${renderStars(p.rating)} <b>${p.rating}</b> <span>(${p.reviewCount})</span></div>
-        <div class="price-block">
-          <span class="retail">${inr(p.retailerPrice).replace('.00', '')}</span>
-          <span class="mrp">${inr(p.mrp).replace('.00', '')}</span>
-          ${save > 0 ? `<span class="save">${save}% OFF</span>` : ''}
-        </div>
+        <div class="rating-row">${renderStars(p.rating || 0)} <b>${p.rating || 0}</b> <span>(${p.reviewCount || 0})</span></div>
+        ${pricingHTML}
         <div class="card-actions">
           <button class="btn btn-primary" data-cart="${p._id}" ${out ? 'disabled style="opacity:.5;cursor:not-allowed"' : ''}>
             ${ICONS.cart} ${out ? 'Out of Stock' : 'Add to Cart'}

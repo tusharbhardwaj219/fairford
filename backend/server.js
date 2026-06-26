@@ -94,18 +94,15 @@ app.use('/api/', rateLimit({
  * Combined with account lockout mechanism in authController
  */
 const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 5, // Reduced from 10 to 5 attempts per 15 minutes
-  skipSuccessfulRequests: false, // Count successful attempts too
-  skipFailedRequests: false, // Count failed attempts (important for security)
+  windowMs: 15 * 60 * 1000,
+  max: process.env.NODE_ENV === 'production' ? 10 : 100,
+  skipSuccessfulRequests: true, // only failed requests count toward the limit
   message: {
     success: false,
-    message: 'Too many login attempts. Please try again in 15 minutes.'
+    message: 'Too many failed attempts. Please try again in 15 minutes.'
   },
   standardHeaders: true,
   legacyHeaders: false,
-  // Store in memory (use Redis for production with multiple servers)
-  store: undefined, // Default memory store - fine for single server
 });
 
 // ── ROUTES ────────────────────────────────────────────────────────────────────
@@ -121,10 +118,7 @@ const prescriptionRoutes = require('./routes/prescriptionRoutes');
 const schemeRoutes       = require('./routes/schemeRoutes');
 const newsletterRoutes   = require('./routes/newsletterRoutes');
 const contactRoutes      = require('./routes/contactRoutes');
-<<<<<<< HEAD
 const distInventoryRoutes = require('./routes/distributorInventoryRoutes');
-=======
->>>>>>> 1c0e9db7d24427e2c280575a9120a80d6904ac37
 
 // Health check
 app.get('/api/health', (_req, res) =>
@@ -143,10 +137,7 @@ app.use('/api/prescriptions', prescriptionRoutes);
 app.use('/api/schemes',      schemeRoutes); 
 app.use('/api/newsletter',   newsletterRoutes);
 app.use('/api/contact',      contactRoutes);
-<<<<<<< HEAD
 app.use('/api/dist-inventory', distInventoryRoutes);
-=======
->>>>>>> 1c0e9db7d24427e2c280575a9120a80d6904ac37
 
 // ── STATIC / FRONTEND ─────────────────────────────────────────────────────────
 app.use('/frontend', express.static(path.join(__dirname, '..', 'frontend')));
