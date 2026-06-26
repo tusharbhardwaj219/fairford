@@ -589,22 +589,78 @@ const RETURN_POLICY = {
 };
 
 /* ---------------------------------------------------------------------
-   Accessor functions — the ONLY way the UI reads data.
-   Swap the bodies for fetch() calls to connect a real backend.
+   Accessor functions — async, API-backed.
+   Cache the first /api/products response so repeated callers (filter, search,
+   detail) don't re-fetch. The product list is stable within a session.
    --------------------------------------------------------------------- */
-function getAllProducts() {
-  return PRODUCTS;
+var _cachedProducts = null;
+
+// Map the API shape (Mongoose _id, role-filtered prices) to the shape the
+// existing UI code already reads: id, retailerPrice/mrp/distributorPrice,
+// stockStatus, category name, etc.
+function _normaliseApiProduct(p) {
+  var stockStatus = p.stockStatus;
+  if (!stockStatus) {
+    var s = Number(p.stock || 0);
+    stockStatus = s === 0 ? 'Out of Stock' : s <= 50 ? 'Low Stock' : 'In Stock';
+  }
+  var category = (p.category && p.category.categoryName) || p.categoryName || 'Tablets';
+  return {
+    id:               String(p._id || p.id),
+    name:             p.name || '',
+    brand:            p.brand || 'Fair Ford Pharma',
+    category:         category,
+    strength:         p.strength || '-',
+    packSize:         p.packSize || '-',
+    mrp:              Number(p.mrp || 0),
+    retailerPrice:    Number(p.retailerPrice || 0),
+    distributorPrice: Number(p.distributorPrice || 0),
+    gst:              Number(p.gst || 12),
+    moq:              Number(p.minimumOrderQuantity || 1),
+    stock:            Number(p.stock || 0),
+    stockStatus:      stockStatus,
+    rating:           Number(p.rating || 4.5),
+    reviewCount:      Number(p.reviewCount || 0),
+    dosageForm:       p.dosageForm || '-',
+    composition:      p.composition || [],
+    uses:             p.uses || '',
+    benefits:         p.benefits || [],
+    sideEffects:      p.sideEffects || [],
+    storage:          p.storage || [],
+    description:      p.description || '',
+    image:            (p.image && p.image.url) || (p.images && p.images[0] && p.images[0].url) || ''
+  };
 }
 
-function getProductById(id) {
-  return PRODUCTS.find(function (p) { return p.id === id; }) || null;
+async function getAllProducts() {
+  if (_cachedProducts) return _cachedProducts;
+  try {
+    var token = localStorage.getItem('ff_token');
+    var headers = { 'Content-Type': 'application/json' };
+    if (token) headers.Authorization = 'Bearer ' + token;
+    var res = await fetch('/api/products?limit=200', { headers: headers });
+    var data = await res.json();
+    var list = (data && data.products) || [];
+    _cachedProducts = list.map(_normaliseApiProduct);
+    return _cachedProducts;
+  } catch (e) {
+    console.error('[data] getAllProducts failed:', e);
+    _cachedProducts = [];
+    return _cachedProducts;
+  }
+}
+
+async function getProductById(id) {
+  var list = await getAllProducts();
+  return list.find(function (p) { return p.id === String(id); }) || null;
 }
 
 /* Returns up to `limit` related products: same category or same brand,
    excluding the current product. */
-function getRelatedProducts(product, limit) {
+async function getRelatedProducts(product, limit) {
   limit = limit || 8;
-  return PRODUCTS
+  var list = await getAllProducts();
+  return list
     .filter(function (p) {
       return p.id !== product.id &&
         (p.category === product.category || p.brand === product.brand);
@@ -612,9 +668,10 @@ function getRelatedProducts(product, limit) {
     .slice(0, limit);
 }
 
-/* Unique, sorted brand list — used to build the brand filter dynamically. */
-function getAllBrands() {
+/* Unique, sorted brand list — kept for any caller that still needs it. */
+async function getAllBrands() {
+  var list = await getAllProducts();
   var set = {};
-  PRODUCTS.forEach(function (p) { set[p.brand] = true; });
+  list.forEach(function (p) { set[p.brand] = true; });
   return Object.keys(set).sort();
 }

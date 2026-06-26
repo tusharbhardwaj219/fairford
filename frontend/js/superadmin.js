@@ -560,21 +560,35 @@ function renderProducts(data) {
   const tbody = document.getElementById('prod-tbody');
   if (!tbody) return;
   if (!data.length) {
-    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;color:var(--text-3);padding:24px">No products found</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="12" style="text-align:center;color:var(--text-3);padding:24px">No products found</td></tr>`;
     return;
   }
+  // Build thumbnail <td>: real image if uploaded, otherwise an initial-letter
+  // placeholder so the column never collapses to whitespace.
+  function thumbCell(d) {
+    if (d.imageUrl) {
+      return `<td><img src="${d.imageUrl}" alt="" class="prod-thumb" loading="lazy"></td>`;
+    }
+    const initial = String(d.name || '?').trim().charAt(0).toUpperCase() || '?';
+    return `<td><span class="prod-thumb prod-thumb--fallback">${initial}</span></td>`;
+  }
+  // data-label is what the responsive "card" view shows next to each cell
+  // when the table collapses to a stacked layout on narrow screens.
   tbody.innerHTML = '';
   data.forEach(d => {
     tbody.innerHTML += `<tr>
-      <td><strong>${d.name}</strong></td>
-      <td style="font-family:'DM Mono',monospace;font-size:12px">${d.sku}</td>
-      <td><span class="badge badge-blue">${d.category}</span></td>
-      <td>₹${d.mrp}</td>
-      <td style="font-size:12px">${d.manufacturer}</td>
-      <td style="text-align:center;font-weight:500">${d.stock.toLocaleString('en-IN')}</td>
-      <td><span class="badge ${d.status === 'active' ? 'badge-green' : 'badge-gray'}">${d.status}</span></td>
-      <td style="font-size:12px;color:var(--text-3)">${d.created_date}</td>
-      <td class="tbl-actions">
+      ${thumbCell(d)}
+      <td data-label="Name"><strong>${d.name}</strong></td>
+      <td data-label="SKU" style="font-family:'DM Mono',monospace;font-size:12px">${d.sku}</td>
+      <td data-label="Category"><span class="badge badge-blue">${d.category}</span></td>
+      <td data-label="MRP">₹${Number(d.mrp || 0).toLocaleString('en-IN')}</td>
+      <td data-label="Retailer ₹">₹${Number(d.retailerPrice || 0).toLocaleString('en-IN')}</td>
+      <td data-label="Distributor ₹">₹${Number(d.distributorPrice || 0).toLocaleString('en-IN')}</td>
+      <td data-label="Manufacturer" style="font-size:12px">${d.manufacturer}</td>
+      <td data-label="Stock" style="text-align:center;font-weight:500">${(d.stock || 0).toLocaleString('en-IN')}</td>
+      <td data-label="Status"><span class="badge ${d.status === 'active' ? 'badge-green' : 'badge-gray'}">${d.status}</span></td>
+      <td data-label="Added" style="font-size:12px;color:var(--text-3)">${d.created_date}</td>
+      <td class="tbl-actions" data-label="">
         <button class="btn btn-ghost btn-sm" onclick="editProduct('${d.id}')">Edit</button>
         <button class="btn btn-danger btn-sm" onclick="deleteProduct('${d.id}')">Delete</button>
       </td>
@@ -600,6 +614,7 @@ function openProductModal() {
   document.getElementById('productFormTitle').textContent = 'Add New Product';
   document.getElementById('submitBtn').textContent = 'Add Product';
   document.getElementById('productId').value = '';
+  resetProductImagePreview();
   modal.classList.add('active');
 }
 
@@ -607,21 +622,71 @@ function closeProductModal() {
   document.getElementById('productModal')?.classList.remove('active');
 }
 
+/* ── Product image preview helpers ── */
+function setProductImagePreview(src) {
+  const box = document.getElementById('prodImagePreview');
+  if (!box) return;
+  box.innerHTML = src
+    ? `<img src="${src}" alt="Product image preview">`
+    : '<span class="prod-image-placeholder">No image selected</span>';
+  const clearBtn = document.getElementById('productImageClear');
+  if (clearBtn) clearBtn.style.display = src ? '' : 'none';
+}
+
+function resetProductImagePreview() {
+  setProductImagePreview('');
+  const input = document.getElementById('productImageInput');
+  if (input) input.value = '';
+}
+
+document.addEventListener('change', function (e) {
+  if (e.target && e.target.id === 'productImageInput') {
+    const file = e.target.files && e.target.files[0];
+    if (!file) { setProductImagePreview(''); return; }
+    if (file.size > 5 * 1024 * 1024) {
+      toast('Image is larger than 5 MB', 'error');
+      e.target.value = '';
+      setProductImagePreview('');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = function (ev) { setProductImagePreview(ev.target.result); };
+    reader.readAsDataURL(file);
+  }
+});
+
+document.addEventListener('click', function (e) {
+  if (e.target && e.target.id === 'productImageClear') {
+    resetProductImagePreview();
+  }
+});
+
 async function editProduct(id) {
   try {
     const product = await apiFetch(`/products/${id}`);
     const form = document.getElementById('productForm');
-    form.querySelector('[name=product-name]').value = product.name;
-    form.querySelector('[name=product-sku]').value = product.sku;
-    form.querySelector('[name=product-cat]').value = product.category;
-    form.querySelector('[name=product-mrp]').value = product.mrp;
-    form.querySelector('[name=product-mfr]').value = product.manufacturer;
-    form.querySelector('[name=product-stock]').value = product.stock;
-    form.querySelector('[name=product-desc]').value = product.description;
-    form.querySelector('[name=product-status]').value = product.status;
+    form.querySelector('[name=product-name]').value     = product.name || '';
+    form.querySelector('[name=product-sku]').value      = product.sku || '';
+    form.querySelector('[name=product-cat]').value      = product.category || '';
+    form.querySelector('[name=product-mrp]').value      = product.mrp ?? '';
+    form.querySelector('[name=product-retail]').value   = product.retailerPrice ?? '';
+    form.querySelector('[name=product-dist]').value     = product.distributorPrice ?? '';
+    form.querySelector('[name=product-mfr]').value      = product.manufacturer || '';
+    form.querySelector('[name=product-stock]').value    = product.stock ?? '';
+    form.querySelector('[name=product-strength]').value = product.strength || '';
+    form.querySelector('[name=product-pack]').value     = product.packSize || '';
+    form.querySelector('[name=product-dosage]').value   = product.dosageForm || '';
+    form.querySelector('[name=product-desc]').value     = product.description || '';
+    form.querySelector('[name=product-status]').value   = product.status || 'active';
     document.getElementById('productId').value = id;
     document.getElementById('productFormTitle').textContent = 'Edit Product';
     document.getElementById('submitBtn').textContent = 'Update Product';
+    // Clear any selected file, then show the existing image (if any) as the
+    // preview. Picking a new file in the input replaces it; leaving the input
+    // empty keeps the existing image untouched server-side.
+    var fileInput = document.getElementById('productImageInput');
+    if (fileInput) fileInput.value = '';
+    setProductImagePreview(product.imageUrl || '');
     document.getElementById('productModal').classList.add('active');
   } catch (e) { toast('Failed to load product', 'error'); }
 }
@@ -629,28 +694,78 @@ async function editProduct(id) {
 async function saveProduct() {
   const form = document.getElementById('productForm');
   const productId = document.getElementById('productId').value;
+  const numOrNull = (v) => (v === '' || v == null ? null : Number(v));
   const payload = {
-    name: form.querySelector('[name=product-name]').value,
-    sku: form.querySelector('[name=product-sku]').value,
-    category: form.querySelector('[name=product-cat]').value,
-    mrp: parseInt(form.querySelector('[name=product-mrp]').value),
-    manufacturer: form.querySelector('[name=product-mfr]').value || 'Fair Ford Pharma',
-    stock: parseInt(form.querySelector('[name=product-stock]').value || 0),
-    description: form.querySelector('[name=product-desc]').value,
-    status: form.querySelector('[name=product-status]').value,
+    name:             form.querySelector('[name=product-name]').value.trim(),
+    sku:              form.querySelector('[name=product-sku]').value.trim(),
+    category:         form.querySelector('[name=product-cat]').value,
+    mrp:              numOrNull(form.querySelector('[name=product-mrp]').value),
+    retailerPrice:    numOrNull(form.querySelector('[name=product-retail]').value),
+    distributorPrice: numOrNull(form.querySelector('[name=product-dist]').value),
+    manufacturer:     form.querySelector('[name=product-mfr]').value.trim() || 'Fair Ford Pharma',
+    strength:         form.querySelector('[name=product-strength]').value.trim(),
+    packSize:         form.querySelector('[name=product-pack]').value.trim(),
+    dosageForm:       form.querySelector('[name=product-dosage]').value.trim(),
+    stock:            parseInt(form.querySelector('[name=product-stock]').value || '0', 10),
+    description:      form.querySelector('[name=product-desc]').value,
+    status:           form.querySelector('[name=product-status]').value,
   };
+  // The 3 prices are required by the storefront; reject early with a clear toast.
+  if (payload.mrp == null || payload.retailerPrice == null || payload.distributorPrice == null) {
+    toast('MRP, Retailer Price and Distributor Price are all required', 'error');
+    return;
+  }
+
+  // Use multipart only when a file is attached; otherwise JSON is fine.
+  // Multer leaves req.body alone for JSON requests, so the backend handles both.
+  const fileInput = document.getElementById('productImageInput');
+  const file = fileInput && fileInput.files && fileInput.files[0];
+  const url = productId ? `/products/${productId}` : '/products';
+  const method = productId ? 'PUT' : 'POST';
+
+  const submitBtn = document.getElementById('submitBtn');
+  const origBtnText = submitBtn.textContent;
+  submitBtn.disabled = true;
+  submitBtn.textContent = productId ? 'Updating…' : 'Adding…';
+
   try {
-    if (productId) {
-      await apiFetch(`/products/${productId}`, { method: 'PUT', body: JSON.stringify(payload) });
-      toast('Product updated successfully');
+    if (file) {
+      const fd = new FormData();
+      Object.keys(payload).forEach(k => {
+        if (payload[k] !== null && payload[k] !== undefined) fd.append(k, payload[k]);
+      });
+      fd.append('image', file);
+      // apiFetch sets Content-Type: application/json by default — pass FormData
+      // directly via fetch so the browser sets the multipart boundary itself.
+      const token = localStorage.getItem('ff_token');
+      const res = await fetch(API_BASE + url, {
+        method,
+        headers: token ? { Authorization: 'Bearer ' + token } : {},
+        body: fd,
+      });
+      if (res.status === 401 || res.status === 403) {
+        localStorage.removeItem('ff_token');
+        localStorage.removeItem('ff_user');
+        window.location.replace('/admin.html');
+        return;
+      }
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.error || body.message || ('HTTP ' + res.status));
+      }
     } else {
-      await apiFetch('/products', { method: 'POST', body: JSON.stringify(payload) });
-      toast('Product added successfully');
+      await apiFetch(url, { method, body: JSON.stringify(payload) });
     }
+    toast(productId ? 'Product updated successfully' : 'Product added successfully');
     closeProductModal();
     allProducts = [];
     await loadProducts();
-  } catch (e) { toast(e.message, 'error'); }
+  } catch (e) {
+    toast(e.message, 'error');
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = origBtnText;
+  }
 }
 
 async function deleteProduct(id) {
@@ -1458,9 +1573,15 @@ async function pollNewLogins() {
       const newCount = count - _lastPendingCount;
       const latest = data[data.length - 1];
       showLoginNotification(newCount, latest);
+    }
+    // Always rehydrate the visible UI so the Approvals table reflects backend
+    // state without the user clicking refresh — regardless of count delta. This
+    // also picks up rows whose status changed (approved/rejected elsewhere).
+    if (_lastPendingCount === -1 || count !== _lastPendingCount) {
       allApprovals = [];
       loadDashboardStats();
       loadPendingWidget();
+      loadApprovalsTable();
     }
     _lastPendingCount = count;
   } catch (_) {}
@@ -1508,7 +1629,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     loadDistMapping(),
     loadPricingTable(),
   ]);
-  // Start polling for new login requests (distributors/retailers logging in from their app)
+  // Poll for new pending KYC approvals every 10s so the admin sees newly-signed-up
+  // retailers and order requests without manually refreshing the page.
   setTimeout(pollNewLogins, 3000);
-  setInterval(pollNewLogins, 20000);
+  setInterval(pollNewLogins, 10000);
 });

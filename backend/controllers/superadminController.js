@@ -286,17 +286,26 @@ function skuOf(p) { return str(p.slug || `FF-${sid(p).slice(-6).toUpperCase()}`)
 
 function toProduct(p) {
   const catName = (p.category && p.category.categoryName) || p.categoryName || 'General';
+  const imageUrl = (p.image && p.image.url) ||
+                   (p.images && p.images[0] && p.images[0].url) || '';
   return {
-    id:           sid(p),
-    name:         str(p.name),
-    sku:          skuOf(p),
-    category:     str(catName),
-    mrp:          num(p.mrp),
-    manufacturer: str(p.brand || 'Fair Ford Pharma'),
-    stock:        num(p.stock),
-    status:       str(p.status || 'active'),
-    created_date: fmtDate(p.createdAt),
-    description:  str(p.description),
+    id:               sid(p),
+    name:             str(p.name),
+    sku:              skuOf(p),
+    category:         str(catName),
+    mrp:              num(p.mrp),
+    retailerPrice:    num(p.retailerPrice),
+    distributorPrice: num(p.distributorPrice),
+    manufacturer:     str(p.brand || 'Fair Ford Pharma'),
+    brand:            str(p.brand || 'Fair Ford Pharma'),
+    strength:         str(p.strength || '-'),
+    packSize:         str(p.packSize || '-'),
+    dosageForm:       str(p.dosageForm || '-'),
+    stock:            num(p.stock),
+    status:           str(p.status || 'active'),
+    created_date:     fmtDate(p.createdAt),
+    description:      str(p.description),
+    imageUrl:         imageUrl,
   };
 }
 
@@ -331,22 +340,45 @@ exports.getProduct = async (req, res) => {
 
 exports.createProduct = async (req, res) => {
   try {
-    const { name, sku, category, mrp, manufacturer, stock, description, status } = req.body;
-    if (!name || !mrp) return res.status(400).json({ error: 'name and mrp are required' });
+    const {
+      name, sku, category, mrp, retailerPrice, distributorPrice,
+      manufacturer, brand, strength, packSize, dosageForm,
+      stock, description, status,
+    } = req.body;
+    if (!name || mrp == null) return res.status(400).json({ error: 'name and mrp are required' });
+
+    const mrpNum   = Number(mrp);
+    // Sensible defaults if the form omits them — but the form sends all three.
+    const retNum   = Number(retailerPrice ?? mrp);
+    const distNum  = Number(distributorPrice ?? mrp);
+    if (Number.isNaN(mrpNum) || Number.isNaN(retNum) || Number.isNaN(distNum)) {
+      return res.status(400).json({ error: 'mrp, retailerPrice and distributorPrice must be numbers' });
+    }
+
     const categoryId = await resolveCategoryId(category);
-    const price = Number(mrp);
-    const p = await Product.create({
+    const productData = {
       name,
       slug: sku || undefined,
-      brand: manufacturer || 'Fair Ford Pharma',
+      brand: manufacturer || brand || 'Fair Ford Pharma',
       category: categoryId,
       categoryName: category || 'General',
-      strength: '-', packSize: '-', dosageForm: '-',
-      mrp: price, retailerPrice: price, distributorPrice: price,
+      strength:   strength   || '-',
+      packSize:   packSize   || '-',
+      dosageForm: dosageForm || '-',
+      mrp: mrpNum,
+      retailerPrice: retNum,
+      distributorPrice: distNum,
       stock: Number(stock) || 0,
       description: description || '',
       status: status || 'active',
-    });
+    };
+    // Multer (Cloudinary storage) attaches the uploaded asset to req.file.
+    // `path` is the secure URL Cloudinary returns; `filename` is the public_id
+    // we need to delete the asset later on update/delete.
+    if (req.file) {
+      productData.image = { url: req.file.path, public_id: req.file.filename };
+    }
+    const p = await Product.create(productData);
     res.status(201).json(toProduct(p));
   } catch (e) { res.status(500).json({ error: e.message }); }
 };
@@ -354,16 +386,41 @@ exports.createProduct = async (req, res) => {
 exports.updateProduct = async (req, res) => {
   try {
     if (!isOid(req.params.id)) return res.status(404).json({ error: 'Product not found' });
-    const { name, sku, category, mrp, manufacturer, stock, description, status } = req.body;
+    const {
+      name, sku, category, mrp, retailerPrice, distributorPrice,
+      manufacturer, brand, strength, packSize, dosageForm,
+      stock, description, status,
+    } = req.body;
     const patch = {};
     if (name !== undefined) patch.name = name;
     if (sku !== undefined) patch.slug = sku;
     if (mrp !== undefined) patch.mrp = Number(mrp);
+    if (retailerPrice !== undefined)    patch.retailerPrice    = Number(retailerPrice);
+    if (distributorPrice !== undefined) patch.distributorPrice = Number(distributorPrice);
     if (manufacturer !== undefined) patch.brand = manufacturer;
+    else if (brand !== undefined)   patch.brand = brand;
+    if (strength !== undefined)   patch.strength   = strength;
+    if (packSize !== undefined)   patch.packSize   = packSize;
+    if (dosageForm !== undefined) patch.dosageForm = dosageForm;
     if (stock !== undefined) patch.stock = Number(stock);
     if (description !== undefined) patch.description = description;
     if (status !== undefined) patch.status = status;
     if (category !== undefined) { patch.category = await resolveCategoryId(category); patch.categoryName = category; }
+
+    // Replace the product image: delete the old Cloudinary asset (fire and
+    // forget — failure to clean up shouldn't block the update), then store
+    // the new one. If no file came in, leave the existing image intact.
+    if (req.file) {
+      const existing = await Product.findById(req.params.id).select('image').lean();
+      if (existing && existing.image && existing.image.public_id) {
+        try {
+          const cloudinary = require('../config/cloudinary');
+          cloudinary.uploader.destroy(existing.image.public_id).catch(() => {});
+        } catch (_) {}
+      }
+      patch.image = { url: req.file.path, public_id: req.file.filename };
+    }
+
     const p = await Product.findByIdAndUpdate(req.params.id, { $set: patch }, { new: true });
     if (!p) return res.status(404).json({ error: 'Product not found' });
     ok(res);
