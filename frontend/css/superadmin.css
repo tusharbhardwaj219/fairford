@@ -750,6 +750,18 @@ table.data td .badge+.btn{margin-left:4px}
 .prod-thumb--fallback { background: linear-gradient(135deg, #e0f2fe, #f1f5f9); }
 
 /* ─────────────────────────────────────────────────────────────────────────
+   Layout containment — keep horizontal scroll INSIDE the table wrapper.
+   #main is a flex column, so .page / .card default to min-width:auto and
+   stretch to fit the widest table cell, which pushed a horizontal scrollbar
+   onto the whole window. Forcing min-width:0 lets them shrink and the
+   .tbl-wrap's overflow-x:auto finally takes effect.
+   ─────────────────────────────────────────────────────────────────────── */
+#main     { min-width: 0; }
+.page     { min-width: 0; max-width: 100%; }
+.card     { min-width: 0; max-width: 100%; }
+.tbl-wrap { max-width: 100%; }
+
+/* ─────────────────────────────────────────────────────────────────────────
    Product section — responsive search/filter row
    The inline widths are gone from the HTML, so these rules actually win.
    ─────────────────────────────────────────────────────────────────────── */
@@ -758,6 +770,16 @@ table.data td .badge+.btn{margin-left:4px}
   gap: 12px;
   align-items: center;
 }
+
+/* Tighter padding on the products table — 12 columns at default 16px
+   horizontal padding overflows even a 1920px viewport (minus 220px
+   sidebar). 8px keeps it readable and saves ~96px of width. */
+#pg-products table.data th,
+#pg-products table.data td { padding: 10px 8px; }
+#pg-products table.data th:first-child,
+#pg-products table.data td:first-child { padding-left: 16px; }
+#pg-products table.data th:last-child,
+#pg-products table.data td:last-child { padding-right: 16px; }
 .prod-filters {
   display: flex;
   flex-wrap: wrap;
