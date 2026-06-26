@@ -28,11 +28,7 @@
   <div class="sb-brand">
     <div class="sb-logo">
       <div class="sb-logo-icon">
-<<<<<<< HEAD
-        <a href="#"><img src=https://res.cloudinary.com/dp4yririh/image/upload/v1781166637/LOGO_ja5rle.png alt="fair ford logo" height="36" width="36"></a>
-=======
-        <a href="#"><img src="LOGO.png" alt="fair ford logo" height="36" width="36"></a>
->>>>>>> 1c0e9db7d24427e2c280575a9120a80d6904ac37
+        <a href="#"><img src="https://res.cloudinary.com/dp4yririh/image/upload/v1781166637/LOGO_ja5rle.png" alt="fair ford logo" height="36" width="36"></a>
       </div>
       <div>
         <div class="sb-logo-text">Fair Ford</div>
@@ -386,20 +382,21 @@
     <div class="card">
       <div class="card-header">
         <span class="card-title">Product Catalog</span>
-        <div style="display:flex;gap:8px">
-          <input id="prod-search" class="form-input" placeholder="Search product…" style="width:200px" oninput="filterProducts()">
-          <select id="prod-cat-filter" class="form-input" style="width:130px" onchange="filterProducts()">
+        <div class="prod-filters">
+          <input id="prod-search" class="form-input prod-filter-search" placeholder="Search product…" oninput="filterProducts()">
+          <select id="prod-cat-filter" class="form-input prod-filter-sel" onchange="filterProducts()">
             <option value="">All Categories</option>
+            <option>Tablets</option><option>Capsules</option><option>Syrups</option><option>Injections</option><option>Ointments</option>
             <option>Antibiotics</option><option>Analgesics</option><option>Vitamins</option><option>Cardiac</option><option>Antifungals</option>
           </select>
-          <select id="prod-status-filter" class="form-input" style="width:120px" onchange="filterProducts()">
+          <select id="prod-status-filter" class="form-input prod-filter-sel" onchange="filterProducts()">
             <option value="">All Status</option><option>active</option><option>inactive</option>
           </select>
         </div>
       </div>
       <div class="tbl-wrap">
         <table class="data">
-          <thead><tr><th>Product Name</th><th>SKU</th><th>Category</th><th>MRP</th><th>Manufacturer</th><th>Stock</th><th>Status</th><th>Added Date</th><th>Actions</th></tr></thead>
+          <thead><tr><th>Image</th><th>Product Name</th><th>SKU</th><th>Category</th><th>MRP</th><th>Retailer ₹</th><th>Distributor ₹</th><th>Manufacturer</th><th>Stock</th><th>Status</th><th>Added Date</th><th>Actions</th></tr></thead>
           <tbody id="prod-tbody"></tbody>
         </table>
       </div>
@@ -725,17 +722,56 @@
         <div class="form-group"><label class="form-label">Category *</label>
           <select class="form-input" name="product-cat" required>
             <option value="">Select Category</option>
-            <option value="Antibiotics">Antibiotics</option><option value="Analgesics">Analgesics</option>
-            <option value="Vitamins">Vitamins</option><option value="Cardiac">Cardiac</option>
+            <option value="Tablets">Tablets</option>
+            <option value="Capsules">Capsules</option>
+            <option value="Syrups">Syrups</option>
+            <option value="Injections">Injections</option>
+            <option value="Ointments">Ointments</option>
+            <option value="Antibiotics">Antibiotics</option>
+            <option value="Analgesics">Analgesics</option>
+            <option value="Vitamins">Vitamins</option>
+            <option value="Cardiac">Cardiac</option>
             <option value="Antifungals">Antifungals</option>
           </select>
         </div>
-        <div class="form-group"><label class="form-label">MRP (₹) *</label><input class="form-input" name="product-mrp" type="number" placeholder="250" required></div>
+        <div class="form-group"><label class="form-label">Manufacturer / Brand</label><input class="form-input" name="product-mfr" placeholder="Fair Ford Pharma"></div>
       </div>
       <div class="form-row">
-        <div class="form-group"><label class="form-label">Manufacturer</label><input class="form-input" name="product-mfr" placeholder="Fair Ford Pharma"></div>
+        <div class="form-group"><label class="form-label">MRP (₹) *</label><input class="form-input" name="product-mrp" type="number" step="0.01" placeholder="250" required></div>
+        <div class="form-group"><label class="form-label">Retailer Price (₹) *</label><input class="form-input" name="product-retail" type="number" step="0.01" placeholder="200" required></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Distributor Price (₹) *</label><input class="form-input" name="product-dist" type="number" step="0.01" placeholder="170" required></div>
         <div class="form-group"><label class="form-label">Stock Quantity</label><input class="form-input" name="product-stock" type="number" placeholder="0"></div>
       </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Strength</label><input class="form-input" name="product-strength" placeholder="500 mg"></div>
+        <div class="form-group"><label class="form-label">Pack Size</label><input class="form-input" name="product-pack" placeholder="10 x 10 Tablets"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Dosage Form</label><input class="form-input" name="product-dosage" placeholder="Oral Tablet"></div>
+        <div class="form-group"><!-- spacer --></div>
+      </div>
+
+      <!-- Product image: optional on edit, shown on the storefront product card -->
+      <div class="form-group">
+        <label class="form-label">Product Image</label>
+        <div class="prod-image-picker">
+          <div class="prod-image-preview" id="prodImagePreview">
+            <span class="prod-image-placeholder">No image selected</span>
+          </div>
+          <div class="prod-image-controls">
+            <label class="btn btn-ghost btn-sm" for="productImageInput" style="cursor:pointer;">
+              Choose image…
+            </label>
+            <input type="file" id="productImageInput" name="product-image"
+                   accept="image/png,image/jpeg,image/webp" style="display:none;">
+            <button type="button" id="productImageClear" class="btn btn-danger btn-sm" style="display:none;">Remove</button>
+            <span class="prod-image-hint">PNG / JPG / WEBP up to 5 MB</span>
+          </div>
+        </div>
+      </div>
+
       <div class="form-group"><label class="form-label">Description</label><textarea class="form-input" name="product-desc" placeholder="Product description" style="resize:vertical;min-height:80px"></textarea></div>
       <div class="form-group"><label class="form-label">Status</label>
         <select class="form-input" name="product-status">
@@ -746,7 +782,7 @@
         <button type="button" class="btn btn-ghost" onclick="closeProductModal()">Cancel</button>
         <button type="submit" id="submitBtn" class="btn btn-pri">Add Product</button>
       </div>
-    </form>
+    </form>  
   </div>
 </div>
 

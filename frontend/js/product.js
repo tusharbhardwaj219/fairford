@@ -4,7 +4,7 @@
    loading state, product card rendering, and navigation to details.
    ===================================================================== */
 
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', async function () {
 
     /* ---- Auth guard: redirect to login if not logged in ---- */
     const _rawToken = localStorage.getItem('ff_token');
@@ -39,7 +39,36 @@ document.addEventListener('DOMContentLoaded', function () {
     const STOCK_OPTS = ["In Stock", "Low Stock", "Out of Stock"];
     const RATING_OPTS = [{ v: 4, l: "4★ & Above" }, { v: 3, l: "3★ & Above" }, { v: 2, l: "2★ & Above" }];
 
-    const ALL = getAllProducts();
+    // Show inline skeletons up front while we fetch from /api/products. We
+    // can't call showSkeletons() yet — it captures `grid` declared lower down.
+    (function paintInitialSkeletons() {
+        var box = document.getElementById('product-grid');
+        if (!box) return;
+        var html = '';
+        for (var i = 0; i < 8; i++) {
+            html += '<div class="skeleton-card">' +
+                      '<div class="sk sk-media"></div>' +
+                      '<div class="sk sk-line w40"></div>' +
+                      '<div class="sk sk-line w80"></div>' +
+                      '<div class="sk sk-line w60"></div>' +
+                      '<div class="sk sk-btn"></div>' +
+                    '</div>';
+        }
+        box.innerHTML = html;
+    })();
+
+    const ALL = await getAllProducts();
+    if (!ALL.length) {
+        document.getElementById('product-grid').innerHTML =
+          '<div class="empty-state">' +
+            ICONS.search +
+            '<h3>No products yet</h3>' +
+            '<p>Ask your administrator to add products via the Super Admin panel.</p>' +
+          '</div>';
+        document.getElementById('result-count').textContent = '0';
+        return;
+    }
+
     const PRICE_FLOOR = Math.floor(Math.min.apply(null, ALL.map(p => userPrice(p))));
     const PRICE_CEIL = Math.ceil(Math.max.apply(null, ALL.map(p => userPrice(p))));
 
@@ -47,7 +76,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const state = {
         search: "",
         categories: [],
-        brands: [],
         stock: [],
         rating: 0,
         min: PRICE_FLOOR,
@@ -72,10 +100,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     document.getElementById('filter-category').innerHTML =
         CATEGORIES.map(c => checkboxRow('category', c, ALL.filter(p => p.category === c).length)).join('');
-
-    // Brands (dynamic, multi-select)
-    document.getElementById('filter-brand').innerHTML =
-        getAllBrands().map(b => checkboxRow('brand', b, ALL.filter(p => p.brand === b).length)).join('');
 
     // Stock
     document.getElementById('filter-stock').innerHTML =
@@ -142,7 +166,6 @@ document.addEventListener('DOMContentLoaded', function () {
     function readState() {
         state.search = (document.getElementById('search-input').value || '').trim().toLowerCase();
         state.categories = getChecked('category');
-        state.brands = getChecked('brand');
         state.stock = getChecked('stock');
         const r = document.querySelector('input[name="rating"]:checked');
         state.rating = r ? Number(r.value) : 0;
@@ -160,7 +183,6 @@ document.addEventListener('DOMContentLoaded', function () {
             if (state.search && p.name.toLowerCase().indexOf(state.search) < 0 &&
                 p.brand.toLowerCase().indexOf(state.search) < 0) return false;
             if (state.categories.length && state.categories.indexOf(p.category) < 0) return false;
-            if (state.brands.length && state.brands.indexOf(p.brand) < 0) return false;
             if (state.stock.length && state.stock.indexOf(p.stockStatus) < 0) return false;
             if (state.rating && p.rating < state.rating) return false;
             if (userPrice(p) < state.min || userPrice(p) > state.max) return false;
@@ -206,10 +228,16 @@ document.addEventListener('DOMContentLoaded', function () {
               </div>`;
         }
 
+        // Prefer the real uploaded image; fall back to the category-themed SVG
+        // so older seeded products without an image still render nicely.
+        const media = p.image
+          ? `<img src="${p.image}" alt="${p.name}" class="card-media-img" loading="lazy">`
+          : productImageSVG(p.category);
+
         return `<article class="card" data-id="${p.id}">
       <button class="wish ${wished ? 'active' : ''}" data-wish="${p.id}" aria-label="Add to wishlist">${ICONS.heart}</button>
       <div class="card-media" data-go="${p.id}">
-        <div class="pv"><span class="cat-tag">${p.category}</span>${productImageSVG(p.category)}</div>
+        <div class="pv"><span class="cat-tag">${p.category}</span>${media}</div>
       </div>
       <div class="card-body">
         <div class="card-top">
@@ -269,7 +297,6 @@ document.addEventListener('DOMContentLoaded', function () {
         const chips = [];
         if (state.search) chips.push({ t: '"' + state.search + '"', clear: () => { document.getElementById('search-input').value = ''; } });
         state.categories.forEach(c => chips.push({ t: c, clear: () => uncheck('category', c) }));
-        state.brands.forEach(b => chips.push({ t: b, clear: () => uncheck('brand', b) }));
         state.stock.forEach(s => chips.push({ t: s, clear: () => uncheck('stock', s) }));
         if (state.rating) chips.push({ t: state.rating + '★ & above', clear: () => { const r = document.querySelector('input[name="rating"]:checked'); if (r) r.checked = false; } });
         if (state.min > PRICE_FLOOR || state.max < PRICE_CEIL) chips.push({ t: inr(state.min).replace('.00', '') + ' – ' + inr(state.max).replace('.00', ''), clear: resetPrice });
@@ -308,7 +335,7 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('search-input').addEventListener('input', debouncedLive);
     document.getElementById('sort-select').addEventListener('change', applyLive);
 
-    ['filter-category', 'filter-brand', 'filter-stock', 'filter-rating'].forEach(function (id) {
+    ['filter-category', 'filter-stock', 'filter-rating'].forEach(function (id) {
         document.getElementById(id).addEventListener('change', applyLive);
     });
 
@@ -363,12 +390,9 @@ document.addEventListener('DOMContentLoaded', function () {
     if (openBtn) openBtn.addEventListener('click', openSidebar);
     backdrop.addEventListener('click', closeSidebar);
 
-    /* =========  INITIAL LOAD with skeletons  ========= */
-    showSkeletons(8);
-    setTimeout(function () {
-        readState();
-        renderChips();
-        renderGrid(computeList());
-        store.syncCounts();
-    }, 650); // simulate network latency → swap for real fetch()
+    /* =========  INITIAL RENDER (data already fetched)  ========= */
+    readState();
+    renderChips();
+    renderGrid(computeList());
+    store.syncCounts();
 });

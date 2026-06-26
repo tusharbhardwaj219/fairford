@@ -997,6 +997,12 @@
 <!-- TOAST NOTIFICATIONS -->
 <div class="toast-stack" id="toastStack"></div>
 
+<!-- Shared header/footer (matches home page) — must load before page script
+     so the swapped DOM is ready when about.js binds its own listeners. -->
+<link rel="stylesheet" href="/frontend/css/style.css">
+<script>window.__PAGE_KEY__ = 'about';</script>
+<script src="/frontend/js/common.js"></script>
+<script src="/frontend/js/page-chrome.js"></script>
 <script src="/frontend/js/about.js" defer></script>
 </body>
 </html>

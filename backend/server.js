@@ -121,10 +121,7 @@ const prescriptionRoutes = require('./routes/prescriptionRoutes');
 const schemeRoutes       = require('./routes/schemeRoutes');
 const newsletterRoutes   = require('./routes/newsletterRoutes');
 const contactRoutes      = require('./routes/contactRoutes');
-<<<<<<< HEAD
 const distInventoryRoutes = require('./routes/distributorInventoryRoutes');
-=======
->>>>>>> 1c0e9db7d24427e2c280575a9120a80d6904ac37
 
 // Health check
 app.get('/api/health', (_req, res) =>
@@ -143,10 +140,7 @@ app.use('/api/prescriptions', prescriptionRoutes);
 app.use('/api/schemes',      schemeRoutes); 
 app.use('/api/newsletter',   newsletterRoutes);
 app.use('/api/contact',      contactRoutes);
-<<<<<<< HEAD
 app.use('/api/dist-inventory', distInventoryRoutes);
-=======
->>>>>>> 1c0e9db7d24427e2c280575a9120a80d6904ac37
 
 // ── STATIC / FRONTEND ─────────────────────────────────────────────────────────
 app.use('/frontend', express.static(path.join(__dirname, '..', 'frontend')));

@@ -357,7 +357,7 @@ function renderHeader(active) {
       </li>
     </ul>
     <div class="topbar__actions">
-      <a href="#become-distributor" class="topbar__cta">
+      <a href="distributor-inventory.html" class="topbar__cta">
         <span>Become a distributor</span>
         <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
       </a>
@@ -563,6 +563,19 @@ function initHeader() {
   // Sync cart/wishlist badge counts
   store.syncCounts();
 
+  // Cross-tab sync: when another tab mutates ff_cart or ff_wish, refresh
+  // the badges + open panels on this tab so they don't go stale. Only wire
+  // this once even if initHeader is called more than once.
+  if (!window.__ffStorageSync) {
+    window.__ffStorageSync = true;
+    window.addEventListener('storage', function (e) {
+      if (e.key !== 'ff_cart' && e.key !== 'ff_wish' && e.key !== null) return;
+      store.syncCounts();
+      store._refreshCartPanel();
+      store._refreshWishPanel();
+    });
+  }
+
   // Inject cart & wishlist slide panels
   initPanels();
 }
@@ -674,21 +687,80 @@ function initPanels() {
     if (!isNaN(v)) store.updateCartQty(inp.getAttribute('data-qid'), v);
   });
 
-  // Cart foot — checkout button. Ordering happens on the retailer page, which
-  // shares the same 'ff_cart' so the cart carries over. Guests are sent to login.
-  document.getElementById('ff-cart-foot').addEventListener('click', function(e) {
-    if (!e.target.closest('.fbtn-checkout')) return;
+  // Cart foot — checkout button. For signed-in retailers we POST directly to
+  // /api/orders so they can complete a cash-on-delivery order from any page
+  // that has the shared cart panel (product, search, etc.) without bouncing
+  // through retailer.html. Guests are sent to login; mis-configured retailers
+  // (no shop address) are sent to retailer.html to fill it in.
+  document.getElementById('ff-cart-foot').addEventListener('click', async function (e) {
+    var btn = e.target.closest('.fbtn-checkout');
+    if (!btn) return;
+
     var token   = localStorage.getItem('ff_token');
     var userStr = localStorage.getItem('ff_user');
-    if (token && userStr) {
-      try {
-        var u = JSON.parse(userStr);
-        if (u.role === 'ret') { window.location.href = 'retailer.html'; return; }
-      } catch (err) {}
+    var user    = null;
+    try { user = userStr ? JSON.parse(userStr) : null; } catch (err) { user = null; }
+
+    if (!token || !user) {
+      localStorage.setItem('ff_redirect', window.location.pathname.replace(/^\//, '') || 'index.html');
+      toast('Please sign in as a retailer to place an order.');
+      setTimeout(function () { window.location.href = 'login&signup.html'; }, 900);
+      return;
     }
-    localStorage.setItem('ff_redirect', 'retailer.html');
-    toast('Please sign in as a retailer to place an order.');
-    setTimeout(function () { window.location.href = 'login&signup.html'; }, 900);
+    if (user.role !== 'ret') {
+      toast('Only retailer accounts can place storefront orders.');
+      return;
+    }
+
+    var cart = store.cart;
+    if (!cart.length) { toast('Your cart is empty'); return; }
+
+    var orig = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = 'Placing…';
+
+    try {
+      var res = await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+        body: JSON.stringify({
+          items: cart.map(function (c) { return { product: c.id, quantity: c.qty }; }),
+          deliveryPriority: 'standard',
+        }),
+      });
+      var data = await res.json().catch(function () { return {}; });
+
+      if (!res.ok || !data.success) {
+        var msg = data.message || ('Order failed (HTTP ' + res.status + ')');
+        // Address missing → drop them on the retailer page to set it.
+        if (/address|pincode|city/i.test(msg)) {
+          toast('Please set your shop address first.');
+          localStorage.setItem('ff_cart', JSON.stringify(cart)); // preserve cart
+          setTimeout(function () { window.location.href = 'retailer.html'; }, 1000);
+          return;
+        }
+        // Account pending KYC → same destination, with banner shown there.
+        if (/KYC|active|approval/i.test(msg)) {
+          toast('Your account is pending approval. Track status in your dashboard.');
+          setTimeout(function () { window.location.href = 'retailer.html'; }, 1000);
+          return;
+        }
+        toast('⚠ ' + msg);
+        return;
+      }
+
+      // Success — clear cart locally + UI.
+      store._setCart([]);
+      store.syncCounts();
+      store._refreshCartPanel();
+      var num = (data.order && data.order.orderNumber) ? ' ' + data.order.orderNumber : '';
+      toast('✓ Order' + num + ' placed — admin approval pending.');
+    } catch (err) {
+      toast('⚠ ' + (err.message || 'Network error'));
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = orig;
+    }
   });
 
   // Wishlist body — move to cart + remove (event delegation)

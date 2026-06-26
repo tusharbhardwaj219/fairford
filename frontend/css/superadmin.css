@@ -684,3 +684,188 @@ table.data td .badge+.btn{margin-left:4px}
 }
 .login-notif-title{font-size:13px;font-weight:600;color:var(--text)}
 .login-notif-sub{font-size:12px;color:var(--text-2);margin-top:2px}
+
+/* ════════════════════════════════
+   PRODUCT IMAGES — modal preview + table thumbnail + responsive header
+   ════════════════════════════════ */
+
+/* Modal: drag-style image picker */
+.prod-image-picker {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.prod-image-preview {
+  width: 120px;
+  height: 120px;
+  border-radius: 12px;
+  border: 1.5px dashed var(--border, #d1d5db);
+  background: var(--bg, #f9fafb);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.prod-image-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.prod-image-placeholder {
+  font-size: 11.5px;
+  color: var(--text-3, #9ca3af);
+  text-align: center;
+  padding: 8px;
+}
+.prod-image-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 180px;
+}
+.prod-image-hint {
+  font-size: 11.5px;
+  color: var(--text-3, #9ca3af);
+}
+
+/* Table: square thumbnail in first cell */
+.prod-thumb {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  object-fit: cover;
+  background: var(--bg, #f3f4f6);
+  border: 1px solid var(--border, #e5e7eb);
+  font-weight: 600;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  color: var(--brand, #0f4c81);
+  font-size: 15px;
+}
+.prod-thumb--fallback { background: linear-gradient(135deg, #e0f2fe, #f1f5f9); }
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Product section — responsive search/filter row
+   The inline widths are gone from the HTML, so these rules actually win.
+   ─────────────────────────────────────────────────────────────────────── */
+#pg-products .card-header {
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+.prod-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  flex: 1 1 320px;
+  justify-content: flex-end;
+}
+.prod-filter-search { flex: 1 1 200px; min-width: 0; }
+.prod-filter-sel    { flex: 0 1 140px; min-width: 110px; }
+
+/* ─────────────────────────────────────────────────────────────────────────
+   ≤ 960px — drop the lowest-value columns so the table actually fits
+   without becoming a horizontal-scroll graveyard.
+   ─────────────────────────────────────────────────────────────────────── */
+@media (max-width: 960px) {
+  #pg-products table.data th:nth-child(8),  /* Manufacturer */
+  #pg-products table.data td:nth-child(8),
+  #pg-products table.data th:nth-child(11), /* Added Date */
+  #pg-products table.data td:nth-child(11) { display: none; }
+}
+
+/* ≤ 760px — header stacks, filters become full-width, drop SKU + Status too */
+@media (max-width: 760px) {
+  #pg-products .pg-header { flex-direction: column; align-items: stretch; gap: 12px; }
+  #pg-products .pg-header .btn { width: 100%; justify-content: center; }
+
+  .prod-filters { flex: 1 1 100%; justify-content: stretch; }
+  .prod-filter-search,
+  .prod-filter-sel { flex: 1 1 140px; }
+
+  #pg-products table.data th:nth-child(3),  /* SKU */
+  #pg-products table.data td:nth-child(3),
+  #pg-products table.data th:nth-child(10), /* Status */
+  #pg-products table.data td:nth-child(10) { display: none; }
+
+  .prod-image-picker { flex-direction: column; }
+  .prod-image-preview { width: 100%; height: 180px; }
+  .prod-image-controls { width: 100%; }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   ≤ 600px — convert the table into a card list. Each row becomes a
+   self-contained card; each cell gets its label from the data-label attr
+   we set in renderProducts(). This is the only sane mobile UX for a wide
+   product catalog table.
+   ─────────────────────────────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  /* Make sure all hidden-at-mid-width columns are visible again — the card
+     layout has the space for them. */
+  #pg-products table.data th:nth-child(n),
+  #pg-products table.data td:nth-child(n) { display: revert; }
+
+  #pg-products .tbl-wrap { overflow-x: visible; }
+  #pg-products table.data,
+  #pg-products table.data tbody,
+  #pg-products table.data tr,
+  #pg-products table.data td { display: block; width: 100%; }
+  #pg-products table.data thead { display: none; }
+
+  #pg-products table.data tr {
+    background: var(--card, #fff);
+    border: 1px solid var(--border, #e5e7eb);
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 12px;
+    box-shadow: 0 1px 2px rgba(0,0,0,.03);
+  }
+  #pg-products table.data tr:hover td { background: transparent; }
+  #pg-products table.data td {
+    border: 0;
+    padding: 6px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 13.5px;
+  }
+  #pg-products table.data td:before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: var(--text-2, #6b7280);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    margin-right: 12px;
+    flex-shrink: 0;
+  }
+  /* The first cell (image) goes full-width above the rest */
+  #pg-products table.data td:first-child {
+    justify-content: center;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border, #e5e7eb);
+    margin-bottom: 8px;
+  }
+  #pg-products table.data td:first-child:before { content: none; }
+  #pg-products table.data td:first-child .prod-thumb {
+    width: 72px; height: 72px; font-size: 22px;
+  }
+  /* Actions row aligns to the right */
+  #pg-products table.data td.tbl-actions {
+    justify-content: flex-end;
+    padding-top: 10px;
+    border-top: 1px solid var(--border, #e5e7eb);
+    margin-top: 8px;
+  }
+  #pg-products table.data td.tbl-actions:before { content: none; }
+}
+
+@media (max-width: 540px) {
+  .prod-thumb { width: 36px; height: 36px; font-size: 13px; }
+}

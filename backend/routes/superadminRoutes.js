@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const c = require('../controllers/superadminController');
 const { verifyToken, authorizeRoles } = require('../middleware/authMiddleware');
+const { uploadProductImage, handleUploadError } = require('../middleware/uploadMiddleware');
 
 // Whole dashboard API is admin/superadmin only.
 router.use(verifyToken, authorizeRoles('admin', 'superadmin'));
@@ -27,11 +28,13 @@ router.get('/retailers/:id', c.getRetailer);
 router.put('/retailers/:id', c.updateRetailer);
 router.delete('/retailers/:id', c.deleteRetailer);
 
-// Products
+// Products. POST/PUT accept multipart/form-data so an image can be attached
+// (the field name "image" matches the form input). JSON requests still work —
+// multer just leaves req.body alone when there's no file.
 router.get('/products', c.listProducts);
-router.post('/products', c.createProduct);
+router.post('/products', uploadProductImage, handleUploadError, c.createProduct);
 router.get('/products/:id', c.getProduct);
-router.put('/products/:id', c.updateProduct);
+router.put('/products/:id', uploadProductImage, handleUploadError, c.updateProduct);
 router.delete('/products/:id', c.deleteProduct);
 
 // Schemes
