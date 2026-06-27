@@ -40,6 +40,23 @@ exports.handleUploadError = (err, req, res, next) => {
     if (err.code === 'LIMIT_FILE_COUNT') return res.status(400).json({ success: false, message: 'Maximum 5 images allowed.' });
     return res.status(400).json({ success: false, message: err.message });
   }
-  if (err) return res.status(400).json({ success: false, message: err.message });
+  if (err) {
+    // Cloudinary credential / config errors — skip image upload and let the
+    // request continue so the product/category is still created without an image.
+    const msg = String(err.message || '');
+    const isCloudinaryAuthErr =
+      msg.includes('Unknown API key') ||
+      msg.includes('Invalid Signature') ||
+      msg.includes('Must supply api_key') ||
+      msg.includes('cloud_name') ||
+      msg.includes('api_key') ||
+      msg.includes('api_secret');
+    if (isCloudinaryAuthErr) {
+      console.warn('[upload] Cloudinary not configured — skipping image upload:', msg);
+      req.file = undefined;
+      return next();
+    }
+    return res.status(400).json({ success: false, message: err.message });
+  }
   next();
 };

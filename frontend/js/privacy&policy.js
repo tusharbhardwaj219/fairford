@@ -1,107 +1,84 @@
-// ── Mobile Menu ──
-const menuBtn = document.getElementById("menuBtn");
-const navLinks = document.getElementById("navLinks");
+// privacy&policy.js — Privacy Policy page interactions
+// Note: page-chrome.js replaces the inline navbar with the shared site header.
+// All navbar/mobile-menu code that referenced the old inline header has been removed.
 
-menuBtn.addEventListener("click", () => {
-    const isOpen = navLinks.classList.toggle("active");
-    menuBtn.setAttribute("aria-expanded", isOpen);
-    menuBtn.querySelector("i").className = isOpen
-        ? "ri-close-line"
-        : "ri-menu-3-line";
-});
+(function () {
+  'use strict';
 
-// Close menu when a nav link is clicked
-navLinks.querySelectorAll("a").forEach(link => {
-    link.addEventListener("click", () => {
-        navLinks.classList.remove("active");
-        menuBtn.setAttribute("aria-expanded", "false");
-        menuBtn.querySelector("i").className = "ri-menu-3-line";
+  var progressBar = document.getElementById('scrollProgress');
+  var backToTop   = document.getElementById('backToTop');
+
+  // ── Back to Top ──
+  if (backToTop) {
+    backToTop.addEventListener('click', function () {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     });
-});
+  }
 
-// Close menu on outside click
-document.addEventListener("click", (e) => {
-    if (!navLinks.contains(e.target) && !menuBtn.contains(e.target)) {
-        navLinks.classList.remove("active");
-        menuBtn.setAttribute("aria-expanded", "false");
-        menuBtn.querySelector("i").className = "ri-menu-3-line";
-    }
-});
+  function updateScrollProgress() {
+    if (!progressBar) return;
+    var scrollTop  = window.scrollY;
+    var docHeight  = document.documentElement.scrollHeight - window.innerHeight;
+    progressBar.style.width = (docHeight > 0 ? (scrollTop / docHeight) * 100 : 0) + '%';
+  }
 
-// ── Scroll Progress Bar ──
-const progressBar = document.getElementById("scrollProgress");
+  function updateBackToTop() {
+    if (backToTop) backToTop.classList.toggle('visible', window.scrollY > 400);
+  }
 
-function updateScrollProgress() {
-    const scrollTop = window.scrollY;
-    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-    const pct = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
-    progressBar.style.width = pct + "%";
-}
-
-// ── Navbar Shadow on Scroll ──
-const navbar = document.querySelector(".navbar");
-
-function updateNavbar() {
-    navbar.classList.toggle("scrolled", window.scrollY > 40);
-}
-
-// ── Back to Top ──
-const backToTop = document.getElementById("backToTop");
-
-function updateBackToTop() {
-    backToTop.classList.toggle("visible", window.scrollY > 400);
-}
-
-backToTop.addEventListener("click", () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-});
-
-// ── Consolidated scroll listener ──
-window.addEventListener("scroll", () => {
+  window.addEventListener('scroll', function () {
     updateScrollProgress();
-    updateNavbar();
     updateBackToTop();
-}, { passive: true });
+  }, { passive: true });
 
-// ── Reveal Animation (IntersectionObserver) ──
-const reveals = document.querySelectorAll(".reveal");
+  updateScrollProgress();
+  updateBackToTop();
 
-const revealObserver = new IntersectionObserver(
-    (entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add("active");
-                revealObserver.unobserve(entry.target);
-            }
-        });
-    },
-    { threshold: 0.12, rootMargin: "0px 0px -60px 0px" }
-);
+  // ── Reveal Animation ──
+  var reveals = document.querySelectorAll('.reveal');
+  if ('IntersectionObserver' in window && reveals.length) {
+    var revealObserver = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('active');
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' });
 
-reveals.forEach(el => revealObserver.observe(el));
+    reveals.forEach(function (el) { revealObserver.observe(el); });
+  }
 
-// ── Active Sidebar Link (IntersectionObserver) ──
-const sections = document.querySelectorAll("section[id]");
-const sidebarLinks = document.querySelectorAll(".sidebar-link");
+  // ── Active Sidebar Link via IntersectionObserver ──
+  var sections     = document.querySelectorAll('section[id]');
+  var sidebarLinks = document.querySelectorAll('.pp-nav-link[data-section]');
 
-const sectionObserver = new IntersectionObserver(
-    (entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                const id = entry.target.id;
-                sidebarLinks.forEach(link => {
-                    const isActive = link.getAttribute("data-section") === id;
-                    link.classList.toggle("active", isActive);
-                });
-            }
-        });
-    },
-    { threshold: 0.35, rootMargin: "-80px 0px -40% 0px" }
-);
+  if ('IntersectionObserver' in window && sections.length && sidebarLinks.length) {
+    var sectionObserver = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          var id = entry.target.id;
+          sidebarLinks.forEach(function (link) {
+            link.classList.toggle('active', link.getAttribute('data-section') === id);
+          });
+        }
+      });
+    }, { threshold: 0.35, rootMargin: '-80px 0px -40% 0px' });
 
-sections.forEach(section => sectionObserver.observe(section));
+    sections.forEach(function (sec) { sectionObserver.observe(sec); });
+  }
 
-// ── Initial states ──
-updateScrollProgress();
-updateNavbar();
-updateBackToTop();
+  // ── Smooth Scroll for anchor links ──
+  document.querySelectorAll('a[href^="#"]').forEach(function (a) {
+    a.addEventListener('click', function (e) {
+      var href = a.getAttribute('href');
+      if (!href || href === '#') return;
+      var target = document.querySelector(href);
+      if (target) {
+        e.preventDefault();
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  });
+
+})();

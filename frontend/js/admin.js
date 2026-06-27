@@ -287,4 +287,4 @@ document.addEventListener('click', (e) => {
 });
 
 /* ── Init ── */
-if (isAdmin()) showApp(); else { $('adLogin').style.display = 'flex'; }
+if (isAdmin()) { $('adLogin').style.display = 'none'; showApp(); }

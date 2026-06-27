@@ -382,7 +382,7 @@ function renderHeader(active) {
       </span>
       <span class="logo-text">
         <span class="logo-name">Fair Ford</span>
-        <span class="logo-tag">&bull; Health care</span>
+        <span class="logo-tag"> Pharmaceuticals </span>
       </span>
     </a>
 
@@ -404,11 +404,11 @@ function renderHeader(active) {
       </a>
       <button class="icon-btn" id="wishlistBtn" data-action="wishlist" aria-label="Wishlist">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-        <span class="hdr-badge empty" id="wishlistCount">0</span>
+        <span class="badge empty" id="wishlistCount">0</span>
       </button>
       <button class="icon-btn" id="cartBtn" data-action="cart" aria-label="Shopping cart">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"/></svg>
-        <span class="hdr-badge empty" id="cartCount">0</span>
+        <span class="badge empty" id="cartCount">0</span>
       </button>
       <button class="icon-btn" data-action="account" aria-label="My account">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
