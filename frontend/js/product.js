@@ -46,13 +46,14 @@ document.addEventListener('DOMContentLoaded', async function () {
         if (!box) return;
         var html = '';
         for (var i = 0; i < 8; i++) {
-            html += '<div class="skeleton-card">' +
-                      '<div class="sk sk-media"></div>' +
-                      '<div class="sk sk-line w40"></div>' +
-                      '<div class="sk sk-line w80"></div>' +
-                      '<div class="sk sk-line w60"></div>' +
-                      '<div class="sk sk-btn"></div>' +
-                    '</div>';
+            html += '<div class="pl-skel"><div class="pl-skel-media"></div>' +
+                    '<div class="pl-skel-body">' +
+                    '<div class="sk sk-line" style="width:64px;height:16px;border-radius:999px"></div>' +
+                    '<div class="sk sk-line" style="width:92%;height:18px;margin-top:8px"></div>' +
+                    '<div class="sk sk-line" style="width:64%;height:14px"></div>' +
+                    '<div class="sk sk-line" style="width:52%;height:26px;margin-top:6px;border-radius:11px"></div>' +
+                    '<div class="sk sk-btn" style="margin-top:12px;border-radius:10px"></div>' +
+                    '</div></div>';
         }
         box.innerHTML = html;
     })();
@@ -60,8 +61,8 @@ document.addEventListener('DOMContentLoaded', async function () {
     const ALL = await getAllProducts();
     if (!ALL.length) {
         document.getElementById('product-grid').innerHTML =
-          '<div class="empty-state">' +
-            ICONS.search +
+          '<div class="pl-empty-state">' +
+            '<div class="pl-empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="34" height="34"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div>' +
             '<h3>No products yet</h3>' +
             '<p>Ask your administrator to add products via the Super Admin panel.</p>' +
           '</div>';
@@ -205,56 +206,60 @@ document.addEventListener('DOMContentLoaded', async function () {
     function cardHTML(p) {
         const price  = userPrice(p);
         const out    = p.stockStatus === "Out of Stock";
+        const low    = p.stockStatus === "Low Stock";
         const wished = store.wishlist.indexOf(p.id) >= 0;
+
+        // Stock chip CSS class
+        const stockCls = out ? 'pl-stock-out' : low ? 'pl-stock-low' : 'pl-stock-in';
 
         // Role-aware pricing block
         let pricingHTML;
         if (IS_DIST) {
-            // Distributor: price + MRP + discount % + margin
-            const save   = (p.mrp && p.mrp > 0) ? Math.round(((p.mrp - price) / p.mrp) * 100) : 0;
-            const margin = save; // same formula for this layout
-            pricingHTML = `
-              <div class="price-block">
-                <span class="retail" title="Distributor Price">${inr(price).replace('.00', '')}</span>
-                <span class="mrp">MRP ${inr(p.mrp).replace('.00', '')}</span>
-                ${save > 0 ? `<span class="save">${save}% OFF</span>` : ''}
-              </div>
-              ${margin > 0 ? `<div class="margin-note">Margin: ${margin}%</div>` : ''}`;
+            const save = (p.mrp && p.mrp > 0) ? Math.round(((p.mrp - price) / p.mrp) * 100) : 0;
+            pricingHTML = `<div class="pl-price-row">
+              <span class="pl-price-main">${inr(price).replace('.00', '')}</span>
+              ${p.mrp ? `<span class="pl-price-mrp">MRP ${inr(p.mrp).replace('.00', '')}</span>` : ''}
+              ${save > 0 ? `<span class="pl-discount-badge">${save}% OFF</span>` : ''}
+            </div>
+            ${save > 0 ? `<div class="pl-margin-note">Trade Margin: ${save}%</div>` : ''}`;
         } else {
             // Retailer: price ONLY — never show MRP or discount
-            pricingHTML = `
-              <div class="price-block">
-                <span class="retail" title="Retailer Price">${inr(price).replace('.00', '')}</span>
-              </div>`;
+            pricingHTML = `<div class="pl-price-row">
+              <span class="pl-price-main">${inr(price).replace('.00', '')}</span>
+              <span class="pl-price-label">Retailer Price</span>
+            </div>`;
         }
 
-        // Prefer the real uploaded image; fall back to the category-themed SVG
-        // so older seeded products without an image still render nicely.
+        // Product image: uploaded photo or category-themed SVG illustration
         const media = p.image
-          ? `<img src="${p.image}" alt="${p.name}" class="card-media-img" loading="lazy">`
-          : productImageSVG(p.category);
+            ? `<img src="${p.image}" alt="${p.name}" class="pl-img" loading="lazy">`
+            : `<div class="pl-img-svg">${productImageSVG(p.category)}</div>`;
 
-        return `<article class="card" data-id="${p.id}">
-      <button class="wish ${wished ? 'active' : ''}" data-wish="${p.id}" aria-label="Add to wishlist">${ICONS.heart}</button>
-      <div class="card-media" data-go="${p.id}">
-        <div class="pv"><span class="cat-tag">${p.category}</span>${media}</div>
+        const cartLabel = out
+            ? `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg> Out of Stock`
+            : `${ICONS.cart} Add to Cart`;
+
+        return `<article class="pl-card" data-id="${p.id}">
+      <div class="pl-card-media" data-go="${p.id}">
+        <div class="pl-stock-chip ${stockCls}"><span class="pl-stock-dot"></span>${p.stockStatus}</div>
+        <button class="pl-wish ${wished ? 'active' : ''}" data-wish="${p.id}" aria-label="${wished ? 'Remove from wishlist' : 'Add to wishlist'}">${ICONS.heart}</button>
+        <div class="pl-img-wrap">${media}</div>
+        <div class="pl-hover-overlay" aria-hidden="true">
+          <button class="pl-quick-view-btn" data-go="${p.id}">${ICONS.eye} Quick View</button>
+        </div>
       </div>
-      <div class="card-body">
-        <div class="card-top">
-          <span class="brandline">${p.brand}</span>
-          <span class="badge ${badgeClass(p.stockStatus)}">${p.stockStatus}</span>
+      <div class="pl-card-body">
+        <div class="pl-card-meta-row">
+          <span class="pl-cat-chip">${p.category}</span>
+          <span class="pl-brand-name">${p.brand || ''}</span>
         </div>
-        <h3 class="pname" data-go="${p.id}">${p.name}</h3>
-        <div class="meta-row">
-          <span>${p.packSize}</span><span class="dot"></span><span>${p.strength}</span>
-        </div>
-        <div class="rating-row">${renderStars(p.rating)} <b>${p.rating}</b> <span>(${p.reviewCount})</span></div>
-        ${pricingHTML}
-        <div class="card-actions">
-          <button class="btn btn-primary" data-cart="${p.id}" ${out ? 'disabled style="opacity:.5;cursor:not-allowed"' : ''}>
-            ${ICONS.cart} ${out ? 'Out of Stock' : 'Add to Cart'}
-          </button>
-          <button class="btn btn-ghost" data-go="${p.id}" aria-label="View details">${ICONS.eye}</button>
+        <h3 class="pl-pname" data-go="${p.id}">${p.name}</h3>
+        ${(p.packSize || p.strength) ? `<div class="pl-specs-row">${p.packSize ? `<span class="pl-spec-tag">${p.packSize}</span>` : ''}${p.strength ? `<span class="pl-spec-tag">${p.strength}</span>` : ''}</div>` : ''}
+        <div class="pl-rating-row">${renderStars(p.rating)} <span class="pl-rating-val">${p.rating || '—'}</span> <span class="pl-rating-cnt">(${p.reviewCount || 0})</span></div>
+        <div class="pl-pricing-box">${pricingHTML}</div>
+        <div class="pl-card-actions">
+          <button class="pl-btn-cart${out ? ' pl-btn-oos' : ''}" data-cart="${p.id}" ${out ? 'disabled' : ''}>${cartLabel}</button>
+          <button class="pl-btn-view" data-go="${p.id}" aria-label="View details">${ICONS.eye}</button>
         </div>
       </div>
     </article>`;
@@ -263,16 +268,17 @@ document.addEventListener('DOMContentLoaded', async function () {
     function renderGrid(list) {
         document.getElementById('result-count').textContent = list.length;
         if (!list.length) {
-            grid.innerHTML = `<div class="empty-state">
-        ${ICONS.search}
+            grid.innerHTML = `<div class="pl-empty-state">
+        <div class="pl-empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="34" height="34"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/><path d="M11 8v6M8 11h6"/></svg></div>
         <h3>No products match your filters</h3>
         <p>Try widening your price range or clearing a few filters.</p>
+        <button class="pl-empty-btn" data-action="clear-filters"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg> Clear All Filters</button>
       </div>`;
             return;
         }
         grid.innerHTML = list.map(cardHTML).join('');
         // stagger entrance
-        Array.prototype.forEach.call(grid.querySelectorAll('.card'), function (c, i) {
+        Array.prototype.forEach.call(grid.querySelectorAll('.pl-card'), function (c, i) {
             c.style.animationDelay = Math.min(i * 45, 400) + 'ms';
         });
     }
@@ -281,12 +287,15 @@ document.addEventListener('DOMContentLoaded', async function () {
     function showSkeletons(n) {
         let html = '';
         for (let i = 0; i < n; i++) {
-            html += `<div class="skeleton-card">
-        <div class="sk sk-media"></div>
-        <div class="sk sk-line w40"></div>
-        <div class="sk sk-line w80"></div>
-        <div class="sk sk-line w60"></div>
-        <div class="sk sk-btn"></div>
+            html += `<div class="pl-skel">
+        <div class="pl-skel-media"></div>
+        <div class="pl-skel-body">
+          <div class="sk sk-line" style="width:64px;height:16px;border-radius:999px"></div>
+          <div class="sk sk-line" style="width:92%;height:18px;margin-top:8px"></div>
+          <div class="sk sk-line" style="width:64%;height:14px"></div>
+          <div class="sk sk-line" style="width:52%;height:26px;margin-top:6px;border-radius:11px"></div>
+          <div class="sk sk-btn" style="margin-top:12px;border-radius:10px"></div>
+        </div>
       </div>`;
         }
         grid.innerHTML = html;
@@ -357,11 +366,13 @@ document.addEventListener('DOMContentLoaded', async function () {
     document.getElementById('clear-filters').addEventListener('click', function () { clearAll(); toast('Filters cleared'); });
     document.getElementById('reset-top').addEventListener('click', function (e) { e.preventDefault(); clearAll(); });
 
-    /* Grid click delegation: navigate / cart / wishlist */
+    /* Grid click delegation: navigate / cart / wishlist / clear-filters */
     grid.addEventListener('click', function (e) {
         const go = e.target.closest('[data-go]');
         const cart = e.target.closest('[data-cart]');
         const wish = e.target.closest('[data-wish]');
+        const clearBtn = e.target.closest('[data-action="clear-filters"]');
+        if (clearBtn) { clearAll(); return; }
         if (wish) {
             const on = store.toggleWish(wish.getAttribute('data-wish'));
             wish.classList.toggle('active', on);

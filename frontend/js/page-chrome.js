@@ -8,7 +8,7 @@
    forcing a 200-line HTML rewrite on each one.
    ===================================================================== */
 (function () {
-  function go() {
+  function injectHeader() {
     var pageKey = window.__PAGE_KEY__ || '';
 
     // Remove the inline chrome — any combination of these may be present
@@ -43,7 +43,39 @@
 
     if (typeof initHeader === 'function') initHeader();
     if (typeof initFooter === 'function') initFooter();
+    if (typeof initPanels === 'function') initPanels();
     if (typeof store !== 'undefined' && store.syncCounts) store.syncCounts();
+  }
+
+  // Load a script once (skip if already present) then call cb.
+  function loadScript(src, cb) {
+    if (document.querySelector('script[src="' + src + '"]')) { cb(); return; }
+    var s = document.createElement('script');
+    s.src = src;
+    s.onload = cb;
+    s.onerror = cb; // continue even if load fails
+    document.head.appendChild(s);
+  }
+
+  // Inject a stylesheet once (skip if already present).
+  function loadCSS(href) {
+    if (document.querySelector('link[href="' + href + '"]')) return;
+    var link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = href;
+    document.head.appendChild(link);
+  }
+
+  function go() {
+    // Inject panel CSS so cart/wishlist panels are styled on non-product pages.
+    loadCSS('/frontend/css/panels.css');
+    // Ensure product-data scripts are available so cart/wishlist panels can
+    // show product names + prices on non-product pages (About, Contact, etc.)
+    loadScript('/frontend/js/api.js', function () {
+      loadScript('/frontend/js/data.js', function () {
+        injectHeader();
+      });
+    });
   }
 
   if (document.readyState === 'loading') {

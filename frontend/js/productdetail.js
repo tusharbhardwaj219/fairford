@@ -225,7 +225,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const galleryHtml = `
     <div class="pd-gal-col">
       <div class="pd-badge-strip">
-        ${inStock ? '<span class="pd-bdg pd-bdg-green">✓ In Stock</span>' : '<span class="pd-bdg pd-bdg-red">✕ Out of Stock</span>'}
+        ${inStock ? `<span class="pd-bdg pd-bdg-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><polyline points="20 6 9 17 4 12"/></svg> In Stock</span>` : `<span class="pd-bdg pd-bdg-red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="11" height="11"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Out of Stock</span>`}
         ${cat ? `<span class="pd-bdg pd-bdg-blue">${cat}</span>` : ''}
         ${p.dosageForm ? `<span class="pd-bdg pd-bdg-gold">${esc(p.dosageForm)}</span>` : ''}
         ${p.schedule   ? `<span class="pd-bdg pd-bdg-emerald">${esc(p.schedule)}</span>` : ''}
@@ -239,20 +239,23 @@ document.addEventListener('DOMContentLoaded', function () {
                <div class="pd-img-ph-txt">${esc(p.name)}</div>
              </div>`
         }
-        ${hasImg ? '<div class="pd-zoom-hint">🔍 Click to zoom</div>' : ''}
+        ${hasImg ? `<div class="pd-zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="12" height="12"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg> Click to zoom</div>` : ''}
       </div>
 
       ${thumbsHtml ? `<div class="pd-thumbs-row" id="pd-thumbs">${thumbsHtml}</div>` : ''}
 
       <div class="pd-gal-acts">
         <button class="pd-gal-btn" id="pd-wish-btn" aria-label="Add to wishlist">
-          ♡ <span id="pd-wish-lbl">Wishlist</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          <span id="pd-wish-lbl">Wishlist</span>
         </button>
         <button class="pd-gal-btn" onclick="window.print()" aria-label="Print product">
-          🖨️ Print
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+          Print
         </button>
         <button class="pd-gal-btn" id="pd-share-btn" aria-label="Share product">
-          ↗ Share
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          Share
         </button>
       </div>
     </div>`;
@@ -285,8 +288,8 @@ document.addEventListener('DOMContentLoaded', function () {
       <h1 class="pd-prod-title">${esc(p.name)}</h1>
 
       <div class="pd-metas">
-        ${p.strength   ? `<span class="pd-meta-pill">💊 ${esc(p.strength)}</span>` : ''}
-        ${p.packSize   ? `<span class="pd-meta-pill">📦 ${esc(p.packSize)}</span>` : ''}
+        ${p.strength   ? `<span class="pd-meta-pill">${esc(p.strength)}</span>` : ''}
+        ${p.packSize   ? `<span class="pd-meta-pill">${esc(p.packSize)}</span>` : ''}
         ${p.gst != null ? `<span class="pd-meta-pill">GST ${p.gst}%</span>` : ''}
         ${p.batchNo    ? `<span class="pd-meta-pill">Batch ${esc(p.batchNo)}</span>` : ''}
         ${p.hsn        ? `<span class="pd-meta-pill">HSN ${esc(p.hsn)}</span>` : ''}
@@ -298,7 +301,7 @@ document.addEventListener('DOMContentLoaded', function () {
         <div class="pd-stars">${starsHtml}</div>
         <span class="pd-rat-num">${ratNum || ''}</span>
         <span class="pd-rat-cnt">out of 5</span>
-        <span class="pd-verif">✓ Verified</span>
+        <span class="pd-verif"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><polyline points="20 6 9 17 4 12"/></svg> Verified</span>
       </div>` : ''}
 
       <div class="pd-avail">
@@ -340,28 +343,32 @@ document.addEventListener('DOMContentLoaded', function () {
         <div class="pd-cta-row">
           <button class="pd-cta pd-cta-primary" id="pd-add-cart"
             ${!inStock ? 'disabled' : ''}>
-            🛒 ${inStock ? 'Add to Cart' : 'Out of Stock'}
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+            ${inStock ? 'Add to Cart' : 'Out of Stock'}
           </button>
           <button class="pd-cta pd-cta-dark" id="pd-buy-now"
             ${!inStock ? 'disabled' : ''}>
-            ⚡ Buy Now
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            Buy Now
           </button>
         </div>
 
         <div class="pd-cta-row pd-cta-row-sec">
           <button class="pd-cta pd-cta-ghost" id="pd-wish-btn2">
-            ♡ Save to Wishlist
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            Save to Wishlist
           </button>
           <button class="pd-cta pd-cta-outline" onclick="window.print()">
-            🖨️ Print Sheet
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+            Print Sheet
           </button>
         </div>
 
         <div class="pd-trust-strip">
-          <span class="pd-trust-item">✓ WHO-GMP Certified</span>
-          <span class="pd-trust-item">✓ Cash on Delivery</span>
-          <span class="pd-trust-item">✓ Secure Ordering</span>
-          <span class="pd-trust-item">✓ B2B Support</span>
+          <span class="pd-trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><polyline points="20 6 9 17 4 12"/></svg> WHO-GMP Certified</span>
+          <span class="pd-trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><polyline points="20 6 9 17 4 12"/></svg> Cash on Delivery</span>
+          <span class="pd-trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><polyline points="20 6 9 17 4 12"/></svg> Secure Ordering</span>
+          <span class="pd-trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><polyline points="20 6 9 17 4 12"/></svg> B2B Support</span>
         </div>
       </div>
     </div>`;
@@ -373,14 +380,49 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function buildHighlights(p, inStock) {
     const feats = [
-      { ico: '🏭', lbl: 'WHO-GMP Certified', dsc: 'Manufactured under international quality standards' },
-      { ico: '💳', lbl: 'Cash on Delivery', dsc: 'Secure COD payment for all B2B orders' },
-      { ico: '🔬', lbl: 'Quality Assured', dsc: 'Third-party lab tested for purity and potency' },
-      { ico: '🚚', lbl: 'Fast Dispatch', dsc: 'Orders processed within 24 hours of confirmation' },
-      { ico: '🔒', lbl: 'Secure Platform', dsc: 'HTTPS encrypted end-to-end transactions' },
-      { ico: '📋', lbl: 'GST Compliant', dsc: 'All invoices GST compliant with HSN codes' },
-      { ico: '🎯', lbl: 'B2B Pricing', dsc: 'Exclusive trade pricing for registered retailers' },
-      { ico: inStock ? '✅' : '🔔', lbl: inStock ? 'Ready to Ship' : 'Stock Alert', dsc: inStock ? 'Available inventory ready for dispatch' : 'Sign up for restock notifications' }
+      {
+        bg: 'linear-gradient(135deg,#1565C0,#0F4C81)',
+        ico: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M8.5 12l2.5 2.5 5-5"/></svg>',
+        lbl: 'WHO-GMP Certified', dsc: 'Manufactured under international quality standards'
+      },
+      {
+        bg: 'linear-gradient(135deg,#0891B2,#0E7490)',
+        ico: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2.5"/><path d="M2 10h20"/></svg>',
+        lbl: 'Cash on Delivery', dsc: 'Secure COD payment for all B2B orders'
+      },
+      {
+        bg: 'linear-gradient(135deg,#7C3AED,#6D28D9)',
+        ico: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2v8l-2 4v6h10v-6l-2-4V2"/><path d="M9 2h6"/><path d="M7 14h10"/></svg>',
+        lbl: 'Quality Assured', dsc: 'Third-party lab tested for purity and potency'
+      },
+      {
+        bg: 'linear-gradient(135deg,#059669,#047857)',
+        ico: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>',
+        lbl: 'Fast Dispatch', dsc: 'Orders processed within 24 hours of confirmation'
+      },
+      {
+        bg: 'linear-gradient(135deg,#DC2626,#B91C1C)',
+        ico: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>',
+        lbl: 'Secure Platform', dsc: 'HTTPS encrypted end-to-end transactions'
+      },
+      {
+        bg: 'linear-gradient(135deg,#D97706,#B45309)',
+        ico: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>',
+        lbl: 'GST Compliant', dsc: 'All invoices GST compliant with HSN codes'
+      },
+      {
+        bg: 'linear-gradient(135deg,#0F4C81,#073B7A)',
+        ico: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>',
+        lbl: 'B2B Pricing', dsc: 'Exclusive trade pricing for registered retailers'
+      },
+      {
+        bg: inStock ? 'linear-gradient(135deg,#16A34A,#15803D)' : 'linear-gradient(135deg,#9333EA,#7E22CE)',
+        ico: inStock
+          ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>'
+          : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>',
+        lbl: inStock ? 'Ready to Ship' : 'Stock Alert',
+        dsc: inStock ? 'Available inventory ready for dispatch' : 'Sign up for restock notifications'
+      }
     ];
 
     return `
@@ -394,7 +436,7 @@ document.addEventListener('DOMContentLoaded', function () {
       <div class="pd-feat-grid">
         ${feats.map(f => `
         <div class="pd-feat-card">
-          <div class="pd-feat-ico">${f.ico}</div>
+          <div class="pd-feat-ico" style="background:${f.bg}">${f.ico}</div>
           <div>
             <div class="pd-feat-lbl">${f.lbl}</div>
             <div class="pd-feat-dsc">${f.dsc}</div>
@@ -432,7 +474,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function buildTabOverview(p) {
     if (!p.description && !p.uses) {
-      return `<div class="pd-empty-tab"><span style="font-size:2rem">📄</span>No overview available for this product.</div>`;
+      return `<div class="pd-empty-tab"><svg viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.5" stroke-linecap="round" width="36" height="36"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>No overview available for this product.</div>`;
     }
     return `
     <div class="pd-tab-inner">
@@ -451,11 +493,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function buildTabComposition(p) {
     if (!p.composition) {
-      return `<div class="pd-empty-tab"><span style="font-size:2rem">🧪</span>Composition information not available.</div>`;
+      return `<div class="pd-empty-tab"><svg viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.5" stroke-linecap="round" width="36" height="36"><path d="M9 2v8l-2 4v6h10v-6l-2-4V2"/><path d="M9 2h6"/><path d="M7 14h10"/></svg>Composition information not available.</div>`;
     }
     const items = Array.isArray(p.composition) ? p.composition : [p.composition];
     if (!items.length) {
-      return `<div class="pd-empty-tab"><span style="font-size:2rem">🧪</span>Composition information not available.</div>`;
+      return `<div class="pd-empty-tab"><svg viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.5" stroke-linecap="round" width="36" height="36"><path d="M9 2v8l-2 4v6h10v-6l-2-4V2"/><path d="M9 2h6"/><path d="M7 14h10"/></svg>Composition information not available.</div>`;
     }
     return `
     <div class="pd-tab-inner">
@@ -485,7 +527,7 @@ document.addEventListener('DOMContentLoaded', function () {
     ].filter(r => r[1]);
 
     if (!rows.length) {
-      return `<div class="pd-empty-tab"><span style="font-size:2rem">📋</span>Specifications not available.</div>`;
+      return `<div class="pd-empty-tab"><svg viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.5" stroke-linecap="round" width="36" height="36"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>Specifications not available.</div>`;
     }
     return `
     <div class="pd-tab-inner">
@@ -500,10 +542,26 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function buildTabStorage(p) {
     const cards = [
-      { ico: '🌡️', lbl: 'Temperature',  val: 'Below 25°C' },
-      { ico: '💧', lbl: 'Humidity',      val: 'Dry place' },
-      { ico: '🌑', lbl: 'Light',         val: 'Away from direct sunlight' },
-      { ico: '🔒', lbl: 'Access',        val: 'Keep out of reach of children' }
+      {
+        bg: 'linear-gradient(135deg,#EF4444,#DC2626)',
+        ico: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/></svg>',
+        lbl: 'Temperature', val: 'Below 25°C'
+      },
+      {
+        bg: 'linear-gradient(135deg,#3B82F6,#1D4ED8)',
+        ico: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>',
+        lbl: 'Humidity', val: 'Dry place'
+      },
+      {
+        bg: 'linear-gradient(135deg,#F59E0B,#D97706)',
+        ico: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>',
+        lbl: 'Light', val: 'Away from sunlight'
+      },
+      {
+        bg: 'linear-gradient(135deg,#8B5CF6,#7C3AED)',
+        ico: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>',
+        lbl: 'Access', val: 'Keep away from children'
+      }
     ];
     return `
     <div class="pd-tab-inner">
@@ -511,13 +569,14 @@ document.addEventListener('DOMContentLoaded', function () {
       <div class="pd-storage-grid">
         ${cards.map(c => `
         <div class="pd-storage-card">
-          <div class="pd-storage-ico">${c.ico}</div>
+          <div class="pd-storage-ico" style="background:${c.bg}">${c.ico}</div>
           <div class="pd-storage-lbl">${c.lbl}</div>
           <div class="pd-storage-val">${c.val}</div>
         </div>`).join('')}
       </div>
       <div class="pd-warn-box" style="margin-top:20px">
-        ⚠️ Store as directed on the package. Improper storage may affect potency and safety. Consult the manufacturer data sheet for full storage instructions.
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16" style="display:inline-block;vertical-align:-3px;margin-right:6px;color:#D97706"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        Store as directed on the package. Improper storage may affect potency and safety.
       </div>
     </div>`;
   }
@@ -531,8 +590,8 @@ document.addEventListener('DOMContentLoaded', function () {
         Always verify your drug license compliance before purchasing scheduled medicines.
       </p>
       <div class="pd-warn-box">
-        ⚠️ <strong>For Professional Use Only:</strong> This pharmaceutical product must be dispensed under the supervision of a registered pharmacist.
-        Not for direct consumer sale without appropriate prescription where required.
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16" style="display:inline-block;vertical-align:-3px;margin-right:6px;color:#D97706"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <strong>For Professional Use Only:</strong> This pharmaceutical product must be dispensed under the supervision of a registered pharmacist. Not for direct consumer sale without appropriate prescription where required.
       </div>
     </div>`;
   }
@@ -562,7 +621,7 @@ document.addEventListener('DOMContentLoaded', function () {
         <div class="pd-rev-av">${r.name[0]}</div>
         <div class="pd-rev-info">
           <div class="pd-rev-name">
-            ${esc(r.name)} <span class="pd-verif-sm">✓ Verified</span>
+            ${esc(r.name)} <span class="pd-verif-sm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="10" height="10"><polyline points="20 6 9 17 4 12"/></svg> Verified</span>
           </div>
           <div class="pd-rev-date">${r.city} · ${r.date}</div>
         </div>
@@ -571,8 +630,8 @@ document.addEventListener('DOMContentLoaded', function () {
       <div class="pd-rev-title">${esc(r.title)}</div>
       <div class="pd-rev-body">${esc(r.body)}</div>
       <div class="pd-rev-acts">
-        <button class="pd-rev-btn">👍 Helpful</button>
-        <button class="pd-rev-btn">💬 Comment</button>
+        <button class="pd-rev-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg> Helpful</button>
+        <button class="pd-rev-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Comment</button>
       </div>
     </div>`).join('');
 
@@ -622,7 +681,7 @@ document.addEventListener('DOMContentLoaded', function () {
         <div class="pd-faq-item" id="pd-faq-${i}">
           <button class="pd-faq-q" data-faq="${i}" aria-expanded="false">
             ${esc(f.q)}
-            <span class="pd-faq-ico">+</span>
+            <span class="pd-faq-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="14" height="14"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
           </button>
           <div class="pd-faq-a" id="pd-faq-a-${i}" style="max-height:0">
             <p>${esc(f.a)}</p>
@@ -654,7 +713,8 @@ document.addEventListener('DOMContentLoaded', function () {
         <button class="pd-sw-qbtn" id="pd-sw-plus">+</button>
       </div>
       <button class="pd-sw-cart" id="pd-sw-cart" ${!inStock ? 'disabled' : ''}>
-        🛒 ${inStock ? 'Add to Cart' : 'Out of Stock'}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+        ${inStock ? 'Add to Cart' : 'Out of Stock'}
       </button>
     </div>`;
     document.body.appendChild(widget);
@@ -899,16 +959,9 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function categoryIcon(cat) {
-    if (!cat) return '💊';
-    const raw = typeof cat === 'object' ? (cat.categoryName || '') : String(cat);
-    const c = raw.toLowerCase();
-    if (c.includes('syrup') || c.includes('liquid'))  return '🧴';
-    if (c.includes('inject'))                          return '💉';
-    if (c.includes('cream') || c.includes('topical')) return '🧫';
-    if (c.includes('eye') || c.includes('drop'))      return '👁️';
-    if (c.includes('vitamin') || c.includes('supple')) return '🌿';
-    if (c.includes('antibiotic'))                      return '🦠';
-    return '💊';
+    const name = cat && typeof cat === 'object' ? (cat.categoryName || '') : String(cat || '');
+    if (typeof productImageSVG === 'function') return productImageSVG(name);
+    return '<svg viewBox="0 0 48 22" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="48" height="22" rx="11" fill="#0F4C81"/><rect width="24" height="22" rx="11" fill="rgba(255,255,255,.18)"/><line x1="24" y1="2" x2="24" y2="20" stroke="rgba(255,255,255,.35)" stroke-width="1"/></svg>';
   }
 
   // ── State helpers ─────────────────────────────────────────────────────────
@@ -930,11 +983,14 @@ document.addEventListener('DOMContentLoaded', function () {
     const root = document.getElementById('detail-root');
     if (!root) return;
     root.innerHTML = `
-      <div style="text-align:center;padding:60px 20px;">
-        <div style="font-size:3rem;margin-bottom:16px;">⚠️</div>
-        <h2 style="color:#dc2626;margin-bottom:8px;">Unable to Load Product</h2>
-        <p style="color:#64748b;margin-bottom:24px;">${msg}</p>
-        <a href="product.html" class="btn btn-primary" style="display:inline-block;padding:12px 28px;">
+      <div style="text-align:center;padding:72px 24px;">
+        <div style="width:80px;height:80px;border-radius:24px;background:rgba(220,38,38,.08);border:1.5px dashed rgba(220,38,38,.28);display:grid;place-items:center;margin:0 auto 20px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="36" height="36"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        </div>
+        <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.4rem;font-weight:800;color:#111827;margin-bottom:8px;letter-spacing:-.02em;">Unable to Load Product</h2>
+        <p style="color:#6B7280;margin-bottom:24px;font-size:.9rem;line-height:1.65;">${msg}</p>
+        <a href="product.html" style="display:inline-flex;align-items:center;gap:8px;padding:11px 26px;background:linear-gradient(135deg,#1565C0,#0F4C81);color:#fff;font-size:.85rem;font-weight:700;border-radius:10px;text-decoration:none;box-shadow:0 4px 14px rgba(15,76,129,.3);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
           Browse Products
         </a>
       </div>`;
@@ -946,11 +1002,13 @@ document.addEventListener('DOMContentLoaded', function () {
     const root = document.getElementById('detail-root');
     if (!root) return;
     root.innerHTML = `
-      <div style="text-align:center;padding:60px 20px;">
-        <div style="font-size:3rem;margin-bottom:16px;">🔒</div>
-        <h2 style="margin-bottom:8px;">Session Expired</h2>
-        <p style="color:#64748b;margin-bottom:24px;">Please login again to continue.</p>
-        <a href="login&signup.html" class="btn btn-primary" style="display:inline-block;padding:12px 28px;">
+      <div style="text-align:center;padding:72px 24px;">
+        <div style="width:80px;height:80px;border-radius:24px;background:rgba(15,76,129,.08);border:1.5px dashed rgba(15,76,129,.25);display:grid;place-items:center;margin:0 auto 20px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#0F4C81" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="36" height="36"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </div>
+        <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.4rem;font-weight:800;color:#111827;margin-bottom:8px;letter-spacing:-.02em;">Session Expired</h2>
+        <p style="color:#6B7280;margin-bottom:24px;font-size:.9rem;line-height:1.65;">Your session has expired. Please login again to continue.</p>
+        <a href="login&amp;signup.html" style="display:inline-flex;align-items:center;gap:8px;padding:11px 26px;background:linear-gradient(135deg,#1565C0,#0F4C81);color:#fff;font-size:.85rem;font-weight:700;border-radius:10px;text-decoration:none;box-shadow:0 4px 14px rgba(15,76,129,.3);">
           Login Again
         </a>
       </div>`;
@@ -962,13 +1020,14 @@ document.addEventListener('DOMContentLoaded', function () {
     const root = document.getElementById('detail-root');
     if (!root) return;
     root.innerHTML = `
-      <div style="text-align:center;padding:60px 20px;">
-        <div style="font-size:3rem;margin-bottom:16px;">🚫</div>
-        <h2 style="margin-bottom:8px;">Unauthorized Access</h2>
-        <p style="color:#64748b;margin-bottom:24px;">
-          You don't have permission to view this product.
-        </p>
-        <a href="index.html" class="btn btn-primary" style="display:inline-block;padding:12px 28px;">
+      <div style="text-align:center;padding:72px 24px;">
+        <div style="width:80px;height:80px;border-radius:24px;background:rgba(220,38,38,.06);border:1.5px dashed rgba(220,38,38,.22);display:grid;place-items:center;margin:0 auto 20px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="36" height="36"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+        </div>
+        <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.4rem;font-weight:800;color:#111827;margin-bottom:8px;letter-spacing:-.02em;">Unauthorized Access</h2>
+        <p style="color:#6B7280;margin-bottom:24px;font-size:.9rem;line-height:1.65;">You don't have permission to view this product.</p>
+        <a href="index.html" style="display:inline-flex;align-items:center;gap:8px;padding:11px 26px;background:linear-gradient(135deg,#1565C0,#0F4C81);color:#fff;font-size:.85rem;font-weight:700;border-radius:10px;text-decoration:none;box-shadow:0 4px 14px rgba(15,76,129,.3);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
           Go Home
         </a>
       </div>`;
