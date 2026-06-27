@@ -134,23 +134,18 @@
   });
 
 
-  /* ------------------------------------------------------------
-     3. RIGHT-SIDE ICON CLICK HOOKS
-     ------------------------------------------------------------ */
-  document.querySelectorAll('.icon-btn').forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      const action = btn.getAttribute('data-action');
-      if (action === 'cart') openSidebar('cart');
-      else if (action === 'wishlist') openSidebar('wish');
-    });
-  });
+  // Cart and wishlist panels are handled by common.js initPanels()
+  // (loaded via the scripts added below script.js in index.html).
 
 })();
 
 
 /* ============================================================
-   2. STORE — single source of truth, persisted in localStorage
+   2. STORE — dead code from old cart/wishlist implementation.
+   Wrapped in IIFE so globals (inr, Store, etc.) don't conflict
+   with the same names in common.js (which now owns cart/wishlist).
    ============================================================ */
+(function () {
 const STORAGE_KEY = 'fairford.v1';
 const Store = {
   state: { cart: {}, wishlist: [] },
@@ -430,8 +425,7 @@ document.addEventListener('DOMContentLoaded', function(){
   /* Show counts on page load */
   refreshCounters();
 });
-
-
+})(); // end dead-code IIFE
 
 
 // =============HERO SLIDER=================//

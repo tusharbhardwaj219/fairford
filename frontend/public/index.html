@@ -14,6 +14,7 @@
 
     <!-- External stylesheet -->
     <link rel="stylesheet" href="/frontend/css/style.css">
+    <link rel="stylesheet" href="/frontend/css/panels.css">
 
     <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
 
@@ -1341,6 +1342,39 @@
 
     <!-- External JavaScript -->
     <script src="/frontend/js/script.js"></script>
+
+    <!-- Shared cart / wishlist (same storage as product pages) -->
+    <script src="/frontend/js/api.js"></script>
+    <script src="/frontend/js/data.js"></script>
+    <script src="/frontend/js/common.js"></script>
+    <script>
+      // Wire shared slide panels and sync badge counts.
+      // initHeader() is NOT called here (script.js already handles sticky /
+      // mobile-drawer / auth); we only need the panels + badge counts.
+      (function () {
+        function boot() {
+          if (typeof initPanels === 'function') initPanels();
+          if (typeof store !== 'undefined' && store.syncCounts) store.syncCounts();
+          // Keep badges in sync when the user adds items on another tab
+          if (!window.__ffStorageSync) {
+            window.__ffStorageSync = true;
+            window.addEventListener('storage', function (e) {
+              if (e.key !== 'ff_cart' && e.key !== 'ff_wish' && e.key !== null) return;
+              if (typeof store !== 'undefined') {
+                store.syncCounts();
+                store._refreshCartPanel();
+                store._refreshWishPanel();
+              }
+            });
+          }
+        }
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', boot);
+        } else {
+          boot();
+        }
+      })();
+    </script>
 
     <!-- Initialize Lucide Icons -->
     <script>

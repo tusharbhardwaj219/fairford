@@ -26,57 +26,256 @@
     <!-- Header injected by common.js -->
     <div id="site-header"></div>
 
-    <!-- Premium hero banner -->
-    <div class="ph-hero">
-      <div class="container ph-hero-inner">
-        <div class="ph-hero-content">
-          <div class="ph-hero-badge">WHO-GMP Certified Platform</div>
-          <h1 class="ph-hero-title">India's Trusted <span>B2B Pharma</span><br>Marketplace</h1>
-          <p class="ph-hero-sub">Source verified pharmaceutical products at exclusive trade pricing. Retailer-only access with seamless COD ordering and fastest distributor routing.</p>
-          <div class="ph-stats-row">
-            <div class="ph-stat">
-              <span class="ph-stat-num">500+</span>
-              <span class="ph-stat-lbl">Products</span>
-            </div>
-            <div class="ph-stat-div"></div>
-            <div class="ph-stat">
-              <span class="ph-stat-num">50+</span>
-              <span class="ph-stat-lbl">Categories</span>
-            </div>
-            <div class="ph-stat-div"></div>
-            <div class="ph-stat">
-              <span class="ph-stat-num">24h</span>
-              <span class="ph-stat-lbl">Dispatch</span>
-            </div>
-            <div class="ph-stat-div"></div>
-            <div class="ph-stat">
-              <span class="ph-stat-num">COD</span>
-              <span class="ph-stat-lbl">Payment</span>
-            </div>
-          </div>
-        </div>
-        <div class="ph-hero-visual">
-          <div class="ph-visual-cards">
-            <div class="ph-vis-card">
-              <div class="ph-vis-icon">💊</div>
-              <div><div class="ph-vis-text">Tablets</div><div class="ph-vis-sub">200+ SKUs</div></div>
-            </div>
-            <div class="ph-vis-card">
-              <div class="ph-vis-icon">🧴</div>
-              <div><div class="ph-vis-text">Syrups</div><div class="ph-vis-sub">80+ SKUs</div></div>
-            </div>
-            <div class="ph-vis-card">
-              <div class="ph-vis-icon">💉</div>
-              <div><div class="ph-vis-text">Injectables</div><div class="ph-vis-sub">60+ SKUs</div></div>
-            </div>
-            <div class="ph-vis-card">
-              <div class="ph-vis-icon">🌿</div>
-              <div><div class="ph-vis-text">Supplements</div><div class="ph-vis-sub">40+ SKUs</div></div>
-            </div>
-          </div>
-        </div>
+    <!-- ═══════════════════════════════════════════════════════════════
+         PREMIUM ENTERPRISE HERO BANNER
+         ═══════════════════════════════════════════════════════════════ -->
+    <section class="ph-hero" aria-label="Hero">
+
+      <!-- Layered background decoration (CSS-only, aria-hidden) -->
+      <div class="ph-bg-grid"  aria-hidden="true"></div>
+      <div class="ph-bg-hex"   aria-hidden="true"></div>
+      <div class="ph-bg-orb"   aria-hidden="true"></div>
+
+      <!-- Molecular structure decorations -->
+      <div class="ph-mol" aria-hidden="true">
+        <div class="ph-mol-dot" style="top:18%;left:3.5%"></div>
+        <div class="ph-mol-dot" style="top:55%;left:6%"></div>
+        <div class="ph-mol-dot" style="top:78%;left:4%"></div>
+        <div class="ph-mol-dot" style="top:30%;left:9%"></div>
+        <div class="ph-mol-line" style="top:18.4%;left:3.7%;width:90px;transform:rotate(25deg)"></div>
+        <div class="ph-mol-line" style="top:55.4%;left:6.2%;width:70px;transform:rotate(-15deg)"></div>
+        <div class="ph-mol-line" style="top:30.4%;left:4.2%;width:85px;transform:rotate(42deg)"></div>
       </div>
-    </div>
+
+      <div class="container ph-hero-inner">
+
+        <!-- ── LEFT: Content ── -->
+        <div class="ph-hero-content">
+
+          <!-- Certification badge -->
+          <div class="ph-cert-badge" aria-label="WHO-GMP Certified Platform">
+            <div class="ph-cert-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" width="13" height="13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2L3 6v6c0 5.25 3.75 10.15 9 11.25C17.25 22.15 21 17.25 21 12V6L12 2z"/>
+                <path d="M8.5 12l2.5 2.5 5-5"/>
+              </svg>
+            </div>
+            <span>WHO-GMP Certified Platform</span>
+            <div class="ph-cert-pulse" aria-hidden="true"></div>
+            <span class="ph-cert-live">Verified</span>
+          </div>
+
+          <!-- Heading -->
+          <h1 class="ph-hero-title">
+            India's Trusted<br>
+            <span class="ph-grad-text">B2B Pharma</span><br>
+            Marketplace
+          </h1>
+
+          <!-- Subtitle -->
+          <p class="ph-hero-sub">
+            Source verified pharmaceutical products at exclusive trade pricing.
+            Retailer-only access with seamless COD ordering and fastest
+            distributor routing.
+          </p>
+
+          <!-- CTA buttons -->
+          <div class="ph-hero-ctas">
+            <a href="registration.html" class="ph-btn ph-btn-primary">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2z"/><path d="M12 8v8"/><path d="M8 12h8"/>
+              </svg>
+              Request Wholesale Pricing
+            </a>
+            <a href="product.html" class="ph-btn ph-btn-secondary">
+              Browse Products
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </a>
+          </div>
+
+          <!-- Stats strip -->
+          <div class="ph-stats-strip">
+
+            <div class="ph-stat2">
+              <div class="ph-stat2-icon" aria-hidden="true">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                  <rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/>
+                  <rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>
+                </svg>
+              </div>
+              <div>
+                <span class="ph-stat2-num">500+</span>
+                <span class="ph-stat2-lbl">Products</span>
+              </div>
+            </div>
+
+            <div class="ph-stat-sep" aria-hidden="true"></div>
+
+            <div class="ph-stat2">
+              <div class="ph-stat2-icon" aria-hidden="true">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                  <path d="M4 6h16M4 12h16M4 18h10"/>
+                </svg>
+              </div>
+              <div>
+                <span class="ph-stat2-num">50+</span>
+                <span class="ph-stat2-lbl">Categories</span>
+              </div>
+            </div>
+
+            <div class="ph-stat-sep" aria-hidden="true"></div>
+
+            <div class="ph-stat2">
+              <div class="ph-stat2-icon" aria-hidden="true">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                  <circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/>
+                </svg>
+              </div>
+              <div>
+                <span class="ph-stat2-num">24h</span>
+                <span class="ph-stat2-lbl">Dispatch</span>
+              </div>
+            </div>
+
+            <div class="ph-stat-sep" aria-hidden="true"></div>
+
+            <div class="ph-stat2">
+              <div class="ph-stat2-icon" aria-hidden="true">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                  <rect x="2" y="5" width="20" height="14" rx="2.5"/><path d="M2 10h20"/>
+                </svg>
+              </div>
+              <div>
+                <span class="ph-stat2-num">COD</span>
+                <span class="ph-stat2-lbl">Payment</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ── RIGHT: Premium dashboard cards ── -->
+        <div class="ph-hero-visual" aria-hidden="true">
+          <div class="ph-dashboard-wrap">
+
+            <!-- Tablets -->
+            <div class="ph-dash-card ph-dash-card-1">
+              <div class="ph-dash-img ph-dash-img-tablet">
+                <svg viewBox="0 0 64 64" width="44" height="44" fill="none">
+                  <rect x="8" y="26" width="48" height="12" rx="6" fill="url(#tg)"/>
+                  <rect x="8" y="26" width="24" height="12" fill="rgba(255,255,255,.14)"/>
+                  <rect x="31" y="26" width="1" height="12" fill="rgba(255,255,255,.3)"/>
+                  <defs>
+                    <linearGradient id="tg" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stop-color="#38BDF8"/>
+                      <stop offset="100%" stop-color="#0F4C81"/>
+                    </linearGradient>
+                  </defs>
+                </svg>
+              </div>
+              <div class="ph-dash-info">
+                <span class="ph-dash-cat">Tablets</span>
+                <span class="ph-dash-sku">200+ SKUs</span>
+              </div>
+              <div class="ph-dash-trend">
+                <span class="ph-dash-pct">+12%</span>
+                <div class="ph-dash-arrow">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M7 17l10-10M7 7h10v10"/></svg>
+                </div>
+              </div>
+            </div>
+
+            <!-- Syrups -->
+            <div class="ph-dash-card ph-dash-card-2">
+              <div class="ph-dash-img ph-dash-img-syrup">
+                <svg viewBox="0 0 64 64" width="44" height="44" fill="none">
+                  <rect x="24" y="14" width="16" height="6" rx="3" fill="#D97706" opacity=".75"/>
+                  <rect x="20" y="20" width="24" height="34" rx="6" fill="url(#sg)"/>
+                  <rect x="23" y="28" width="18" height="10" rx="2" fill="rgba(255,255,255,.2)"/>
+                  <defs>
+                    <linearGradient id="sg" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stop-color="#FCD34D"/>
+                      <stop offset="100%" stop-color="#D97706"/>
+                    </linearGradient>
+                  </defs>
+                </svg>
+              </div>
+              <div class="ph-dash-info">
+                <span class="ph-dash-cat">Syrups</span>
+                <span class="ph-dash-sku">80+ SKUs</span>
+              </div>
+              <div class="ph-dash-trend">
+                <span class="ph-dash-pct">+8%</span>
+                <div class="ph-dash-arrow">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M7 17l10-10M7 7h10v10"/></svg>
+                </div>
+              </div>
+            </div>
+
+            <!-- Injectables -->
+            <div class="ph-dash-card ph-dash-card-3">
+              <div class="ph-dash-img ph-dash-img-inject">
+                <svg viewBox="0 0 64 64" width="44" height="44" fill="none">
+                  <rect x="28" y="8"  width="8" height="6"  rx="2" fill="rgba(110,231,183,.6)"/>
+                  <rect x="29" y="14" width="6" height="36" rx="3" fill="url(#ig)"/>
+                  <rect x="30.5" y="20" width="3" height="22" rx="1.5" fill="rgba(255,255,255,.2)"/>
+                  <rect x="26" y="48" width="12" height="5" rx="2.5" fill="#059669" opacity=".9"/>
+                  <defs>
+                    <linearGradient id="ig" x1="0%" y1="0%" x2="0%" y2="100%">
+                      <stop offset="0%" stop-color="#6EE7B7"/>
+                      <stop offset="100%" stop-color="#059669"/>
+                    </linearGradient>
+                  </defs>
+                </svg>
+              </div>
+              <div class="ph-dash-info">
+                <span class="ph-dash-cat">Injectables</span>
+                <span class="ph-dash-sku">60+ SKUs</span>
+              </div>
+              <div class="ph-dash-trend">
+                <span class="ph-dash-pct">+19%</span>
+                <div class="ph-dash-arrow">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M7 17l10-10M7 7h10v10"/></svg>
+                </div>
+              </div>
+            </div>
+
+            <!-- Supplements -->
+            <div class="ph-dash-card ph-dash-card-4">
+              <div class="ph-dash-img ph-dash-img-supp">
+                <svg viewBox="0 0 64 64" width="44" height="44" fill="none">
+                  <rect x="14" y="16" width="36" height="40" rx="6" fill="url(#pg)"/>
+                  <rect x="18" y="24" width="28" height="16" rx="3" fill="rgba(255,255,255,.18)"/>
+                  <rect x="20" y="26" width="10" height="3" rx="1.5" fill="rgba(255,255,255,.55)"/>
+                  <rect x="20" y="31" width="18" height="2.5" rx="1.25" fill="rgba(255,255,255,.35)"/>
+                  <rect x="20" y="35" width="14" height="2.5" rx="1.25" fill="rgba(255,255,255,.25)"/>
+                  <defs>
+                    <linearGradient id="pg" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stop-color="#A78BFA"/>
+                      <stop offset="100%" stop-color="#7C3AED"/>
+                    </linearGradient>
+                  </defs>
+                </svg>
+              </div>
+              <div class="ph-dash-info">
+                <span class="ph-dash-cat">Supplements</span>
+                <span class="ph-dash-sku">40+ SKUs</span>
+              </div>
+              <div class="ph-dash-trend">
+                <span class="ph-dash-pct">+5%</span>
+                <div class="ph-dash-arrow">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M7 17l10-10M7 7h10v10"/></svg>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </section>
 
     <main class="container">
         <!-- Page heading + breadcrumb -->

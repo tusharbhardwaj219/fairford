@@ -140,6 +140,7 @@ const store = {
     else { cart.push({ id: String(id), qty: qty || 1 }); }
     this._setCart(cart);
     this.syncCounts();
+    if (this._openPanel) this._openPanel('ff-cart-panel');
     this._refreshCartPanel();
   },
 
@@ -166,7 +167,10 @@ const store = {
       this.syncCounts(); this._refreshWishPanel(); return false;
     }
     wish.push(String(id)); this._setWish(wish);
-    this.syncCounts(); this._refreshWishPanel(); return true;
+    this.syncCounts();
+    if (this._openPanel) this._openPanel('ff-wish-panel');
+    this._refreshWishPanel();
+    return true;
   },
 
   removeFromWish: function(id) {
@@ -199,26 +203,47 @@ const store = {
     return typeof getAllProducts === 'function' ? getAllProducts() : [];
   },
 
-  _refreshCartPanel: function() {
+  _refreshCartPanel: async function() {
     var panel = document.getElementById('ff-cart-panel');
     if (!panel) return;
+    var products;
+    try { products = typeof getAllProducts === 'function' ? await getAllProducts() : []; }
+    catch(e) { products = []; }
+
+    // Purge cart entries whose IDs no longer exist in the catalogue.
     var cart = this.cart;
-    var products = this._products();
+    var validCart = cart.filter(function(item) {
+      return products.some(function(x) { return x.id === item.id; });
+    });
+    if (validCart.length !== cart.length) {
+      this._setCart(validCart);
+      this.syncCounts();
+      cart = validCart;
+    }
+
     var body = document.getElementById('ff-cart-body');
     var foot = document.getElementById('ff-cart-foot');
     var count = document.getElementById('ff-cart-count');
     var total = cart.reduce(function(s, x) { return s + x.qty; }, 0);
     if (count) count.textContent = total + (total === 1 ? ' item' : ' items');
 
+    var SVG_TRASH = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>';
+    var SVG_MINUS = '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14"/></svg>';
+    var SVG_PLUS  = '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>';
+    var SVG_CART  = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"/></svg>';
+
     if (!cart.length) {
       body.innerHTML =
         '<div class="fpanel-empty">' +
-          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">' +
-            '<circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>' +
-            '<path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"/>' +
-          '</svg>' +
+          '<div class="fpanel-empty-icon">' +
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">' +
+              '<circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>' +
+              '<path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"/>' +
+            '</svg>' +
+          '</div>' +
           '<p class="fpanel-empty-big">Your cart is empty</p>' +
-          '<p>Browse products on the <a href="product.html" style="color:var(--color-primary,#0F4C81);text-decoration:underline">product page</a>.</p>' +
+          '<p class="fpanel-empty-sub">Browse our catalogue and add products to your order.</p>' +
+          '<a href="product.html" class="fpanel-empty-btn">Browse Products</a>' +
         '</div>';
       foot.innerHTML = '';
       return;
@@ -231,22 +256,25 @@ const store = {
       var lineTotal = p.retailerPrice * item.qty;
       subtotal += lineTotal;
       gstTotal += (lineTotal * (p.gst || 12)) / 100;
+      var thumb = p.image
+        ? '<img src="' + p.image + '" alt="' + p.name + '" class="fline-img">'
+        : '<div class="fline-svg">' + (typeof productImageSVG === 'function' ? productImageSVG(p.category) : p.name.charAt(0)) + '</div>';
       html +=
         '<div class="fline">' +
-          '<div class="fline-thumb">' + p.name.charAt(0) + '</div>' +
+          '<div class="fline-thumb">' + thumb + '</div>' +
           '<div class="fline-info">' +
             '<p class="fline-name">' + p.name + '</p>' +
-            '<p class="fline-comp">' + p.brand + '</p>' +
-            '<p class="fline-rate">' + inr(p.retailerPrice).replace('.00','') + '/unit · MOQ ' + (p.moq || 1) + '</p>' +
+            '<p class="fline-comp">' + p.brand + (p.packSize ? ' · ' + p.packSize : '') + '</p>' +
+            '<p class="fline-rate">' + inr(p.retailerPrice).replace('.00','') + ' / unit · MOQ ' + (p.moq || 1) + '</p>' +
             '<div class="fqty">' +
-              '<button class="fqty-btn" data-qminus="' + p.id + '">−</button>' +
-              '<input class="fqty-inp" type="number" value="' + item.qty + '" min="1" data-qid="' + p.id + '" />' +
-              '<button class="fqty-btn" data-qplus="' + p.id + '">+</button>' +
+              '<button class="fqty-btn" data-qminus="' + p.id + '" aria-label="Decrease">' + SVG_MINUS + '</button>' +
+              '<input class="fqty-inp" type="number" value="' + item.qty + '" min="1" data-qid="' + p.id + '" aria-label="Quantity" />' +
+              '<button class="fqty-btn" data-qplus="' + p.id + '" aria-label="Increase">' + SVG_PLUS + '</button>' +
             '</div>' +
           '</div>' +
           '<div class="fline-right">' +
             '<span class="fline-total">' + inr(lineTotal).replace('.00','') + '</span>' +
-            '<button class="fline-remove" data-remove="' + p.id + '">Remove</button>' +
+            '<button class="fline-remove" data-remove="' + p.id + '" aria-label="Remove item">' + SVG_TRASH + '</button>' +
           '</div>' +
         '</div>';
     });
@@ -259,28 +287,48 @@ const store = {
         '<div class="ftotals-row"><span>Estimated GST</span><span>' + inr(gstTotal).replace('.00','') + '</span></div>' +
         '<div class="ftotals-row grand"><span>Grand Total</span><span>' + inr(grand).replace('.00','') + '</span></div>' +
       '</div>' +
-      '<button class="fbtn-checkout">Proceed to Checkout</button>' +
+      '<button class="fbtn-checkout">' + SVG_CART + ' Proceed to Checkout</button>' +
       '<p class="ffoot-note">Min. order quantities apply · Prices in INR</p>';
   },
 
-  _refreshWishPanel: function() {
+  _refreshWishPanel: async function() {
     var panel = document.getElementById('ff-wish-panel');
     if (!panel) return;
+    var products;
+    try { products = typeof getAllProducts === 'function' ? await getAllProducts() : []; }
+    catch(e) { products = []; }
+
+    // Purge wishlist entries whose IDs no longer exist in the catalogue.
     var wish = this.wishlist;
-    var products = this._products();
+    var validWish = wish.filter(function(id) {
+      return products.some(function(x) { return x.id === id; });
+    });
+    if (validWish.length !== wish.length) {
+      this._setWish(validWish);
+      this.syncCounts();
+      wish = validWish;
+    }
+
     var body = document.getElementById('ff-wish-body');
     var foot = document.getElementById('ff-wish-foot');
     var count = document.getElementById('ff-wish-count');
     if (count) count.textContent = wish.length + (wish.length === 1 ? ' item' : ' items');
 
+    var SVG_TRASH = '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>';
+    var SVG_CART  = '<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"/></svg>';
+    var SVG_CART_LG = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"/></svg>';
+
     if (!wish.length) {
       body.innerHTML =
         '<div class="fpanel-empty">' +
-          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">' +
-            '<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>' +
-          '</svg>' +
+          '<div class="fpanel-empty-icon fpanel-empty-icon--heart">' +
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">' +
+              '<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>' +
+            '</svg>' +
+          '</div>' +
           '<p class="fpanel-empty-big">No saved products</p>' +
-          '<p>Save products from the <a href="product.html" style="color:var(--color-primary,#0F4C81);text-decoration:underline">product page</a>.</p>' +
+          '<p class="fpanel-empty-sub">Tap the heart icon on any product to save it here.</p>' +
+          '<a href="product.html" class="fpanel-empty-btn">Browse Products</a>' +
         '</div>';
       foot.innerHTML = '';
       return;
@@ -290,22 +338,26 @@ const store = {
     wish.forEach(function(id) {
       var p = products.find(function(x) { return x.id === id; });
       if (!p) return;
+      var thumb = p.image
+        ? '<img src="' + p.image + '" alt="' + p.name + '" class="fline-img">'
+        : '<div class="fline-svg">' + (typeof productImageSVG === 'function' ? productImageSVG(p.category) : p.name.charAt(0)) + '</div>';
       html +=
         '<div class="fwish-line">' +
-          '<div class="fline-thumb">' + p.name.charAt(0) + '</div>' +
+          '<div class="fline-thumb">' + thumb + '</div>' +
           '<div class="fline-info">' +
             '<p class="fline-name">' + p.name + '</p>' +
-            '<p class="fline-comp">' + p.brand + ' · ' + p.packSize + '</p>' +
-            '<p class="fline-rate">' + inr(p.retailerPrice).replace('.00','') + '</p>' +
+            '<p class="fline-comp">' + p.brand + (p.packSize ? ' · ' + p.packSize : '') + '</p>' +
+            '<p class="fline-rate fline-rate--price">' + inr(p.retailerPrice).replace('.00','') + '</p>' +
           '</div>' +
           '<div class="fwish-actions">' +
-            '<button class="fwish-move" data-wish-cart="' + id + '">Add to Cart</button>' +
-            '<button class="fline-remove" data-wish-remove="' + id + '">Remove</button>' +
+            '<button class="fwish-move" data-wish-cart="' + id + '">' + SVG_CART + ' Add to Cart</button>' +
+            '<button class="fline-remove" data-wish-remove="' + id + '" aria-label="Remove from wishlist">' + SVG_TRASH + '</button>' +
           '</div>' +
         '</div>';
     });
     body.innerHTML = html;
-    foot.innerHTML = '<button class="fbtn-checkout fbtn-add-all">Add All to Cart</button>';
+    foot.innerHTML =
+      '<button class="fbtn-checkout fbtn-add-all">' + SVG_CART_LG + ' Add All to Cart</button>';
   }
 };
 
@@ -638,6 +690,8 @@ function initPanels() {
     overlay.classList.add('is-open');
     document.body.style.overflow = 'hidden';
   }
+  // Expose so addToCart / toggleWish can auto-open the panel
+  store._openPanel = openPanel;
   function closeAll() {
     cartPanel.classList.remove('is-open');
     wishPanel.classList.remove('is-open');
