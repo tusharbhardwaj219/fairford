@@ -48,7 +48,9 @@ async function doLogin() {
   msg.classList.remove('show');
   if (!email || !password) { msg.textContent = 'Enter email and password.'; msg.classList.add('show'); return; }
 
-  const btn = $('adLoginBtn'); btn.disabled = true; btn.classList.add('is-loading');
+  const btn = $('adLoginBtn');
+  var succeeded = false;
+  btn.disabled = true; btn.classList.add('is-loading');
   try {
     const res = await fetch('/api/auth/login', {
       method: 'POST',
@@ -59,7 +61,16 @@ async function doLogin() {
     if (!data.success) throw new Error(data.message || 'Login failed');
     localStorage.setItem('ff_token', data.token);
     localStorage.setItem('ff_user', JSON.stringify(Object.assign({}, data.user, { role: (data.user && data.user.role) || 'admin' })));
-    showApp();
+    var cbEl = $('rememberMe');
+    if (cbEl && cbEl.checked) {
+      localStorage.setItem('ff_remember_email', email);
+    } else {
+      localStorage.removeItem('ff_remember_email');
+    }
+    succeeded = true;
+    btn.classList.remove('is-loading');
+    btn.classList.add('is-success');
+    setTimeout(function () { showApp(); }, 1200);
   } catch (e) {
     msg.textContent = e.message; msg.classList.add('show');
     var card = document.querySelector('.ad-login-card');
@@ -69,7 +80,7 @@ async function doLogin() {
       card.classList.add('adl-shake');
     }
   } finally {
-    btn.disabled = false; btn.classList.remove('is-loading');
+    if (!succeeded) { btn.disabled = false; btn.classList.remove('is-loading'); }
   }
 }
 
@@ -334,4 +345,28 @@ else { var _ef = $('adEmail'); if (_ef) setTimeout(function(){ _ef.focus(); }, 6
   var e = $('adEmail'), p = $('adPass');
   if (e) e.addEventListener('input', clearErr);
   if (p) p.addEventListener('input', clearErr);
+}());
+
+/* Caps Lock detection */
+(function () {
+  var passInput = $('adPass');
+  var warn = $('capslockWarn');
+  if (!passInput || !warn) return;
+  function checkCaps(e) {
+    if (typeof e.getModifierState === 'function') {
+      warn.classList.toggle('visible', e.getModifierState('CapsLock'));
+    }
+  }
+  passInput.addEventListener('keydown', checkCaps);
+  passInput.addEventListener('keyup', checkCaps);
+  passInput.addEventListener('blur', function () { warn.classList.remove('visible'); });
+}());
+
+/* Remember Me — populate email on load */
+(function () {
+  var cb = $('rememberMe');
+  var emailInput = $('adEmail');
+  if (!cb || !emailInput) return;
+  var saved = localStorage.getItem('ff_remember_email');
+  if (saved) { emailInput.value = saved; cb.checked = true; }
 }());

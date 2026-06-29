@@ -489,7 +489,7 @@ function renderHeader(active) {
   <div class="drawer-header">
     <a href="index.html" class="logo">
       <span class="logo-mark" aria-hidden="true">
-        <img src="image/LOGO.png" alt="Fair Ford Pharmaceuticals Pvt. Ltd. logo" width="60" height="60">
+        <img src=https://res.cloudinary.com/dp4yririh/image/upload/v1781166637/LOGO_ja5rle.png alt="Fair Ford Pharmaceuticals Pvt. Ltd. logo" width="60" height="60">
       </span>
       <span class="logo-text">
         <span class="logo-name">Fair Ford</span>
