@@ -51,7 +51,9 @@
    ============================================================ */
 .pd-hero {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  /* Cap the gallery column so the product image doesn't dominate the page on
+     wide screens. Info column takes the remaining space. */
+  grid-template-columns: minmax(0, 440px) 1fr;
   gap: 40px;
   margin-top: 24px;
   align-items: start;
@@ -86,6 +88,9 @@
 .pd-main-img {
   position: relative;
   aspect-ratio: 1/1;
+  max-width: 380px;
+  margin: 0 auto;
+  width: 100%;
   background: linear-gradient(135deg, #F0F7FF 0%, #E8F4FD 100%);
   border: 1px solid var(--pd-border);
   border-radius: var(--pd-r-lg);
