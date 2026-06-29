@@ -306,7 +306,7 @@ router.put('/:id', verifyToken, async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ success: false, message: 'Invalid product ID' });
     }
-    const product = await Product.findByIdAndUpdate(id, { ...req.body }, { new: true });
+    const product = await Product.findByIdAndUpdate(id, { ...req.body }, { returnDocument: 'after' });
     if (!product) return res.status(404).json({ success: false, message: 'Product not found' });
     res.status(200).json({ success: true, message: 'Product updated', data: product });
   } catch (err) {
@@ -320,7 +320,7 @@ router.delete('/:id', verifyToken, async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ success: false, message: 'Invalid product ID' });
     }
-    const product = await Product.findByIdAndUpdate(id, { isActive: false }, { new: true });
+    const product = await Product.findByIdAndUpdate(id, { isActive: false }, { returnDocument: 'after' });
     if (!product) return res.status(404).json({ success: false, message: 'Product not found' });
     res.status(200).json({ success: true, message: 'Product deleted' });
   } catch (err) {
