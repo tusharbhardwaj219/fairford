@@ -2,15 +2,30 @@ const cloudinary  = require('../config/cloudinary');
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const multer = require('multer');
 
-const createStorage = (folder) =>
-  new CloudinaryStorage({
+// Per-folder size caps. `crop: 'limit'` only shrinks oversized uploads and
+// preserves the original aspect ratio, so portrait/landscape product photos
+// keep their proportions instead of being awkwardly cropped.
+const SIZE_BY_FOLDER = {
+  products:      { width: 1200, height: 1200 },
+  categories:    { width:  800, height:  800 },
+  users:         { width:  512, height:  512 },
+  prescriptions: { width: 2000, height: 2000 },
+};
+
+const createStorage = (folder) => {
+  const cap = SIZE_BY_FOLDER[folder] || { width: 1200, height: 1200 };
+  return new CloudinaryStorage({
     cloudinary,
     params: {
       folder: `fairford/${folder}`,
       allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
-      transformation: [{ quality: 'auto', fetch_format: 'auto' }],
+      transformation: [
+        { width: cap.width, height: cap.height, crop: 'limit' },
+        { quality: 'auto', fetch_format: 'auto' },
+      ],
     },
   });
+};
 
 const fileFilter = (req, file, cb) => {
   const allowed = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];

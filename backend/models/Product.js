@@ -169,6 +169,36 @@ productSchema.pre(/^find/, function () {
   this.populate({ path: 'category', select: 'categoryName categorySlug' });
 });
 
+// Keep stockStatus in sync when stock is updated via findByIdAndUpdate /
+// findOneAndUpdate. The pre('save') hook above only runs on .save(); query
+// updates bypass it, which left stockStatus stale (e.g. stayed "Out of Stock"
+// after Super Admin restocked from 0).
+productSchema.pre('findOneAndUpdate', async function () {
+  const update = this.getUpdate() || {};
+  const setBlock = update.$set || update;
+  const incBlock = update.$inc || {};
+
+  let nextStock;
+  if (typeof setBlock.stock === 'number') {
+    nextStock = setBlock.stock;
+  } else if (typeof incBlock.stock === 'number') {
+    const current = await this.model
+      .findOne(this.getQuery(), null, { _recursed: true })
+      .select('stock')
+      .lean();
+    if (current) nextStock = (current.stock || 0) + incBlock.stock;
+  }
+  if (nextStock === undefined) return;
+
+  const nextStatus =
+    nextStock <= 0 ? 'Out of Stock' :
+    nextStock <= 50 ? 'Low Stock' :
+    'In Stock';
+
+  update.$set = Object.assign({}, update.$set, { stockStatus: nextStatus });
+  this.setUpdate(update);
+});
+
 productSchema.statics.getFeaturedProducts = function (limit = 8) {
   return this.find({ isFeatured: true, status: 'active' }).limit(limit);
 };
