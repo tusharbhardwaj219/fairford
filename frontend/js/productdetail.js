@@ -840,7 +840,8 @@ document.addEventListener('DOMContentLoaded', function () {
         const thumb = e.target.closest('.pd-thumb');
         if (!thumb) return;
         const idx = parseInt(thumb.dataset.idx);
-        mainImgEl.src = p.images[idx];
+        var rawImg = p.images[idx];
+        mainImgEl.src = (rawImg && typeof rawImg === 'object') ? (rawImg.url || '') : (rawImg || '');
         thumbsWrap.querySelectorAll('.pd-thumb').forEach(function (t) {
           t.classList.toggle('pd-thumb-on', t === thumb);
         });
