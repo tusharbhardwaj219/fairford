@@ -176,7 +176,7 @@ router.post('/avatar', verifyToken, async (req, res) => {
     const user = await User.findByIdAndUpdate(
       req.userId,
       { avatar: avatarUrl, updatedAt: new Date() },
-      { new: true }
+      { returnDocument: 'after' }
     ).select('-password');
 
     res.status(200).json({
@@ -264,7 +264,7 @@ router.put('/address', verifyToken, async (req, res) => {
         },
         updatedAt: new Date()
       },
-      { new: true }
+      { returnDocument: 'after' }
     ).select('address');
 
     res.status(200).json({

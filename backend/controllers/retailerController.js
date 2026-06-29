@@ -21,7 +21,7 @@ const updateProfile = async (req, res) => {
     allowed.forEach(f => { if (req.body[f] !== undefined) updates[f] = req.body[f]; });
 
     const retailer = await Retailer.findByIdAndUpdate(
-      req.user._id, { $set: updates }, { new: true, runValidators: true }
+      req.user._id, { $set: updates }, { returnDocument: 'after', runValidators: true }
     ).select('-password');
 
     if (!retailer) return res.status(404).json({ success: false, message: 'Retailer not found' });
