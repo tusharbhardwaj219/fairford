@@ -98,7 +98,7 @@ document.addEventListener('DOMContentLoaded', function () {
       description:  sp.uses        || null,
       ratings:      sp.rating      || null,
       expiryDate:   sp.expDate     || null,
-      images:       [],
+      images:       sp.image ? [sp.image] : (Array.isArray(sp.images) ? sp.images : []),
       schedule:     null,
       batchNo:      null,
       hsn:          null
@@ -208,7 +208,19 @@ document.addEventListener('DOMContentLoaded', function () {
   // ── Builder: Hero section ─────────────────────────────────────────────────
 
   function buildHero(p, inStock, moq, userPrice, mrp, discount, IS_DIST, IS_RET, stock, catName) {
-    const imgs    = (p.images && p.images.length) ? p.images : [];
+    // Normalise image data: API returns images as [{url, public_id}, ...]
+    // while static catalogue entries (or already-flattened sources) may pass plain URL strings.
+    // Also fall back to the singular `image` field if the gallery is empty.
+    const rawImgs = (p.images && p.images.length) ? p.images : [];
+    let imgs = rawImgs.map(function (x) {
+      if (!x) return '';
+      if (typeof x === 'string') return x;
+      return x.url || '';
+    }).filter(Boolean);
+    if (!imgs.length && p.image) {
+      const primary = typeof p.image === 'string' ? p.image : (p.image.url || '');
+      if (primary) imgs = [primary];
+    }
     const hasImg  = imgs.length > 0;
     const cat     = esc(catName || '');
     const brand   = esc(p.manufacturer || p.brand || 'Pharma');
