@@ -4,6 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Fair Ford — Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/frontend/css/admin.css" />
 </head>
 <body>
@@ -11,19 +14,131 @@
   <!-- ── LOGIN ── (hidden by default; admin.js shows it only when not signed in,
        so a returning admin doesn't see a login flash before being redirected) -->
   <div class="ad-login-screen" id="adLogin">
+
+    <aside class="adl-aside" aria-hidden="true">
+      <div class="adl-aside-body">
+        <div class="adl-aside-logo">
+          <svg width="60" height="60" viewBox="0 0 60 60" fill="none">
+            <rect width="60" height="60" rx="18" fill="rgba(255,255,255,0.12)"/>
+            <rect x="25" y="10" width="10" height="40" rx="5" fill="white"/>
+            <rect x="10" y="25" width="40" height="10" rx="5" fill="white"/>
+          </svg>
+        </div>
+        <h2 class="adl-aside-title">Fair Ford<br>Pharmaceuticals</h2>
+        <p class="adl-aside-tagline">B2B Pharma Operations Platform</p>
+        <div class="adl-aside-sep"></div>
+        <ul class="adl-feats">
+          <li><span class="adl-feat-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Order lifecycle management</li>
+          <li><span class="adl-feat-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Retailer KYC approvals</li>
+          <li><span class="adl-feat-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Distributor routing coverage</li>
+          <li><span class="adl-feat-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Real-time operations analytics</li>
+        </ul>
+      </div>
+      <p class="adl-aside-copy">© 2025 Fair Ford Pharmaceuticals Pvt. Ltd.</p>
+      <div class="adl-aside-orb adl-aside-orb--a"></div>
+      <div class="adl-aside-orb adl-aside-orb--b"></div>
+    </aside>
+
+    <div class="adl-form-side">
+    <!-- Decorative background orbs -->
+    <div class="adl-orb adl-orb--1" aria-hidden="true"></div>
+    <div class="adl-orb adl-orb--2" aria-hidden="true"></div>
+    <div class="adl-orb adl-orb--3" aria-hidden="true"></div>
+
     <div class="ad-login-card">
-      <h1>Admin sign in</h1>
-      <p>Fair Ford Pharma — operations panel</p>
-      <div class="ad-msg err" id="adLoginMsg"></div>
-      <div class="ad-field" style="margin-bottom:12px;">
-        <label for="adEmail">Email</label>
-        <input class="ad-input" id="adEmail" type="email" placeholder="admin@medibridge.in" />
+
+      <!-- Brand header -->
+      <div class="adl-brand">
+        <div class="adl-logo-box" aria-hidden="true">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="11" y="2" width="6" height="24" rx="3" fill="white"/>
+            <rect x="2" y="11" width="24" height="6" rx="3" fill="white"/>
+          </svg>
+        </div>
+        <div class="adl-brand-info">
+          <span class="adl-brand-name">Fair Ford</span>
+          <span class="adl-brand-tag">Pharmaceuticals Pvt. Ltd.</span>
+        </div>
       </div>
-      <div class="ad-field" style="margin-bottom:18px;">
-        <label for="adPass">Password</label>
-        <input class="ad-input" id="adPass" type="password" placeholder="••••••••" />
+
+      <hr class="adl-rule" aria-hidden="true"/>
+
+      <h1 class="adl-heading">Admin Sign In</h1>
+      <p class="adl-desc">Secure access to the operations panel</p>
+
+      <!-- Error / info message -->
+      <div class="ad-msg err adl-err" id="adLoginMsg" role="alert"></div>
+
+      <!-- Email -->
+      <div class="adl-group">
+        <label class="adl-label" for="adEmail">Email address</label>
+        <div class="adl-field-wrap">
+          <span class="adl-field-icon" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+              <polyline points="22,6 12,13 2,6"/>
+            </svg>
+          </span>
+          <input class="adl-input" id="adEmail" type="email"
+                 autocomplete="email" placeholder="admin@fairfordpharma.com"/>
+        </div>
       </div>
-      <button class="btn btn-primary" id="adLoginBtn" style="width:100%;">Sign in</button>
+
+      <!-- Password -->
+      <div class="adl-group">
+        <div class="adl-label-row">
+          <label class="adl-label" for="adPass">Password</label>
+          <a href="#" class="adl-link" onclick="return false;" tabindex="-1">Forgot password?</a>
+        </div>
+        <div class="adl-field-wrap">
+          <span class="adl-field-icon" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+          </span>
+          <input class="adl-input adl-input--pass" id="adPass" type="password"
+                 autocomplete="current-password" placeholder="Enter your password"/>
+          <button class="adl-eye" id="passToggle" type="button" aria-label="Show password">
+            <svg id="eyeOpen" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+            <svg id="eyeClosed" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none">
+              <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19M14.12 14.12a3 3 0 1 1-4.24-4.24"/>
+              <line x1="1" y1="1" x2="23" y2="23"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Submit -->
+      <button class="adl-btn" id="adLoginBtn" type="button">
+        <span class="adl-btn-default">
+          Sign In
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </span>
+        <span class="adl-btn-busy" aria-hidden="true">
+          <svg class="adl-spin" width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="10" stroke="rgba(255,255,255,.3)" stroke-width="3"/>
+            <path d="M12 2a10 10 0 0 1 10 10" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+          </svg>
+          Signing in…
+        </span>
+      </button>
+
+      <!-- Security badge -->
+      <p class="adl-secure-note">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="color:#10B981;flex-shrink:0">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          <path d="m9 12 2 2 4-4"/>
+        </svg>
+        256-bit TLS · Admin access only
+      </p>
+
+    </div>
     </div>
   </div>
 
@@ -108,6 +223,7 @@
   </div>
 
   <div class="ad-toast" id="adToast"></div>
+  <script src="/frontend/js/logout-confirm.js"></script>
   <script src="/frontend/js/admin.js"></script>
 </body>
 </html>

@@ -32,8 +32,16 @@ function toast(msg) {
 }
 
 function logout() {
-  localStorage.removeItem('ff_token'); localStorage.removeItem('ff_user');
-  window.location.replace('/login&signup.html');
+  if (window.showLogoutConfirm) {
+    window.showLogoutConfirm(function () {
+      window.lcDoLogout('/login&signup.html');
+    });
+  } else {
+    localStorage.removeItem('ff_token');
+    localStorage.removeItem('ff_user');
+    sessionStorage.removeItem('ff_user');
+    window.location.replace('/login&signup.html');
+  }
 }
 
 async function apiFetch(path, options = {}) {

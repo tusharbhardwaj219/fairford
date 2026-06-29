@@ -785,12 +785,20 @@ function switchTab(tabName) {
 // LOGOUT
 // ════════════════════════════════════════════════════════════════════════════════
 async function handleLogout() {
-  try {
-    await fetch('/api/auth/logout', { method: 'POST', headers: { Authorization: `Bearer ${token}` } });
-  } catch (_) {}
-  localStorage.removeItem('ff_token');
-  localStorage.removeItem('ff_user');
-  window.location.replace('/admin.html');
+  if (window.showLogoutConfirm) {
+    window.showLogoutConfirm(function () {
+      // Fire-and-forget API call, then redirect via standard helper
+      fetch('/api/auth/logout', { method: 'POST', headers: { Authorization: 'Bearer ' + token } }).catch(function () {});
+      window.lcDoLogout('/admin.html');
+    });
+  } else {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST', headers: { Authorization: 'Bearer ' + token } });
+    } catch (_) {}
+    localStorage.removeItem('ff_token');
+    localStorage.removeItem('ff_user');
+    window.location.replace('/admin.html');
+  }
 }
 
 // ════════════════════════════════════════════════════════════════════════════════

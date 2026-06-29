@@ -24,7 +24,6 @@ body {
     color: #1a1a1a;
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
-    overflow-x: hidden;
 }
 
 img, picture, video, canvas, svg {
@@ -203,6 +202,7 @@ ul {
 ============================ */
 
 .header {
+    position: -webkit-sticky;
     position: sticky;
     top: 0;
     z-index: 100;
@@ -1505,21 +1505,33 @@ ul {
     color: #ef4444;
 }
 
-/* Footer Bottom */
+/* Footer Bottom — overridden by style.css which loads after this file */
 .footer-bottom {
     display: flex;
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
     gap: 16px;
-    padding-top: clamp(24px, 4vw, 32px);
-    border-top: 1px solid #e2e8f0;
+    border-top: none;
+    padding-top: 0;
     font-size: 13px;
 }
 
 .footer-copyright,
 .footer-credit {
     color: #94a3b8;
+}
+
+.footer-credit p {
+    display: inline-flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+.footer-heart-svg {
+    vertical-align: middle;
+    flex-shrink: 0;
 }
 
 .footer-credit a {

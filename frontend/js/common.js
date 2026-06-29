@@ -583,10 +583,16 @@ function initHeader() {
   }
 
   function doLogout() {
-    localStorage.removeItem('ff_user');
-    localStorage.removeItem('ff_token');
-    sessionStorage.removeItem('ff_user');
-    window.location.href = 'index.html';
+    if (window.showLogoutConfirm) {
+      window.showLogoutConfirm(function () {
+        window.lcDoLogout('index.html');
+      });
+    } else {
+      localStorage.removeItem('ff_user');
+      localStorage.removeItem('ff_token');
+      sessionStorage.removeItem('ff_user');
+      window.location.href = 'index.html';
+    }
   }
   logoutNav  && logoutNav.addEventListener('click', doLogout);
   logoutDraw && logoutDraw.addEventListener('click', doLogout);
@@ -840,10 +846,22 @@ function initPanels() {
 /* ----------  SHARED FOOTER  ---------- */
 function renderFooter() {
   const year = new Date().getFullYear();
+  /* Inline SVG helpers — zero external dependency, work on every page */
+  const svgChevronUp   = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="18 15 12 9 6 15"/></svg>';
+  const svgFacebook    = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>';
+  const svgInstagram   = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>';
+  const svgYoutube     = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 0 0-1.96 1.96A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02"/></svg>';
+  const svgLinkedin    = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>';
+  const svgMapPin      = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0f4c81" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="margin-top:4px;min-width:18px"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>';
+  const svgPhone       = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0f4c81" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="margin-top:4px;min-width:18px"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.62 3.17a2 2 0 0 1 2-2.18H6.72a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 6 6l.91-.91a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>';
+  const svgEnvelope    = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0f4c81" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="margin-top:4px;min-width:18px"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>';
+  const svgArrowRight  = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>';
+  const svgHeart       = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="#e53e3e" stroke="none" aria-hidden="true" class="footer-heart-svg" style="vertical-align:middle"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>';
+
   return `
   <footer class="footer">
-    <button class="back-to-top" id="backToTop" title="Back to top" aria-label="Back to top">
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-up-icon lucide-arrow-up"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></svg>
+    <button class="back-to-top" id="backToTop" title="Back to top">
+      ${svgChevronUp}
     </button>
 
     <div class="footer-container">
@@ -851,21 +869,21 @@ function renderFooter() {
 
         <div class="footer-section company-info">
           <div class="footer-logo">
-            <span class="logo-text">FAIR FORD Pharmaceuticals<br>PVT. LTD.</span>
+            <span class="logo-text">FAIR FORD Pharmaceuticals <br>PVT. LTD.</span>
           </div>
           <p class="company-description">At FAIRFORD Pharmaceuticals PVT. LTD. We are committed to delivering high-quality healthcare solutions that improve lives. With a focus on innovation and excellence, we strive to be a trusted partner in the pharmaceutical industry.</p>
           <div class="social-links">
-            <a href="https://www.facebook.com/profile.php?id=61550892159031" class="social-icon" title="Facebook" aria-label="Follow us on Facebook" target="_blank" rel="noopener noreferrer">
-              <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+            <a href="https://www.facebook.com/profile.php?id=61550892159031" class="social-icon" title="Facebook" aria-label="Follow us on Facebook" target="_blank">
+              ${svgFacebook}
             </a>
-            <a href="https://www.instagram.com/fairfordpharma/?__pwa=1" class="social-icon" title="Instagram" aria-label="Follow us on Instagram" target="_blank" rel="noopener noreferrer">
-              <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+            <a href="https://www.instagram.com/fairfordpharma/?__pwa=1" class="social-icon" title="Instagram" aria-label="Follow us on Instagram" target="_blank">
+              ${svgInstagram}
             </a>
-            <a href="https://www.youtube.com/@user-jm4zy6du8f" class="social-icon" title="YouTube" aria-label="Follow us on YouTube" target="_blank" rel="noopener noreferrer">
-              <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 0 0-1.95 1.96A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.54C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="#fff"/></svg>
+            <a href="https://www.youtube.com/@user-jm4zy6du8f" class="social-icon" title="YouTube" aria-label="Follow us on YouTube" target="_blank">
+              ${svgYoutube}
             </a>
-            <a href="https://www.linkedin.com/company/fairfordpharma" class="social-icon" title="LinkedIn" aria-label="Connect with us on LinkedIn" target="_blank" rel="noopener noreferrer">
-              <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+            <a href="https://www.linkedin.com/company/fairfordpharma" class="social-icon" title="LinkedIn" aria-label="Connect with us on LinkedIn" target="_blank">
+              ${svgLinkedin}
             </a>
           </div>
         </div>
@@ -898,22 +916,21 @@ function renderFooter() {
         <div class="footer-section contact-info">
           <h3 class="footer-title">Contact Us</h3>
           <div class="contact-item">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20" style="flex-shrink:0;margin-top:3px"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            ${svgMapPin}
             <div>
               <p class="contact-label">Address</p>
               <p class="contact-value" style="text-transform:lowercase;">1st,2nd,3rd and 4th floors, Fair Ford Tower,Gali No-07, Main Road, Anangpur Village, Opposite Mount Kailash Factory, Faridabad- 121003 (Haryana)</p>
             </div>
           </div>
           <div class="contact-item">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20" style="flex-shrink:0;margin-top:3px"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            ${svgPhone}
             <div>
               <p class="contact-label">Phone</p>
               <a href="tel:8595939723" class="contact-value">8595939723</a>
-              
             </div>
           </div>
           <div class="contact-item">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20" style="flex-shrink:0;margin-top:3px"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg>
+            ${svgEnvelope}
             <div>
               <p class="contact-label">Email</p>
               <a href="mailto:info@fairfordpharma.com" class="contact-value">info@fairfordpharma.com</a>
@@ -932,10 +949,10 @@ function renderFooter() {
         </div>
         <form class="newsletter-form" id="newsletterForm" novalidate>
           <div class="input-group">
-            <input type="email" class="newsletter-input" placeholder="your@email.com" required aria-label="Email address">
+            <input type="email" class="newsletter-input" placeholder="your@gmail.com" required aria-label="Email address">
             <button type="submit" class="newsletter-btn">
-              <span>Subscribe</span>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+              <span>submit</span>
+              ${svgArrowRight}
             </button>
           </div>
           <p class="newsletter-message" id="newsletterMessage"></p>
@@ -949,11 +966,7 @@ function renderFooter() {
           <p>&copy; ${year} FAIRFORD Pharmaceuticals PVT. LTD. All rights reserved.</p>
         </div>
         <div class="footer-credit">
-          <p>Designed and Created by
-            <a href="https://www.linkedin.com/in/himanshu-prajapati-469737327?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" target="_blank" rel="noopener noreferrer"> Himanshu</a>,
-            <a href="https://www.linkedin.com/in/bhardwaj-tushar-147711309?utm_source=share_via&utm_content=profile&utm_medium=member_android" target="_blank" rel="noopener noreferrer"> Tushar</a> and  <a href="https://www.linkedin.com/company/fair-ford-pharmaceuticals/" target="_blank" rel="noopener noreferrer"> Dilip yadav</a>
-            <svg viewBox="0 0 24 24" fill="#d64545" width="13" height="13" style="vertical-align:middle;margin:0 3px;animation:heartbeat 1.5s infinite"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-          </p>
+          <p>Designed and Created by <a href="https://www.linkedin.com/in/himanshu-prajapati-469737327?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" target="_blank">Himanshu</a>, <a href="https://www.linkedin.com/in/bhardwaj-tushar-147711309?utm_source=share_via&utm_content=profile&utm_medium=member_android" target="_blank">Tushar</a> and <a href="https://www.linkedin.com/company/fair-ford-pharmaceuticals/" target="_blank">Dilip</a> ${svgHeart} | Powered by Fair Ford Pharmaceuticals PVT. LTD.</p>
         </div>
       </div>
     </div>
@@ -1027,3 +1040,14 @@ function initFooter() {
     this.parentElement.style.boxShadow = 'none';
   });
 }
+
+/* ----------  AUTO-INJECT LOGOUT MODAL  ----------
+   Runs on every page that loads common.js (index.html + all static pages).
+   Dashboard pages (admin, retailer, distributor-inventory) carry an explicit
+   <script src="/frontend/js/logout-confirm.js"> tag instead.       */
+(function () {
+  if (document.querySelector('script[src*="logout-confirm"]')) return;
+  var s = document.createElement('script');
+  s.src = '/frontend/js/logout-confirm.js';
+  document.head.appendChild(s);
+}());
