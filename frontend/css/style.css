@@ -4087,11 +4087,13 @@ img {
 /* ==================== Footer Bottom Bar ==================== */
 
 .footer-bottom {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--spacing-lg);
+    display: flex;
+    justify-content: space-between;
     align-items: center;
-    text-align: center;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+    border-top: none;
+    padding-top: 0;
     animation: fadeIn 0.6s ease-out 0.6s both;
 }
 
@@ -4099,6 +4101,19 @@ img {
 .footer-credit {
     font-size: 0.85rem;
     color: #0f4c81;
+}
+
+.footer-credit p {
+    display: inline-flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+.footer-heart-svg {
+    vertical-align: middle;
+    flex-shrink: 0;
+    animation: heartbeat 1.5s infinite;
 }
 
 .footer-credit i {

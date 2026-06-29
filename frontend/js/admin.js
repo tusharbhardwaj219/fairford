@@ -48,7 +48,7 @@ async function doLogin() {
   msg.classList.remove('show');
   if (!email || !password) { msg.textContent = 'Enter email and password.'; msg.classList.add('show'); return; }
 
-  const btn = $('adLoginBtn'); btn.disabled = true; btn.textContent = 'Signing in…';
+  const btn = $('adLoginBtn'); btn.disabled = true; btn.classList.add('is-loading');
   try {
     const res = await fetch('/api/auth/login', {
       method: 'POST',
@@ -62,15 +62,34 @@ async function doLogin() {
     showApp();
   } catch (e) {
     msg.textContent = e.message; msg.classList.add('show');
+    var card = document.querySelector('.ad-login-card');
+    if (card) {
+      card.classList.remove('adl-shake');
+      void card.offsetWidth;
+      card.classList.add('adl-shake');
+    }
   } finally {
-    btn.disabled = false; btn.textContent = 'Sign in';
+    btn.disabled = false; btn.classList.remove('is-loading');
   }
 }
 
 function logout() {
-  localStorage.removeItem('ff_token'); localStorage.removeItem('ff_user');
-  $('adApp').style.display = 'none';
-  $('adLogin').style.display = 'flex';
+  if (window.showLogoutConfirm) {
+    window.showLogoutConfirm(function () {
+      localStorage.removeItem('ff_token');
+      localStorage.removeItem('ff_user');
+      // Modal auto-closes after ~400ms; delay UI swap so it's not jarring
+      setTimeout(function () {
+        $('adApp').style.display = 'none';
+        $('adLogin').style.display = 'flex';
+      }, 450);
+    });
+  } else {
+    localStorage.removeItem('ff_token');
+    localStorage.removeItem('ff_user');
+    $('adApp').style.display = 'none';
+    $('adLogin').style.display = 'flex';
+  }
 }
 
 function showApp() {
@@ -288,3 +307,31 @@ document.addEventListener('click', (e) => {
 
 /* ── Init ── */
 if (isAdmin()) { $('adLogin').style.display = 'none'; showApp(); }
+else { var _ef = $('adEmail'); if (_ef) setTimeout(function(){ _ef.focus(); }, 60); }
+
+/* ── Password show/hide toggle ── */
+(function () {
+  var toggle = $('passToggle');
+  var passInput = $('adPass');
+  var eyeOpen = $('eyeOpen');
+  var eyeClosed = $('eyeClosed');
+  if (!toggle || !passInput) return;
+  toggle.addEventListener('click', function () {
+    var show = passInput.type === 'password';
+    passInput.type = show ? 'text' : 'password';
+    if (eyeOpen) eyeOpen.style.display = show ? 'none' : '';
+    if (eyeClosed) eyeClosed.style.display = show ? '' : 'none';
+    toggle.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+    passInput.focus();
+  });
+}());
+
+(function () {
+  function clearErr() {
+    var m = $('adLoginMsg');
+    if (m) m.classList.remove('show');
+  }
+  var e = $('adEmail'), p = $('adPass');
+  if (e) e.addEventListener('input', clearErr);
+  if (p) p.addEventListener('input', clearErr);
+}());

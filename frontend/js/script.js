@@ -27,9 +27,16 @@
   }
 
   function logout() {
-    localStorage.removeItem('ff_user');
-    localStorage.removeItem('ff_token');
-    updateAuthUI();
+    if (window.showLogoutConfirm) {
+      window.showLogoutConfirm(function () {
+        window.lcDoLogout('index.html');
+      });
+    } else {
+      localStorage.removeItem('ff_user');
+      localStorage.removeItem('ff_token');
+      sessionStorage.removeItem('ff_user');
+      updateAuthUI();
+    }
   }
 
   if (logoutNavBtn)  logoutNavBtn.addEventListener('click', logout);

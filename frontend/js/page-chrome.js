@@ -22,11 +22,11 @@
     ];
     doomed.forEach(function (n) { if (n) n.parentNode.removeChild(n); });
 
-    // Inject the shared header at the very top of <body>
-    var headerWrap = document.createElement('div');
-    headerWrap.id = 'site-header';
-    document.body.insertBefore(headerWrap, document.body.firstChild);
-    headerWrap.innerHTML = renderHeader(pageKey);
+    // Inject the shared header directly as body children (no wrapper div)
+    // so that <header class="header" position:sticky> is constrained by the
+    // full document height, not a small wrapper div that would end after the
+    // topbar+header and cause the sticky header to scroll off-screen.
+    document.body.insertAdjacentHTML('afterbegin', renderHeader(pageKey));
 
     // Replace inline footer (whatever flavour) with the shared one
     var oldFooter = document.querySelector('footer.footer') ||
