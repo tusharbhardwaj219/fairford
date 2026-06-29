@@ -230,6 +230,8 @@ body{display:flex;min-height:100vh;background:var(--bg);color:var(--text);font-s
   color:var(--text-2);position:relative;transition:background .15s;
 }
 .tb-btn:hover{background:var(--bg)}
+.tb-logout-btn{border-color:#fee2e2;color:#ef4444}
+.tb-logout-btn:hover{background:#fef2f2;border-color:#fca5a5;color:#dc2626}
 .tb-badge{
   position:absolute;top:6px;right:6px;
   width:7px;height:7px;border-radius:50%;

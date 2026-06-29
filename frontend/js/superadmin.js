@@ -59,6 +59,22 @@ function closeSidebar() {
 }
 
 /* ══════════════════════════════════════════
+   LOGOUT
+══════════════════════════════════════════ */
+function logout() {
+  if (window.showLogoutConfirm) {
+    window.showLogoutConfirm(function () {
+      window.lcDoLogout('/admin.html');
+    });
+  } else {
+    localStorage.removeItem('ff_token');
+    localStorage.removeItem('ff_user');
+    sessionStorage.removeItem('ff_user');
+    window.location.replace('/admin.html');
+  }
+}
+
+/* ══════════════════════════════════════════
    API HELPER
 ══════════════════════════════════════════ */
 async function apiFetch(path, opts = {}) {
