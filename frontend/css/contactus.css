@@ -843,6 +843,14 @@ ul {
     translate: 0 -1px;
     box-shadow: 0 10px 26px rgba(15, 76, 129, 0.35);
 }
+.drawer-cta.drawer-logout {
+    background: #ef4444;
+    box-shadow: 0 6px 18px rgba(239, 68, 68, 0.25);
+}
+.drawer-cta.drawer-logout:hover {
+    background: #dc2626;
+    box-shadow: 0 10px 26px rgba(239, 68, 68, 0.40);
+}
 
 .drawer-meta {
     margin-top: 10px;

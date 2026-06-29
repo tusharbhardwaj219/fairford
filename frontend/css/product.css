@@ -806,8 +806,8 @@ h4 {
 }
 
 .drawer-cta:hover { transform: translateY(-1px); box-shadow: 0 10px 26px rgba(15,76,129,.35); }
-.drawer-logout { background: #ef4444; }
-.drawer-logout:hover { box-shadow: 0 8px 22px rgba(239,68,68,.35); }
+.drawer-cta.drawer-logout { background: #ef4444; box-shadow: 0 6px 18px rgba(239,68,68,.25); }
+.drawer-cta.drawer-logout:hover { background: #dc2626; box-shadow: 0 10px 26px rgba(239,68,68,.40); }
 
 .drawer-meta {
     margin-top: var(--space-4);
