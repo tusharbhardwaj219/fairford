@@ -12,7 +12,10 @@ const {
   handleUploadError
 } = require('../middleware/uploadMiddleware');
 
-const isSuperAdmin = authorizeRoles('mfr');
+// Admin-only gate for all product writes. (Was authorizeRoles('mfr') — a role
+// no account has, which left DELETE permanently 403 and, combined with the
+// missing gate on create/update, let any logged-in user mutate products.)
+const adminOnly = authorizeRoles('admin', 'superadmin');
 
 const router = express.Router();
 
@@ -44,6 +47,7 @@ router.get('/:id',                  optionalAuth, productController.getProduct);
 router.post(
   '/',
   protect,
+  adminOnly,
   uploadSingleImage,
   handleUploadError,
   productValidation,
@@ -54,6 +58,7 @@ router.post(
 router.put(
   '/:id',
   protect,
+  adminOnly,
   uploadSingleImage,
   handleUploadError,
   [
@@ -69,15 +74,16 @@ router.put(
 );
 
 // ── Protected: DELETE (SuperAdmin) ────────────────────────────────────────────
-router.delete('/:id', protect, isSuperAdmin, productController.deleteProduct);
+router.delete('/:id', protect, adminOnly, productController.deleteProduct);
 
 // ── Protected: Dashboard stats ────────────────────────────────────────────────
-router.get('/stats/dashboard', protect, productController.getDashboardStats);
+router.get('/stats/dashboard', protect, adminOnly, productController.getDashboardStats);
 
 // ── Protected: Gallery — upload up to 5 images ───────────────────────────────
 router.post(
   '/:id/images',
   protect,
+  adminOnly,
   uploadMultipleImages,
   handleUploadError,
   productController.addProductImages
@@ -87,12 +93,15 @@ router.post(
 router.delete(
   '/:id/images/:imageId',
   protect,
+  adminOnly,
   productController.deleteProductImage
 );
 
 // ── Standalone image upload (returns URL + public_id) ────────────────────────
 router.post(
   '/add-product',
+  protect,
+  adminOnly,
   uploadSingleImage,
   handleUploadError,
   async (req, res) => {
