@@ -363,7 +363,7 @@ exports.updateProduct = async (req, res, next) => {
     }
 
     product = await Product.findByIdAndUpdate(req.params.id, req.body, {
-      new: true, runValidators: true
+      returnDocument: 'after', runValidators: true
     }).populate('category');
 
     return res.status(200).json({ success: true, message: 'Product updated successfully', product });

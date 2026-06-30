@@ -130,7 +130,7 @@ const listRetailers = async (req, res) => {
 const setRetailerStatus = (status) => async (req, res) => {
   try {
     const retailer = await Retailer.findByIdAndUpdate(
-      req.params.id, { $set: { status } }, { new: true }
+      req.params.id, { $set: { status } }, { returnDocument: 'after' }
     ).select('-password');
     if (!retailer) return res.status(404).json({ success: false, message: 'Retailer not found' });
     return res.json({ success: true, message: `Retailer ${status === 'active' ? 'approved' : 'suspended'}`, retailer });
@@ -205,7 +205,7 @@ const updateDistributor = async (req, res) => {
     }
 
     const distributor = await Distributor.findByIdAndUpdate(
-      req.params.id, { $set: updates }, { new: true, runValidators: true }
+      req.params.id, { $set: updates }, { returnDocument: 'after', runValidators: true }
     ).select('-password');
     if (!distributor) return res.status(404).json({ success: false, message: 'Distributor not found' });
 
