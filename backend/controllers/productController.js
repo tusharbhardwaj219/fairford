@@ -244,8 +244,8 @@ exports.getProductBySlug = async (req, res, next) => {
 // ── @route  GET /api/products/category/:categoryId ───────────────────────────
 exports.getProductsByCategory = async (req, res, next) => {
   try {
-    const page  = Number(req.query.page) || 1;
-    const limit = Number(req.query.limit) || 10;
+    const page  = Math.max(1, Number(req.query.page) || 1);
+    const limit = Math.min(500, Math.max(1, Number(req.query.limit) || 10));
     const skip  = (page - 1) * limit;
 
     const category = await Category.findById(req.params.categoryId);
@@ -275,8 +275,8 @@ exports.getProductsByCategory = async (req, res, next) => {
 // ── @route  GET /api/products/brand/:brand ───────────────────────────────────
 exports.getProductsByBrand = async (req, res, next) => {
   try {
-    const page  = Number(req.query.page) || 1;
-    const limit = Number(req.query.limit) || 10;
+    const page  = Math.max(1, Number(req.query.page) || 1);
+    const limit = Math.min(500, Math.max(1, Number(req.query.limit) || 10));
     const skip  = (page - 1) * limit;
 
     const products = await Product.find({ brand: req.params.brand, status: 'active' })
@@ -305,12 +305,14 @@ exports.autoSuggestSearch = async (req, res, next) => {
     if (!keyword || keyword.length < 2) {
       return res.status(200).json({ success: true, suggestions: [] });
     }
+    // Escape regex metacharacters + cap length (ReDoS-safe).
+    const kw = String(keyword).slice(0, 80).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
     const products = await Product.find({
       $or: [
-        { name:        { $regex: keyword, $options: 'i' } },
-        { brand:       { $regex: keyword, $options: 'i' } },
-        { composition: { $regex: keyword, $options: 'i' } }
+        { name:        { $regex: kw, $options: 'i' } },
+        { brand:       { $regex: kw, $options: 'i' } },
+        { composition: { $regex: kw, $options: 'i' } }
       ],
       status: 'active'
     }).select('name brand').limit(10);
