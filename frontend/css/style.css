@@ -4049,7 +4049,7 @@ img {
     outline: none;
     background: rgba(255, 255, 255, 0.08);
     border-color: #0f4c81;
-    box-shadow: #0f4c81 0 0 0 3px rgba(184, 154, 106, 0.2);
+    box-shadow: 0 0 0 3px rgba(15, 76, 129, 0.15);
 }
 
 .newsletter-btn {

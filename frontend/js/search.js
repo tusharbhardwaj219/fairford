@@ -8,11 +8,15 @@
 (function () {
   'use strict';
 
-  var inputEl, suggestEl, clearBtn, gridEl, countEl, emptyEl;
+  var inputEl, suggestEl, clearBtn, gridEl, countEl, emptyEl, loadMoreBtn;
   var ALL_PRODUCTS = [];
   var SUGGEST_TIMER = null;
   var SUGGEST_ABORT = null;
   var ACTIVE_SUGGEST = -1; // index in current dropdown
+
+  var PAGE_SIZE = 12;     // cards shown per page
+  var CURRENT_LIST = [];  // full filtered list
+  var CURRENT_SHOWN = 0;  // how many cards are currently in the DOM
 
   var inr = function (n) {
     return '₹' + Number(n || 0).toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
@@ -87,17 +91,68 @@
            '</article>';
   }
 
+  function updateCountAndButton() {
+    var total = CURRENT_LIST.length;
+    var shown = CURRENT_SHOWN;
+    if (!total) {
+      countEl.textContent = '0 products';
+      if (loadMoreBtn) loadMoreBtn.parentNode.style.display = 'none';
+    } else if (total <= PAGE_SIZE || shown >= total) {
+      countEl.textContent = total + (total === 1 ? ' product' : ' products');
+      if (loadMoreBtn) loadMoreBtn.parentNode.style.display = 'none';
+    } else {
+      countEl.textContent = 'Showing ' + shown + ' of ' + total + ' Products';
+      if (loadMoreBtn) {
+        loadMoreBtn.parentNode.style.display = '';
+        loadMoreBtn.querySelector('.ff-lm-remaining') &&
+          (loadMoreBtn.querySelector('.ff-lm-remaining').textContent =
+            (total - shown) + ' more');
+      }
+    }
+  }
+
   function renderGrid(list) {
-    countEl.textContent = list.length
-      ? list.length + (list.length === 1 ? ' product' : ' products')
-      : '0 products';
+    CURRENT_LIST = list;
+    CURRENT_SHOWN = 0;
+
     if (!list.length) {
       gridEl.innerHTML = '';
       emptyEl.style.display = 'block';
+      updateCountAndButton();
       return;
     }
+
     emptyEl.style.display = 'none';
-    gridEl.innerHTML = list.map(cardHTML).join('');
+    CURRENT_SHOWN = Math.min(PAGE_SIZE, list.length);
+    gridEl.innerHTML = list.slice(0, CURRENT_SHOWN).map(cardHTML).join('');
+    updateCountAndButton();
+  }
+
+  function loadMore() {
+    var prev = CURRENT_SHOWN;
+    var next = Math.min(CURRENT_SHOWN + PAGE_SIZE, CURRENT_LIST.length);
+    if (prev >= CURRENT_LIST.length) return;
+
+    var frag = document.createDocumentFragment();
+    for (var i = prev; i < next; i++) {
+      var tmp = document.createElement('div');
+      tmp.innerHTML = cardHTML(CURRENT_LIST[i]);
+      var card = tmp.firstElementChild;
+      card.classList.add('ff-card--entering');
+      frag.appendChild(card);
+    }
+    gridEl.appendChild(frag);
+
+    CURRENT_SHOWN = next;
+    updateCountAndButton();
+
+    // Scroll first new card into view
+    var allCards = gridEl.querySelectorAll('.ff-card');
+    if (allCards[prev]) {
+      setTimeout(function () {
+        allCards[prev].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 60);
+    }
   }
 
   function filterGrid(keyword) {
@@ -243,6 +298,8 @@
     gridEl = document.getElementById('ffGrid');
     countEl = document.getElementById('ffCount');
     emptyEl = document.getElementById('ffEmpty');
+    loadMoreBtn = document.getElementById('ffLoadMore');
+    if (loadMoreBtn) loadMoreBtn.addEventListener('click', loadMore);
 
     inputEl.addEventListener('input', onInput);
     inputEl.addEventListener('keydown', onKeyDown);
