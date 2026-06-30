@@ -176,7 +176,7 @@ function initButtonActions() {
     
     if (downloadBtn) {
         downloadBtn.addEventListener('click', () => {
-            alert('📄 Brochure download coming soon!\n\nContact us at:\nEmail: info@fairfordpharma.com\nPhone: 9958584020');
+            alert('');
         });
     }
 
