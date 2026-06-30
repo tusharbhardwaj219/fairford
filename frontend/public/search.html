@@ -6,75 +6,154 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Fair Ford — Search</title>
 
-    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap"
-        rel="stylesheet">
-
-    <!-- Font Awesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
-
-    <!-- Shared chrome (header/footer/topbar) styles -->
     <link rel="stylesheet" href="/frontend/css/style.css">
     <link rel="stylesheet" href="/frontend/css/search.css">
-
-    <link rel="icon" type="image/png"
-        href="https://res.cloudinary.com/dp4yririh/image/upload/v1781166637/LOGO_ja5rle.png">
+    <link rel="icon" type="image/png" href="https://res.cloudinary.com/dp4yririh/image/upload/v1781166637/LOGO_ja5rle.png">
 </head>
 
 <body>
-    <main class="container" style="padding-top: 32px; padding-bottom: 64px;">
-        <header class="page-head" style="margin-bottom: 24px;">
-            <h1 style="font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; color: #0f4c81; margin: 0 0 8px;">
-                Search products
-            </h1>
-            <p style="color: #4b5563; margin: 0;">
-                Live results — type a product, brand, or molecule. Suggestions update as you type.
-            </p>
-        </header>
+    <div id="site-header"></div>
 
-        <!-- Search input with auto-suggest dropdown -->
-        <div class="ff-search-wrap" id="ffSearchWrap">
-            <div class="ff-search-bar">
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <circle cx="11" cy="11" r="7" />
-                    <path d="m20 20-3.5-3.5" />
-                </svg>
-                <input id="ffSearchInput" type="text" autocomplete="off" spellcheck="false"
-                    placeholder="Search by product, brand, or molecule…">
-                <button id="ffSearchClear" type="button" aria-label="Clear" style="display:none;">×</button>
+    <!-- ═══════════════════════════════════════════
+         PREMIUM SEARCH HERO
+    ═══════════════════════════════════════════ -->
+    <section class="srch-hero">
+        <!-- Decorative blobs -->
+        <div class="srch-blob srch-blob--a" aria-hidden="true"></div>
+        <div class="srch-blob srch-blob--b" aria-hidden="true"></div>
+
+        <div class="srch-hero-inner">
+            <!-- Label pill -->
+            <div class="srch-hero-label" aria-hidden="true">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+                B2B Product Search
             </div>
-            <ul class="ff-suggest" id="ffSuggest" role="listbox" hidden></ul>
+
+            <h1 class="srch-hero-title">Find the right medicine,<br class="srch-br"> instantly.</h1>
+            <p class="srch-hero-sub">Search across pharmaceutical products by name, brand, or molecule. Results update live as you type.</p>
+
+            <!-- Search bar -->
+            <div class="ff-search-wrap srch-bar-wrap" id="ffSearchWrap">
+                <div class="ff-search-bar">
+                    <svg class="srch-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>
+                    </svg>
+                    <input id="ffSearchInput" type="text" autocomplete="off" spellcheck="false"
+                           placeholder="Search by product, brand, or molecule…">
+                    <button id="ffSearchClear" type="button" aria-label="Clear search" style="display:none;">
+                        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                    </button>
+                </div>
+                <ul class="ff-suggest" id="ffSuggest" role="listbox" hidden></ul>
+            </div>
+
+            <!-- Quick chips -->
+            <div class="srch-chips">
+                <span class="srch-chip-label">Try:</span>
+                <button class="srch-chip" data-query="Paracetamol">Paracetamol</button>
+                <button class="srch-chip" data-query="Amoxicillin">Amoxicillin</button>
+                <button class="srch-chip" data-query="Syrup">Syrups</button>
+                <button class="srch-chip" data-query="Vitamin">Vitamins</button>
+                <button class="srch-chip" data-query="Antibiotic">Antibiotics</button>
+            </div>
         </div>
+    </section>
 
-        <!-- Result count -->
-        <div class="ff-count" id="ffCount" style="color:#6b7280; font-size:13px; margin: 16px 0 12px;">
-            Loading products…
-        </div>
+    <!-- ═══════════════════════════════════════════
+         RESULTS AREA
+    ═══════════════════════════════════════════ -->
+    <main class="srch-main">
+        <div class="container">
 
-        <!-- Product grid -->
-        <div class="ff-grid" id="ffGrid"></div>
+            <!-- Count banner -->
+            <div class="srch-count-row">
+                <div class="srch-count-card">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+                    <span id="ffCount" class="srch-count-text">Loading products…</span>
+                </div>
+            </div>
 
-        <!-- Empty state -->
-        <div class="ff-empty" id="ffEmpty" style="display:none; text-align:center; padding: 60px 20px; color:#6b7280;">
-            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
-                stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 12px; color:#9ca3af;">
-                <circle cx="11" cy="11" r="7" />
-                <path d="m20 20-3.5-3.5" />
-            </svg>
-            <h3 style="margin:0 0 6px; font-weight:600; color:#374151;">No products found</h3>
-            <p style="margin:0;">Try a different keyword, or browse the full catalog.</p>
+            <!-- Product grid (search.js writes here) -->
+            <div class="ff-grid" id="ffGrid">
+                <!-- Skeleton loaders — replaced by search.js when data arrives -->
+                <div class="ff-skel"><div class="ff-skel-img"></div><div class="ff-skel-body"><div class="ff-skel-ln" style="width:48%"></div><div class="ff-skel-ln" style="width:86%"></div><div class="ff-skel-ln" style="width:64%"></div><div class="ff-skel-btn"></div></div></div>
+                <div class="ff-skel"><div class="ff-skel-img"></div><div class="ff-skel-body"><div class="ff-skel-ln" style="width:54%"></div><div class="ff-skel-ln" style="width:78%"></div><div class="ff-skel-ln" style="width:70%"></div><div class="ff-skel-btn"></div></div></div>
+                <div class="ff-skel"><div class="ff-skel-img"></div><div class="ff-skel-body"><div class="ff-skel-ln" style="width:42%"></div><div class="ff-skel-ln" style="width:90%"></div><div class="ff-skel-ln" style="width:60%"></div><div class="ff-skel-btn"></div></div></div>
+                <div class="ff-skel"><div class="ff-skel-img"></div><div class="ff-skel-body"><div class="ff-skel-ln" style="width:56%"></div><div class="ff-skel-ln" style="width:82%"></div><div class="ff-skel-ln" style="width:68%"></div><div class="ff-skel-btn"></div></div></div>
+                <div class="ff-skel"><div class="ff-skel-img"></div><div class="ff-skel-body"><div class="ff-skel-ln" style="width:50%"></div><div class="ff-skel-ln" style="width:76%"></div><div class="ff-skel-ln" style="width:58%"></div><div class="ff-skel-btn"></div></div></div>
+                <div class="ff-skel"><div class="ff-skel-img"></div><div class="ff-skel-body"><div class="ff-skel-ln" style="width:44%"></div><div class="ff-skel-ln" style="width:88%"></div><div class="ff-skel-ln" style="width:72%"></div><div class="ff-skel-btn"></div></div></div>
+                <div class="ff-skel"><div class="ff-skel-img"></div><div class="ff-skel-body"><div class="ff-skel-ln" style="width:52%"></div><div class="ff-skel-ln" style="width:80%"></div><div class="ff-skel-ln" style="width:62%"></div><div class="ff-skel-btn"></div></div></div>
+                <div class="ff-skel"><div class="ff-skel-img"></div><div class="ff-skel-body"><div class="ff-skel-ln" style="width:46%"></div><div class="ff-skel-ln" style="width:84%"></div><div class="ff-skel-ln" style="width:66%"></div><div class="ff-skel-btn"></div></div></div>
+            </div>
+
+            <!-- Load More -->
+            <div class="ff-loadmore-wrap" style="display:none;">
+                <div class="ff-loadmore-line"></div>
+                <button class="ff-loadmore-btn" id="ffLoadMore" type="button">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+                    Load More Products
+                    <span class="ff-lm-remaining"></span>
+                </button>
+                <div class="ff-loadmore-line"></div>
+            </div>
+
+            <!-- Empty state -->
+            <div class="ff-empty" id="ffEmpty" style="display:none;" role="status" aria-live="polite">
+                <div class="ff-empty-inner">
+                    <div class="ff-empty-icon" aria-hidden="true">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="7"/>
+                            <path d="m20 20-3.5-3.5"/>
+                            <path d="M8.5 11h5M11 8.5v5" stroke-width="1.8" opacity=".5"/>
+                        </svg>
+                    </div>
+                    <h3 class="ff-empty-title">No Products Found</h3>
+                    <p class="ff-empty-sub">We couldn't find any products matching your search.<br>Try a different keyword or clear the search to browse everything.</p>
+                    <button class="ff-empty-btn" id="ffEmptyClear">
+                        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                        Clear Search
+                    </button>
+                </div>
+            </div>
+
         </div>
     </main>
 
-    <!-- Shared header/footer (matches home page) -->
+    <div id="site-footer"></div>
+
     <script>window.__PAGE_KEY__ = '';</script>
     <script src="/frontend/js/common.js"></script>
     <script src="/frontend/js/page-chrome.js"></script>
     <script src="/frontend/js/search.js"></script>
-</body>
 
+    <script>
+    /* Quick chip click → pre-fill search & fire input event */
+    document.querySelectorAll('.srch-chip[data-query]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var inp = document.getElementById('ffSearchInput');
+            var clr = document.getElementById('ffSearchClear');
+            if (!inp) return;
+            inp.value = this.getAttribute('data-query');
+            inp.dispatchEvent(new Event('input', { bubbles: true }));
+            if (clr) clr.style.display = '';
+            inp.focus();
+        });
+    });
+    /* Empty-state clear button */
+    var emClr = document.getElementById('ffEmptyClear');
+    if (emClr) {
+        emClr.addEventListener('click', function () {
+            var inp = document.getElementById('ffSearchInput');
+            var clr = document.getElementById('ffSearchClear');
+            if (inp) { inp.value = ''; inp.dispatchEvent(new Event('input', { bubbles: true })); }
+            if (clr) clr.style.display = 'none';
+            if (inp) inp.focus();
+        });
+    }
+    </script>
+</body>
 </html>
