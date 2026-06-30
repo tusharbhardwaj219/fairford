@@ -176,7 +176,12 @@ function initButtonActions() {
     
     if (downloadBtn) {
         downloadBtn.addEventListener('click', () => {
-            alert('');
+            const a = document.createElement('a');
+            a.href = '/uphar-ki-bahar-3.0.pdf';
+            a.download = 'Uphar Ki Bahar 3.0.pdf';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
         });
     }
 
