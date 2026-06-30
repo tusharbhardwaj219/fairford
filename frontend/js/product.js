@@ -401,6 +401,13 @@ document.addEventListener('DOMContentLoaded', async function () {
     if (openBtn) openBtn.addEventListener('click', openSidebar);
     backdrop.addEventListener('click', closeSidebar);
 
+    /* =========  PRE-FILL FROM URL PARAMS  ========= */
+    var urlSearch = new URLSearchParams(window.location.search).get('search');
+    if (urlSearch) {
+        var si = document.getElementById('search-input');
+        if (si) si.value = urlSearch;
+    }
+
     /* =========  INITIAL RENDER (data already fetched)  ========= */
     readState();
     renderChips();

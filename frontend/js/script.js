@@ -717,10 +717,7 @@ function setupEventListeners() {
 function handleDivisionClick(divisionId) {
   const division = divisions.find(d => d.id === parseInt(divisionId));
   if (division) {
-    console.log('Division clicked:', division.title);
-    alert(`Opening ${division.title} division with ${division.skus} SKUs`);
-    // In production, this would navigate to the division page
-    // window.location.href = `/divisions/${division.id}`;
+    window.location.href = 'product.html?search=' + encodeURIComponent(division.title);
   }
 }
 
