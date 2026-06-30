@@ -34,6 +34,7 @@ const placeOrder = async (req, res) => {
 
     const orderItems = [];
     let subtotal = 0;
+    let gstAmount = 0;
 
     for (const item of items) {
       const product = await Product.findById(item.product || item._id);
@@ -44,7 +45,9 @@ const placeOrder = async (req, res) => {
 
       const unitPrice  = product.retailerPrice;
       const totalPrice = unitPrice * item.quantity;
-      subtotal += totalPrice;
+      const gstRate    = product.gst || 12;
+      subtotal  += totalPrice;
+      gstAmount += (totalPrice * gstRate) / 100;   // per-item GST (5/12/18), not a flat 12%
 
       orderItems.push({
         product:     product._id,
@@ -52,38 +55,78 @@ const placeOrder = async (req, res) => {
         brand:       product.brand,
         quantity:    item.quantity,
         unitPrice,
-        gstRate:     product.gst || 12,
+        gstRate,
         totalPrice,
       });
     }
 
-    const gstAmount  = Math.round(subtotal * 0.12);
+    gstAmount = Math.round(gstAmount);
     const totalAmount = subtotal + gstAmount;
+
+    // M-1: guard against accidental double-submits — reject an identical order
+    // (same products & quantities) from the same retailer within a short window.
+    const sig = orderItems.map(i => `${i.product}:${i.quantity}`).sort().join('|');
+    const recentOrders = await Order.find({
+      retailer:  retailer._id,
+      createdAt: { $gte: new Date(Date.now() - 30000) },
+    }).select('items').lean();
+    const isDuplicate = recentOrders.some(o =>
+      (o.items || []).map(i => `${i.product}:${i.quantity}`).sort().join('|') === sig
+    );
+    if (isDuplicate) {
+      return res.status(409).json({
+        success: false,
+        message: 'This looks like a duplicate of an order you just placed. Check your order history before retrying.',
+      });
+    }
+
+    // M-2: decrement stock atomically (match-on-stock + $inc in one op) so two
+    // concurrent orders can't oversell or push stock negative. Roll back the
+    // items already taken if any line can't be satisfied.
+    const decremented = [];
+    for (const item of orderItems) {
+      const upd = await Product.findOneAndUpdate(
+        { _id: item.product, stock: { $gte: item.quantity } },
+        { $inc: { stock: -item.quantity } },
+        { returnDocument: 'after' }
+      );
+      if (!upd) {
+        for (const d of decremented) {
+          await Product.findByIdAndUpdate(d.product, { $inc: { stock: d.quantity } });
+        }
+        return res.status(400).json({ success: false, message: `Insufficient stock for ${item.productName}` });
+      }
+      decremented.push(item);
+    }
 
     const daysMap = { standard: 3, express: 1, urgent: 0 };
     const days = daysMap[deliveryPriority] ?? 3;
     const expectedDelivery = new Date();
     expectedDelivery.setDate(expectedDelivery.getDate() + days);
 
-    const order = await Order.create({
-      retailer:     retailer._id,
-      distributor:  distributor._id,
-      items:        orderItems,
-      subtotal,
-      gstAmount,
-      totalAmount,
-      deliveryPriority: deliveryPriority || 'standard',
-      deliveryAddress:  retailer.shopAddress,
-      expectedDelivery,
-      paymentMethod: 'cash',   // pay on delivery
-      paymentStatus: 'unpaid',
-      notes,
-      timeline: [{ status: 'pending', note: `Order placed by retailer · routed to ${distributor.businessName || distributor.name}` }],
-    });
-
-    // Central stock decrement (company inventory; distributor handles delivery)
-    for (const item of orderItems) {
-      await Product.findByIdAndUpdate(item.product, { $inc: { stock: -item.quantity } });
+    let order;
+    try {
+      order = await Order.create({
+        retailer:     retailer._id,
+        distributor:  distributor._id,
+        items:        orderItems,
+        subtotal,
+        gstAmount,
+        totalAmount,
+        deliveryPriority: deliveryPriority || 'standard',
+        deliveryAddress:  retailer.shopAddress,
+        expectedDelivery,
+        paymentMethod: 'cash',   // pay on delivery
+        paymentStatus: 'unpaid',
+        notes,
+        timeline: [{ status: 'pending', note: `Order placed by retailer · routed to ${distributor.businessName || distributor.name}` }],
+      });
+    } catch (createErr) {
+      // Order creation failed after stock was taken — give it back.
+      for (const d of decremented) {
+        await Product.findByIdAndUpdate(d.product, { $inc: { stock: d.quantity } });
+      }
+      throw createErr;
     }
 
     // Notify the assigned distributor/stockist — never block the order on email failure
@@ -108,7 +151,9 @@ const placeOrder = async (req, res) => {
 // GET /api/orders — get orders (role-based)
 const getOrders = async (req, res) => {
   try {
-    const { status, page = 1, limit = 20 } = req.query;
+    const { status } = req.query;
+    const pageN  = Math.max(1, Number(req.query.page) || 1);
+    const limitN = Math.min(100, Math.max(1, Number(req.query.limit) || 20));
     const filter = {};
 
     if (req.user.role === 'ret') {
@@ -121,7 +166,7 @@ const getOrders = async (req, res) => {
       filter.status = status.toLowerCase();
     }
 
-    const skip  = (Number(page) - 1) * Number(limit);
+    const skip  = (pageN - 1) * limitN;
     const total = await Order.countDocuments(filter);
 
     const orders = await Order.find(filter)
@@ -129,14 +174,14 @@ const getOrders = async (req, res) => {
       .populate('distributor', 'businessName name')
       .sort({ createdAt: -1 })
       .skip(skip)
-      .limit(Number(limit));
+      .limit(limitN);
 
     return res.status(200).json({
       success: true,
       count:   orders.length,
       total,
-      pages:   Math.ceil(total / Number(limit)),
-      page:    Number(page),
+      pages:   Math.ceil(total / limitN),
+      page:    pageN,
       orders,
     });
   } catch (err) {
@@ -211,7 +256,9 @@ const dispatchOrder = async (req, res) => {
 // PUT /api/orders/:id/deliver — mark as delivered
 const deliverOrder = async (req, res) => {
   try {
-    const order = await Order.findById(req.params.id);
+    // Scope to the assigned distributor so one distributor can't transition
+    // another party's order (was findById with no owner check → IDOR).
+    const order = await Order.findOne({ _id: req.params.id, distributor: req.user._id });
     if (!order) return res.status(404).json({ success: false, message: 'Order not found' });
     if (order.status !== 'dispatched') {
       return res.status(400).json({ success: false, message: `Cannot deliver order in '${order.status}' status` });

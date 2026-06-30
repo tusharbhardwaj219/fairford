@@ -146,7 +146,7 @@ async function seed() {
   const dist2 = await new Distributor({
     name:             'Sunil Kulkarni',
     email:            'sunil@punestock.in',
-    password:         'Pune@2024',
+    password:         'Pune@2024!!!',
     phone:            '+91 98200 10002',
     businessName:     'Pune Stockist & Supply Co',
     businessAddress:  { street: '7, Shivajinagar', city: 'Pune', state: 'Maharashtra', pincode: '411005' },
@@ -167,7 +167,7 @@ async function seed() {
     const doc = await new Retailer({
       name:             rd.name,
       email:            rd.email,
-      password:         'Retail@2024',
+      password:         'Retail@2024!',
       phone:            rd.phone,
       shopName:         rd.shopName,
       shopAddress:      rd.shopAddress,
@@ -190,7 +190,7 @@ async function seed() {
   await new Retailer({
     name:              'Sunrise Owner',
     email:             'sunrise@example.in',
-    password:          'Retail@2024',
+    password:          'Retail@2024!',
     phone:             '+91 98200 44321',
     shopName:          'Sunrise Pharmacy',
     shopAddress:       { street: 'Station Road', city: 'Mumbai', state: 'Maharashtra', pincode: '400001' },
@@ -255,7 +255,7 @@ async function seed() {
   await new Admin({
     name:     'Super Admin',
     email:    'admin@medibridge.in',
-    password: 'Admin@2024',
+    password: 'Admin@2024!!',
     role:     'superadmin',
     isActive: true,
   }).save();
@@ -339,9 +339,9 @@ async function seed() {
   console.log('  Returns             :', returnDocs.length);
   console.log('\n  Login credentials');
   console.log('  ─────────────────────────────────────────');
-  console.log('  Admin        admin@medibridge.in   / Admin@2024');
+  console.log('  Admin        admin@medibridge.in   / Admin@2024!!');
   console.log('  Distributor  rajesh@medcore.in     / Medcore@2024');
-  console.log('  Retailer     apollo@example.in     / Retail@2024');
+  console.log('  Retailer     apollo@example.in     / Retail@2024!');
   console.log('  ─────────────────────────────────────────\n');
 
   process.exit(0);
