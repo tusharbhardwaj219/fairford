@@ -11,14 +11,17 @@ class APIFeatures {
 
   // Search by name, brand, or composition
   search() {
-    const keyword = this.queryString.keyword;
-    if (keyword) {
+    const raw = this.queryString.keyword;
+    if (raw) {
+      // Escape regex metacharacters + cap length so a crafted keyword can't
+      // trigger ReDoS / catastrophic backtracking against the catalogue.
+      const kw = String(raw).slice(0, 80).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       this.query = this.query.find({
         $or: [
-          { name: { $regex: keyword, $options: 'i' } },
-          { brand: { $regex: keyword, $options: 'i' } },
-          { composition: { $regex: keyword, $options: 'i' } },
-          { description: { $regex: keyword, $options: 'i' } }
+          { name: { $regex: kw, $options: 'i' } },
+          { brand: { $regex: kw, $options: 'i' } },
+          { composition: { $regex: kw, $options: 'i' } },
+          { description: { $regex: kw, $options: 'i' } }
         ]
       });
     }
@@ -103,8 +106,10 @@ class APIFeatures {
 
   // Pagination
   pagination() {
-    const page = Number(this.queryString.page) || 1;
-    const limit = Number(this.queryString.limit) || 10;
+    // Clamp so a client can't request an unbounded page size (DoS). 500 keeps
+    // headroom above the storefront's full-catalogue fetch (limit=200).
+    const page  = Math.max(1, Number(this.queryString.page) || 1);
+    const limit = Math.min(500, Math.max(1, Number(this.queryString.limit) || 10));
     const skip = (page - 1) * limit;
 
     this.query = this.query.skip(skip).limit(limit);

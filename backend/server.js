@@ -14,7 +14,30 @@ const errorMiddleware = require('./middleware/errorMiddleware');
 const app = express();
 
 // ── SECURITY ─────────────────────────────────────────────────────────────────
-app.use(helmet({ contentSecurityPolicy: false }));
+// Content-Security-Policy tuned for this static, inline-heavy frontend:
+// 'unsafe-inline' is required because the pages use inline <script> blocks,
+// inline styles and inline onclick handlers throughout. The value of the policy
+// here is restricting WHICH external origins may load scripts/styles/frames,
+// plus blocking plugins (object-src) and clickjacking (frame-ancestors).
+app.use(helmet({
+  contentSecurityPolicy: {
+    useDefaults: false,
+    directives: {
+      defaultSrc:     ["'self'"],
+      scriptSrc:      ["'self'", "'unsafe-inline'", 'https://cdnjs.cloudflare.com', 'https://cdn.jsdelivr.net'],
+      scriptSrcAttr:  ["'unsafe-inline'"], // inline onclick handlers used across the pages
+      styleSrc:       ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com', 'https://cdnjs.cloudflare.com', 'https://cdn.jsdelivr.net'],
+      fontSrc:        ["'self'", 'data:', 'https://fonts.gstatic.com', 'https://cdnjs.cloudflare.com'],
+      imgSrc:         ["'self'", 'data:', 'https:'],
+      connectSrc:     ["'self'"],
+      frameSrc:       ["'self'", 'https://www.google.com'], // contact-page Google Maps embed
+      objectSrc:      ["'none'"],
+      baseUri:        ["'self'"],
+      frameAncestors: ["'self'"],
+      formAction:     ["'self'"],
+    },
+  },
+}));
 app.use(mongoSanitize());
 
 // ── CORS ──────────────────────────────────────────────────────────────────────
