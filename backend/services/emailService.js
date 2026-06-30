@@ -168,4 +168,49 @@ const sendDistributorOrderNotification = async (distributor, order, retailer) =>
     });
 };
 
-module.exports = { sendAdminNotification, sendUserAutoReply, sendDistributorOrderNotification };
+/**
+ * Send a password-reset link. Throws on failure so the caller can roll back
+ * the issued token (we don't want a dangling reset if the mail never sends).
+ */
+const sendPasswordResetEmail = async (email, name, resetUrl) => {
+    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+        throw new Error('EMAIL_USER/EMAIL_PASS not configured');
+    }
+    const transporter = createTransporter();
+    await transporter.sendMail({
+        from: `"Fair Ford Pharmaceuticals" <${process.env.EMAIL_USER}>`,
+        to: email,
+        subject: 'Reset your Fair Ford Pharma password',
+        html: `
+            <div style="font-family:Arial,sans-serif;padding:20px;background:#f4f4f4;">
+              <div style="background:#fff;padding:30px;border-radius:8px;max-width:600px;margin:0 auto;">
+                <h2 style="color:#0F4C81;border-bottom:2px solid #0F4C81;padding-bottom:10px;margin-top:0;">
+                  Password Reset Request
+                </h2>
+                <p style="color:#333;font-size:15px;">Hello <strong>${name || 'there'}</strong>,</p>
+                <p style="color:#555;line-height:1.7;">
+                  We received a request to reset your password. Click the button below to choose a
+                  new one. This link expires in <strong>1 hour</strong>.
+                </p>
+                <p style="text-align:center;margin:28px 0;">
+                  <a href="${resetUrl}" style="background:#0F4C81;color:#fff;text-decoration:none;padding:12px 28px;border-radius:6px;font-weight:600;display:inline-block;">
+                    Reset Password
+                  </a>
+                </p>
+                <p style="color:#888;font-size:13px;line-height:1.6;">
+                  If the button doesn't work, paste this link into your browser:<br>
+                  <span style="color:#0F4C81;word-break:break-all;">${resetUrl}</span>
+                </p>
+                <p style="color:#888;font-size:13px;margin-top:24px;">
+                  Didn't request this? You can safely ignore this email — your password won't change.
+                </p>
+                <div style="margin-top:30px;padding-top:18px;border-top:1px solid #eee;font-size:12px;color:#aaa;text-align:center;">
+                  © ${new Date().getFullYear()} Fair Ford Pharmaceuticals Pvt. Ltd.
+                </div>
+              </div>
+            </div>
+        `,
+    });
+};
+
+module.exports = { sendAdminNotification, sendUserAutoReply, sendDistributorOrderNotification, sendPasswordResetEmail };

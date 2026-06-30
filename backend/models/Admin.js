@@ -49,7 +49,10 @@ const adminSchema = new mongoose.Schema(
     lockUntil: {
       type: Date,
       default: null
-    }
+    },
+    // Password reset — stores a hashed token + expiry (never the raw token)
+    resetPasswordToken:  { type: String, default: null, select: false },
+    resetPasswordExpire: { type: Date,   default: null, select: false }
   },
   {
     timestamps: true
