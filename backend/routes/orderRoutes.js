@@ -15,7 +15,7 @@ router.get('/',              ...authAny,  getOrders);
 router.get('/:id',           ...authAny,  getOrderById);
 router.put('/:id/approve',   ...distOnly, approveOrder);
 router.put('/:id/dispatch',  ...distOnly, dispatchOrder);
-router.put('/:id/deliver',   ...authAny,  deliverOrder);
+router.put('/:id/deliver',   ...distOnly, deliverOrder);
 router.put('/:id/return',    ...retOnly,  returnOrder);
 router.put('/:id/cancel',    ...authAny,  cancelOrder);
 

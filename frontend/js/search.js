@@ -68,6 +68,12 @@
     var thumb = img
       ? '<img src="' + esc(img) + '" alt="" loading="lazy">'
       : '<div class="ff-thumb-fallback">' + esc(initial) + '</div>';
+    // Anonymous visitors get prices stripped by the API (B2B gate); show a
+    // login prompt instead of a misleading ₹0.
+    var price = priceFor(p);
+    var priceHtml = price > 0
+      ? inr(price)
+      : '<span class="ff-card-price-login">Login to view price</span>';
 
     return '<article class="ff-card" data-id="' + esc(p.id) + '">' +
              '<div class="ff-card-media">' + thumb + '</div>' +
@@ -77,7 +83,7 @@
                '<p class="ff-card-meta">' + esc(p.packSize || '') +
                  (p.strength ? ' · ' + esc(p.strength) : '') + '</p>' +
                '<div class="ff-card-foot">' +
-                 '<span class="ff-card-price">' + inr(priceFor(p)) + '</span>' +
+                 '<span class="ff-card-price">' + priceHtml + '</span>' +
                  '<button class="ff-card-add" type="button" data-add="' + esc(p.id) + '"' +
                    (out ? ' disabled style="opacity:.5;cursor:not-allowed"' : '') + '>' +
                    (out ? 'Out of stock' : 'Add to cart') +

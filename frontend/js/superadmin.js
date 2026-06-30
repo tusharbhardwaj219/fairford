@@ -25,6 +25,15 @@ function toast(msg, type = 'success') {
   }, 3500);
 }
 
+/* HTML-escape any user-supplied string before it goes into innerHTML.
+   Retailer KYC fields (name, city, address, etc.) are attacker-controlled, so
+   rendering them raw was a stored-XSS vector into the admin's own session. */
+function esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, m => (
+    { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]
+  ));
+}
+
 /* ══════════════════════════════════════════
    NAVIGATION
 ══════════════════════════════════════════ */
@@ -243,11 +252,11 @@ function renderApprovals(data) {
          <button class="btn btn-danger btn-sm" style="margin-left:4px" onclick="rejectUser('${d.id}',this)">Reject</button>`
       : `<span style="font-size:12px;color:var(--text-3)">No action</span>`;
     tbody.innerHTML += `<tr>
-      <td><div style="display:flex;align-items:center;gap:8px"><div class="avatar ${cc}">${ini}</div><strong>${d.name || '—'}</strong></div></td>
-      <td><span class="badge badge-blue">${d.type}</span></td>
-      <td>${d.region}</td>
-      <td style="color:var(--text-2);font-size:12px">${d.submitted}</td>
-      <td style="font-size:12px">${d.docs}</td>
+      <td><div style="display:flex;align-items:center;gap:8px"><div class="avatar ${cc}">${esc(ini)}</div><strong>${esc(d.name) || '—'}</strong></div></td>
+      <td><span class="badge badge-blue">${esc(d.type)}</span></td>
+      <td>${esc(d.region)}</td>
+      <td style="color:var(--text-2);font-size:12px">${esc(d.submitted)}</td>
+      <td style="font-size:12px">${esc(d.docs)}</td>
       <td><span class="badge ${bc} status-badge">${label}</span></td>
       <td>${btns}</td>
     </tr>`;
@@ -468,12 +477,12 @@ function renderRetailers(data) {
   tbody.innerHTML = '';
   data.forEach(d => {
     tbody.innerHTML += `<tr>
-      <td><strong style="color:var(--pri);cursor:pointer;text-decoration:underline;text-underline-offset:3px" onclick="openRetailerProfile('${d.id}')">${d.name}</strong></td>
-      <td style="font-size:12px">${d.city}</td>
-      <td><span class="badge badge-blue">${d.type}</span></td>
-      <td style="font-size:12px">${d.distributor}</td>
+      <td><strong style="color:var(--pri);cursor:pointer;text-decoration:underline;text-underline-offset:3px" onclick="openRetailerProfile('${d.id}')">${esc(d.name)}</strong></td>
+      <td style="font-size:12px">${esc(d.city)}</td>
+      <td><span class="badge badge-blue">${esc(d.type)}</span></td>
+      <td style="font-size:12px">${esc(d.distributor)}</td>
       <td style="text-align:center;font-weight:500">${d.monthly_orders}</td>
-      <td style="font-size:12px;color:var(--text-3)">${d.last_order}</td>
+      <td style="font-size:12px;color:var(--text-3)">${esc(d.last_order)}</td>
       <td class="tbl-actions">
         <span class="badge ${d.status === 'active' ? 'badge-green' : 'badge-gray'}">${d.status}</span>
         <button class="btn btn-ghost btn-sm" onclick="openRetailerModal('${d.id}')">Edit</button>
@@ -1482,16 +1491,16 @@ async function openRetailerProfile(id) {
       <div class="profile-header">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
           <div style="flex:1;min-width:0">
-            <div style="font-size:18px;font-weight:700;color:#fff;margin-bottom:5px">${r.name}</div>
+            <div style="font-size:18px;font-weight:700;color:#fff;margin-bottom:5px">${esc(r.name)}</div>
             <div style="display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:rgba(255,255,255,.75)">
-              ${r.owner_name ? `<span>👤 ${r.owner_name}</span>` : ''}
-              ${r.phone ? `<span>📞 ${r.phone}</span>` : ''}
-              ${r.email ? `<span>✉ ${r.email}</span>` : ''}
-              <span>📍 ${r.city || '—'}</span>
+              ${r.owner_name ? `<span>👤 ${esc(r.owner_name)}</span>` : ''}
+              ${r.phone ? `<span>📞 ${esc(r.phone)}</span>` : ''}
+              ${r.email ? `<span>✉ ${esc(r.email)}</span>` : ''}
+              <span>📍 ${esc(r.city || '—')}</span>
             </div>
           </div>
           <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
-            <span class="badge badge-blue">${r.type || '—'}</span>
+            <span class="badge badge-blue">${esc(r.type || '—')}</span>
             <span class="badge ${statusBadge}">${r.status ? r.status.charAt(0).toUpperCase() + r.status.slice(1) : '—'}</span>
             <button class="profile-close-btn" onclick="closeRetProfile()">×</button>
           </div>
@@ -1504,11 +1513,11 @@ async function openRetailerProfile(id) {
           <div class="profile-stat-label">Monthly Orders</div>
         </div>
         <div class="profile-stat">
-          <div class="profile-stat-val" style="font-size:14px">${r.last_order || '—'}</div>
+          <div class="profile-stat-val" style="font-size:14px">${esc(r.last_order || '—')}</div>
           <div class="profile-stat-label">Last Order</div>
         </div>
         <div class="profile-stat">
-          <div class="profile-stat-val" style="font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.distributor || '—'}</div>
+          <div class="profile-stat-val" style="font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(r.distributor || '—')}</div>
           <div class="profile-stat-label">Distributor</div>
         </div>
       </div>
@@ -1518,23 +1527,23 @@ async function openRetailerProfile(id) {
         <div class="profile-grid">
           <div>
             <div class="profile-field-label">Owner Name</div>
-            <div class="profile-field-val">${r.owner_name || '—'}</div>
+            <div class="profile-field-val">${esc(r.owner_name || '—')}</div>
           </div>
           <div>
             <div class="profile-field-label">Store Type</div>
-            <div class="profile-field-val">${r.type || '—'}</div>
+            <div class="profile-field-val">${esc(r.type || '—')}</div>
           </div>
           <div>
             <div class="profile-field-label">Phone</div>
-            <div class="profile-field-val">${r.phone || '—'}</div>
+            <div class="profile-field-val">${esc(r.phone || '—')}</div>
           </div>
           <div>
             <div class="profile-field-label">Email</div>
-            <div class="profile-field-val">${r.email || '—'}</div>
+            <div class="profile-field-val">${esc(r.email || '—')}</div>
           </div>
           <div style="grid-column:1/-1">
             <div class="profile-field-label">GSTIN</div>
-            <div class="profile-field-val" style="font-family:'DM Mono',monospace;font-size:12px">${r.gstin || '—'}</div>
+            <div class="profile-field-val" style="font-family:'DM Mono',monospace;font-size:12px">${esc(r.gstin || '—')}</div>
           </div>
         </div>
       </div>
@@ -1542,7 +1551,7 @@ async function openRetailerProfile(id) {
       <div class="profile-section">
         <div class="profile-section-title">Address</div>
         <div style="font-size:13px;color:var(--text);line-height:1.7">
-          ${r.address ? `${r.address}<br>${r.city ? r.city.split(',')[0] : ''} — ${r.pincode || ''}` : '<span style="color:var(--text-3)">No address on file</span>'}
+          ${r.address ? `${esc(r.address)}<br>${r.city ? esc(r.city.split(',')[0]) : ''} — ${esc(r.pincode) || ''}` : '<span style="color:var(--text-3)">No address on file</span>'}
         </div>
       </div>
 
