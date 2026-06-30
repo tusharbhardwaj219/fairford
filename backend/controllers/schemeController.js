@@ -46,7 +46,7 @@ const createScheme = async (req, res) => {
 // PUT /api/schemes/:id
 const updateScheme = async (req, res) => {
   try {
-    const scheme = await Scheme.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+    const scheme = await Scheme.findByIdAndUpdate(req.params.id, req.body, { returnDocument: 'after', runValidators: true });
     if (!scheme) return res.status(404).json({ success: false, message: 'Scheme not found' });
     return res.status(200).json({ success: true, message: 'Scheme updated', scheme });
   } catch (err) {

@@ -616,7 +616,7 @@ exports.updateReturnStatus = async (req, res) => {
     const update = { returnStatus };
     if (remarks !== undefined) update.remarks = remarks;
 
-    const returnRecord = await DistributorReturn.findByIdAndUpdate(id, update, { new: true, runValidators: true });
+    const returnRecord = await DistributorReturn.findByIdAndUpdate(id, update, { returnDocument: 'after', runValidators: true });
     if (!returnRecord) return res.status(404).json({ success: false, message: 'Return record not found' });
 
     res.json({ success: true, message: 'Return status updated', data: returnRecord });
