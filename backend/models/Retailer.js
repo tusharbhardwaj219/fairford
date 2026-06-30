@@ -47,6 +47,9 @@ const retailerSchema = new mongoose.Schema({
   loginAttempts: { type: Number, default: 0 },
   // Lock account until this timestamp (brute force protection)
   lockUntil: { type: Date, default: null },
+  // Password reset — stores a hashed token + expiry (never the raw token)
+  resetPasswordToken:  { type: String, default: null, select: false },
+  resetPasswordExpire: { type: Date,   default: null, select: false },
 }, { timestamps: true });
 
 retailerSchema.pre('save', async function () {
