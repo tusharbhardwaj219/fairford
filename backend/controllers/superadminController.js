@@ -87,7 +87,7 @@ exports.updateApproval = async (req, res) => {
     const mapped = APPROVAL_TO_RET[req.body.status];
     if (!mapped) return res.status(400).json({ error: 'Invalid status' });
     if (!isOid(req.params.id)) return res.status(404).json({ error: 'Not found' });
-    const r = await Retailer.findByIdAndUpdate(req.params.id, { status: mapped }, { new: true });
+    const r = await Retailer.findByIdAndUpdate(req.params.id, { status: mapped }, { returnDocument: 'after' });
     if (!r) return res.status(404).json({ error: 'Not found' });
     ok(res);
   } catch (e) { res.status(500).json({ error: e.message }); }
@@ -173,7 +173,7 @@ exports.updateDistributor = async (req, res) => {
     if (name !== undefined) { patch.name = name; patch.businessName = name; }
     if (status !== undefined) patch.status = status;
     if (state !== undefined) patch['businessAddress.state'] = state;
-    const d = await Distributor.findByIdAndUpdate(req.params.id, { $set: patch }, { new: true });
+    const d = await Distributor.findByIdAndUpdate(req.params.id, { $set: patch }, { returnDocument: 'after' });
     if (!d) return res.status(404).json({ error: 'Not found' });
     ok(res);
   } catch (e) { res.status(500).json({ error: e.message }); }
@@ -266,7 +266,7 @@ exports.updateRetailer = async (req, res) => {
     if (name !== undefined) { patch.name = name; patch.shopName = name; }
     if (status !== undefined) patch.status = status;
     if (city !== undefined) patch['shopAddress.city'] = city;
-    const r = await Retailer.findByIdAndUpdate(req.params.id, { $set: patch }, { new: true });
+    const r = await Retailer.findByIdAndUpdate(req.params.id, { $set: patch }, { returnDocument: 'after' });
     if (!r) return res.status(404).json({ error: 'Not found' });
     ok(res);
   } catch (e) { res.status(500).json({ error: e.message }); }
@@ -421,7 +421,7 @@ exports.updateProduct = async (req, res) => {
       patch.image = { url: req.file.path, public_id: req.file.filename };
     }
 
-    const p = await Product.findByIdAndUpdate(req.params.id, { $set: patch }, { new: true });
+    const p = await Product.findByIdAndUpdate(req.params.id, { $set: patch }, { returnDocument: 'after' });
     if (!p) return res.status(404).json({ error: 'Product not found' });
     ok(res);
   } catch (e) { res.status(500).json({ error: e.message }); }
@@ -518,7 +518,7 @@ exports.updateInventory = async (req, res) => {
     const patch = {};
     if (req.body.total_stock !== undefined) patch.stock = Number(req.body.total_stock);
     if (!Object.keys(patch).length) return res.status(400).json({ error: 'No valid fields to update' });
-    const p = await Product.findByIdAndUpdate(req.params.id, { $set: patch }, { new: true });
+    const p = await Product.findByIdAndUpdate(req.params.id, { $set: patch }, { returnDocument: 'after' });
     if (!p) return res.status(404).json({ error: 'Not found' });
     ok(res);
   } catch (e) { res.status(500).json({ error: e.message }); }
@@ -551,7 +551,7 @@ exports.updateWallet = async (req, res) => {
   try {
     if (!isOid(req.params.id)) return res.status(404).json({ error: 'Not found' });
     if (req.body.status !== 'settled') return res.status(400).json({ error: 'Only settling is supported' });
-    const o = await Order.findByIdAndUpdate(req.params.id, { paymentStatus: 'paid' }, { new: true });
+    const o = await Order.findByIdAndUpdate(req.params.id, { paymentStatus: 'paid' }, { returnDocument: 'after' });
     if (!o) return res.status(404).json({ error: 'Not found' });
     ok(res);
   } catch (e) { res.status(500).json({ error: e.message }); }
@@ -655,7 +655,7 @@ exports.updateDistMapping = async (req, res) => {
     ['distributor', 'state', 'district'].forEach(k => { if (req.body[k] !== undefined) patch[k] = req.body[k]; });
     if (req.body.retailers_mapped !== undefined) patch.retailers_mapped = num(req.body.retailers_mapped);
     if (req.body.coverage_pct !== undefined) patch.coverage_pct = num(req.body.coverage_pct);
-    const m = await DistMapping.findByIdAndUpdate(req.params.id, { $set: patch }, { new: true });
+    const m = await DistMapping.findByIdAndUpdate(req.params.id, { $set: patch }, { returnDocument: 'after' });
     if (!m) return res.status(404).json({ error: 'Not found' });
     ok(res);
   } catch (e) { res.status(500).json({ error: e.message }); }
