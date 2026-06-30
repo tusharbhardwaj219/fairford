@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     initHeader();
     initFooter();
 
-    const CATEGORIES = ["Tablets", "Capsules", "Syrups", "Injections", "Ointments", "Gels"];
+    const CATEGORIES = ["Tablets", "Capsules", "Syrups", "Injections", "Ointments", "Gels", "Drops", "Sachets & Powders", "Personal Care"];
     const STOCK_OPTS = ["In Stock", "Low Stock", "Out of Stock"];
     const RATING_OPTS = [{ v: 4, l: "4★ & Above" }, { v: 3, l: "3★ & Above" }, { v: 2, l: "2★ & Above" }];
 
