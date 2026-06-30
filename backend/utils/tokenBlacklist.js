@@ -1,92 +1,83 @@
 /**
- * Token Blacklist - Simple in-memory implementation
- * For production with multiple servers, use Redis instead
+ * Token Blacklist — MongoDB-backed so logouts survive a server restart
+ * (the previous in-memory Map was lost on restart, re-validating "logged out"
+ * tokens). A small in-memory cache fronts the DB for fast repeat hits.
  *
- * This prevents JWT tokens from being reused after logout
- * Tokens automatically expire based on JWT expiry time
+ * Stores a SHA-256 hash of the token, never the raw JWT.
  */
+const crypto = require('crypto');
+const BlacklistedToken = require('../models/BlacklistedToken');
 
-// In-memory store of blacklisted tokens
-// Format: { token: expiryTime }
-const blacklist = new Map();
+const hashToken = (t) => crypto.createHash('sha256').update(String(t)).digest('hex');
+
+// tokenHash -> expiry epoch ms (process-local cache)
+const cache = new Map();
 
 /**
- * Add a token to the blacklist
- * @param {string} token - JWT token to blacklist
- * @param {Date} expiresAt - Token expiration time (from JWT decoded data)
+ * Add a token to the blacklist (persisted + cached).
+ * @param {string} token
+ * @param {Date}   expiresAt
  */
-const addToBlacklist = (token, expiresAt) => {
+const addToBlacklist = async (token, expiresAt) => {
   if (!token || !expiresAt) return;
-
-  // Add token with its expiration time
-  blacklist.set(token, expiresAt);
-
-  // Optional: Log for debugging
-  console.log('[TokenBlacklist] Token added to blacklist, expires at:', expiresAt);
+  const tokenHash = hashToken(token);
+  const exp = new Date(expiresAt);
+  cache.set(tokenHash, exp.getTime());
+  try {
+    await BlacklistedToken.updateOne(
+      { tokenHash },
+      { $set: { tokenHash, expiresAt: exp } },
+      { upsert: true }
+    );
+  } catch (err) {
+    // Persistence is best-effort; the cache still covers this process.
+    console.warn('[TokenBlacklist] persist failed:', err.message);
+  }
 };
 
 /**
- * Check if a token is blacklisted
- * @param {string} token - JWT token to check
- * @returns {boolean} true if token is blacklisted, false otherwise
+ * Check if a token is blacklisted. Async (cache first, then DB).
+ * @param {string} token
+ * @returns {Promise<boolean>}
  */
-const isBlacklisted = (token) => {
+const isBlacklisted = async (token) => {
   if (!token) return false;
+  const tokenHash = hashToken(token);
 
-  const expiryTime = blacklist.get(token);
-  if (!expiryTime) return false;
-
-  // Check if token is still in blacklist and hasn't expired
-  const now = new Date();
-  if (expiryTime > now) {
-    return true; // Token is blacklisted
+  const cached = cache.get(tokenHash);
+  if (cached) {
+    if (cached > Date.now()) return true;
+    cache.delete(tokenHash); // expired
   }
 
-  // Token has expired naturally, remove from blacklist
-  blacklist.delete(token);
+  try {
+    const doc = await BlacklistedToken.findOne({ tokenHash }).lean();
+    if (doc && new Date(doc.expiresAt).getTime() > Date.now()) {
+      cache.set(tokenHash, new Date(doc.expiresAt).getTime());
+      return true;
+    }
+  } catch (err) {
+    console.warn('[TokenBlacklist] lookup failed:', err.message);
+  }
   return false;
 };
 
-/**
- * Cleanup: Periodically remove expired tokens from blacklist
- * Run this every 10 minutes to free up memory
- */
+/** Drop expired entries from the in-memory cache (DB is handled by the TTL index). */
 const cleanupExpiredTokens = () => {
-  const now = new Date();
-  let removed = 0;
-
-  for (const [token, expiryTime] of blacklist.entries()) {
-    if (expiryTime <= now) {
-      blacklist.delete(token);
-      removed++;
-    }
-  }
-
-  if (removed > 0) {
-    console.log(`[TokenBlacklist] Cleaned up ${removed} expired tokens`);
+  const now = Date.now();
+  for (const [tokenHash, exp] of cache.entries()) {
+    if (exp <= now) cache.delete(tokenHash);
   }
 };
-
-// Schedule cleanup every 10 minutes
 setInterval(cleanupExpiredTokens, 10 * 60 * 1000);
 
-/**
- * Get blacklist size (for monitoring)
- */
-const getBlacklistSize = () => blacklist.size;
-
-/**
- * Clear entire blacklist (for testing/debugging only)
- */
-const clearBlacklist = () => {
-  blacklist.clear();
-  console.log('[TokenBlacklist] Blacklist cleared');
-};
+const getBlacklistSize = () => cache.size;
+const clearBlacklist = () => cache.clear();
 
 module.exports = {
   addToBlacklist,
   isBlacklisted,
   cleanupExpiredTokens,
   getBlacklistSize,
-  clearBlacklist
+  clearBlacklist,
 };
