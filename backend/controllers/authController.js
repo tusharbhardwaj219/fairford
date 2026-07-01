@@ -1,11 +1,16 @@
 const bcrypt           = require('bcryptjs');
 const jwt              = require('jsonwebtoken');
+const crypto           = require('crypto');
 const Distributor      = require('../models/Distributor');
 const Retailer         = require('../models/Retailer');
 const Admin            = require('../models/Admin');
 const cloudinary       = require('../config/cloudinary');
 const generateToken    = require('../utils/generateToken');
 const { addToBlacklist } = require('../utils/tokenBlacklist');
+const { sendPasswordResetEmail } = require('../services/emailService');
+
+// Same policy enforced at signup (validation.js)
+const PASSWORD_RE = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{12,}$/;
 
 /**
  * Get appropriate model based on user role
@@ -127,6 +132,12 @@ const login = async (req, res, next) => {
       });
     }
 
+    // Guard: an admin-onboarded record (e.g. a distributor) may have no password
+    // hash. bcrypt.compare(pw, undefined) throws, so treat it as a bad login.
+    if (!user.password) {
+      return res.status(401).json({ success: false, message: 'Invalid email or password' });
+    }
+
     // Verify password
     const isPasswordMatch = await bcrypt.compare(password, user.password);
     if (!isPasswordMatch) {
@@ -156,7 +167,7 @@ const login = async (req, res, next) => {
     // Determine redirect URL based on role. Retailers land on the storefront
     // home — they reach their own dashboard via the header "profile" button.
     // Distributors no longer have a dashboard.
-    const redirectTo = user.role === 'ret' ? '/index.html'
+    const redirectTo = user.role === 'ret' ? '/retailer.html'
                      : (user.role === 'admin' || user.role === 'superadmin') ? '/superadmin.html'
                      : '/index.html';
 
@@ -204,7 +215,7 @@ const getProfile = async (req, res, next) => {
  * Logout user by invalidating their token
  * Token is added to blacklist so it cannot be reused
  */
-const logout = (req, res, next) => {
+const logout = async (req, res, next) => {
   try {
     // Get token from authorization header
     const authHeader = req.headers.authorization;
@@ -215,9 +226,9 @@ const logout = (req, res, next) => {
       try {
         const decoded = jwt.decode(token);
         if (decoded && decoded.exp) {
-          // Add token to blacklist with its expiration time
+          // Add token to the (persisted) blacklist with its expiration time
           const expiresAt = new Date(decoded.exp * 1000);
-          addToBlacklist(token, expiresAt);
+          await addToBlacklist(token, expiresAt);
         }
       } catch (decodeErr) {
         console.warn('[auth:logout] Could not decode token:', decodeErr.message);
@@ -286,4 +297,96 @@ const updateProfileImage = async (req, res, next) => {
   }
 };
 
-module.exports = { signup, login, getProfile, logout, updateProfileImage };
+/**
+ * POST /api/auth/forgot-password
+ * Issue a one-time password-reset link (emailed). Always responds the same way
+ * so the endpoint can't be used to enumerate which emails are registered.
+ */
+const forgotPassword = async (req, res, next) => {
+  try {
+    const email = (req.body.email || '').toLowerCase().trim();
+    if (!email) return res.status(400).json({ success: false, message: 'Email is required' });
+
+    // Only the login-capable identities (retailers self-serve; admins). Distributors
+    // are admin-managed and don't self-reset.
+    let user = null;
+    for (const Model of [Retailer, Admin]) {
+      user = await Model.findOne({ email });
+      if (user) break;
+    }
+
+    const genericMsg = 'If an account exists for that email, a reset link has been sent.';
+    if (!user) return res.status(200).json({ success: true, message: genericMsg });
+
+    // Send the raw token in the link; persist only its hash.
+    const rawToken  = crypto.randomBytes(32).toString('hex');
+    const tokenHash = crypto.createHash('sha256').update(rawToken).digest('hex');
+    user.resetPasswordToken  = tokenHash;
+    user.resetPasswordExpire = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+    await user.save({ validateBeforeSave: false });
+
+    const base = process.env.FRONTEND_URL || `${req.protocol}://${req.get('host')}`;
+    const resetUrl = `${base}/reset-password.html?token=${rawToken}`;
+    try {
+      await sendPasswordResetEmail(user.email, user.name, resetUrl);
+    } catch (mailErr) {
+      // Don't leave a dangling reset token if the mail couldn't be sent.
+      user.resetPasswordToken = null;
+      user.resetPasswordExpire = null;
+      await user.save({ validateBeforeSave: false });
+      console.error('[auth:forgotPassword] email failed:', mailErr.message);
+      return res.status(500).json({ success: false, message: 'Could not send reset email. Please try again later.' });
+    }
+
+    return res.status(200).json({ success: true, message: genericMsg });
+  } catch (err) {
+    console.error('[auth:forgotPassword]', err);
+    next(err);
+  }
+};
+
+/**
+ * POST /api/auth/reset-password
+ * Consume a reset token and set a new (policy-compliant) password.
+ */
+const resetPassword = async (req, res, next) => {
+  try {
+    const { token, password } = req.body;
+    if (!token || !password) {
+      return res.status(400).json({ success: false, message: 'Reset token and new password are required' });
+    }
+    if (!PASSWORD_RE.test(password)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Password must be at least 12 characters and include an uppercase letter, a lowercase letter, a number, and a special character (@$!%*?&).',
+      });
+    }
+
+    const tokenHash = crypto.createHash('sha256').update(String(token)).digest('hex');
+    let user = null;
+    for (const Model of [Retailer, Admin]) {
+      user = await Model.findOne({
+        resetPasswordToken:  tokenHash,
+        resetPasswordExpire: { $gt: new Date() },
+      }).select('+password +resetPasswordToken +resetPasswordExpire');
+      if (user) break;
+    }
+    if (!user) {
+      return res.status(400).json({ success: false, message: 'This reset link is invalid or has expired.' });
+    }
+
+    user.password = password;          // hashed by the model's pre-save hook
+    user.resetPasswordToken  = null;
+    user.resetPasswordExpire = null;
+    user.loginAttempts = 0;            // clear any brute-force lock too
+    user.lockUntil = null;
+    await user.save();
+
+    return res.status(200).json({ success: true, message: 'Password reset successful. You can now log in.' });
+  } catch (err) {
+    console.error('[auth:resetPassword]', err);
+    next(err);
+  }
+};
+
+module.exports = { signup, login, getProfile, logout, updateProfileImage, forgotPassword, resetPassword };
