@@ -117,8 +117,9 @@ function renderProducts() {
   if (!PRODUCTS.length) { box.innerHTML = '<p class="rt-empty">No products found.</p>'; return; }
   box.innerHTML = PRODUCTS.map((p) => {
     const out = (p.stock || 0) <= 0;
-    const img = (p.images && p.images[0] && p.images[0].url)
-      ? '<img src="' + esc(p.images[0].url) + '" alt="">'
+    const imgUrl = (p.image && p.image.url) || (p.images && p.images[0] && p.images[0].url);
+    const img = imgUrl
+      ? '<img src="' + esc(imgUrl) + '" alt="">'
       : esc((p.name || '?').charAt(0).toUpperCase());
     return '<div class="rt-prod">' +
       '<div class="rt-prod-thumb">' + img + '</div>' +
