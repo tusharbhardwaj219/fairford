@@ -21,7 +21,7 @@ const verifyToken = async (req, res, next) => {
 
   try {
     // Check if token is blacklisted (user logged out)
-    if (isBlacklisted(token)) {
+    if (await isBlacklisted(token)) {
       return res.status(401).json({
         success: false,
         message: 'Token has been revoked. Please login again.'
