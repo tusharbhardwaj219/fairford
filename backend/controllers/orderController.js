@@ -170,7 +170,7 @@ const getOrders = async (req, res) => {
     const total = await Order.countDocuments(filter);
 
     const orders = await Order.find(filter)
-      .populate('retailer',    'shopName name shopAddress.city')
+      .populate('retailer',    'shopName name shopAddress.city phone')
       .populate('distributor', 'businessName name')
       .sort({ createdAt: -1 })
       .skip(skip)
