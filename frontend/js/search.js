@@ -27,11 +27,15 @@
     });
   };
 
+  function getUser() {
+    try { return JSON.parse(localStorage.getItem('ff_user') || '{}'); } catch (_) { return {}; }
+  }
+  function isLoggedIn() {
+    var u = getUser();
+    return !!(u && (u.role || u.token || u._id));
+  }
   function isDistributor() {
-    try {
-      var u = JSON.parse(localStorage.getItem('ff_user') || '{}');
-      return u.role === 'dist';
-    } catch (_) { return false; }
+    return getUser().role === 'dist';
   }
   function priceFor(p) {
     // The backend already strips fields based on role, so retailers won't
@@ -72,12 +76,7 @@
     var thumb = img
       ? '<img src="' + esc(img) + '" alt="" loading="lazy">'
       : '<div class="ff-thumb-fallback">' + esc(initial) + '</div>';
-    // Anonymous visitors get prices stripped by the API (B2B gate); show a
-    // login prompt instead of a misleading ₹0.
-    var price = priceFor(p);
-    var priceHtml = price > 0
-      ? inr(price)
-      : '<span class="ff-card-price-login">Login to view price</span>';
+    var loggedIn = isLoggedIn();
 
     return '<article class="ff-card" data-id="' + esc(p.id) + '">' +
              '<div class="ff-card-media">' + thumb + '</div>' +
@@ -87,11 +86,14 @@
                '<p class="ff-card-meta">' + esc(p.packSize || '') +
                  (p.strength ? ' · ' + esc(p.strength) : '') + '</p>' +
                '<div class="ff-card-foot">' +
-                 '<span class="ff-card-price">' + priceHtml + '</span>' +
-                 '<button class="ff-card-add" type="button" data-add="' + esc(p.id) + '"' +
-                   (out ? ' disabled style="opacity:.5;cursor:not-allowed"' : '') + '>' +
-                   (out ? 'Out of stock' : 'Add to cart') +
-                 '</button>' +
+                 (loggedIn
+                   ? '<span class="ff-card-price">' + inr(priceFor(p)) + '</span>'
+                   : '<a class="ff-price-gate" href="login&signup.html">Login to view price</a>') +
+                 (loggedIn
+                   ? '<button class="ff-card-add" type="button" data-add="' + esc(p.id) + '"' +
+                       (out ? ' disabled style="opacity:.5;cursor:not-allowed"' : '') + '>' +
+                       (out ? 'Out of stock' : 'Add to cart') + '</button>'
+                   : '') +
                '</div>' +
              '</div>' +
            '</article>';
@@ -337,6 +339,18 @@
 
     loadAllProducts().then(function () {
       if (qParam) filterGrid(qParam);
+    });
+
+    // When auth state changes in another tab, or when logout/login happens on
+    // this page without a full reload, re-fetch so prices reflect the new state.
+    window.addEventListener('storage', function (e) {
+      if (e.key !== 'ff_user') return;
+      // Re-fetch products so the API returns (or omits) prices correctly for
+      // the new auth state, then re-apply any active search filter.
+      var q = inputEl.value.trim();
+      loadAllProducts().then(function () {
+        if (q) filterGrid(q);
+      });
     });
   }
 
