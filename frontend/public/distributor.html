@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fair Ford — Distributor</title>
+  <link rel="stylesheet" href="/frontend/css/retailer.css" />
+</head>
+<body>
+  <header class="rt-header">
+    <div class="rt-brand">Fair Ford Pharma <small>Distributor fulfillment</small></div>
+    <div class="rt-user">
+      <span id="dtUserName">…</span>
+      <button class="rt-logout" id="dtLogout">Logout</button>
+    </div>
+  </header>
+
+  <main class="rt-wrap">
+    <!-- KYC / status banner -->
+    <div class="rt-banner warn" id="dtBanner">
+      Your account is <strong>pending approval</strong>. You'll be able to view and fulfil orders
+      once an admin activates your account.
+    </div>
+
+    <!-- Coverage (read-only — managed by admin) -->
+    <section class="rt-card">
+      <h2>My coverage <span class="sub">to change territory or pincodes, contact Fair Ford admin</span></h2>
+      <div class="rt-form-row">
+        <div class="rt-field" style="flex:1 1 220px;">
+          <label>Business name</label>
+          <input id="dfBusiness" type="text" disabled />
+        </div>
+        <div class="rt-field" style="flex:1 1 220px;">
+          <label>Base address</label>
+          <input id="dfAddress" type="text" disabled />
+        </div>
+        <div class="rt-field">
+          <label>Territory</label>
+          <input id="dfTerritory" type="text" disabled />
+        </div>
+        <div class="rt-field">
+          <label>Serviceable pincodes</label>
+          <input id="dfPincodes" type="text" disabled />
+        </div>
+        <div class="rt-field">
+          <label>Contact</label>
+          <input id="dfContact" type="text" disabled />
+        </div>
+      </div>
+    </section>
+
+    <!-- Orders -->
+    <section class="rt-card">
+      <h2>Order queue <span class="sub">orders routed to you by nearest-distributor matching</span></h2>
+      <select class="rt-search" id="dtStatusFilter">
+        <option value="">All statuses</option>
+        <option value="pending">Pending</option>
+        <option value="approved">Approved</option>
+        <option value="dispatched">Dispatched</option>
+        <option value="delivered">Delivered</option>
+        <option value="returned">Returned</option>
+        <option value="cancelled">Cancelled</option>
+      </select>
+      <div id="dtOrders">
+        <p class="rt-empty">Loading orders…</p>
+      </div>
+    </section>
+  </main>
+
+  <div class="rt-toast" id="dtToast"></div>
+
+  <script src="/frontend/js/logout-confirm.js"></script>
+  <script src="/frontend/js/distributor.js"></script>
+</body>
+</html>

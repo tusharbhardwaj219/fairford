@@ -164,10 +164,10 @@ const login = async (req, res, next) => {
     // Generate token
     const token = generateToken(user._id, user.role);
 
-    // Determine redirect URL based on role. Retailers land on the storefront
-    // home — they reach their own dashboard via the header "profile" button.
-    // Distributors no longer have a dashboard.
+    // Determine redirect URL based on role. Retailers/distributors land on
+    // their own minimal dashboard; admins land on the Super Admin dashboard.
     const redirectTo = user.role === 'ret' ? '/retailer.html'
+                     : user.role === 'dist' ? '/distributor.html'
                      : (user.role === 'admin' || user.role === 'superadmin') ? '/superadmin.html'
                      : '/index.html';
 

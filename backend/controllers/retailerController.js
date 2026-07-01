@@ -48,7 +48,7 @@ const getProducts = async (req, res) => {
     const skip     = (Number(page) - 1) * Number(limit);
     const total    = await Product.countDocuments(filter);
     const products = await Product.find(filter)
-      .select('name brand category strength packSize dosageForm retailerPrice gst stock stockStatus minimumOrderQuantity images slug')
+      .select('name brand category strength packSize dosageForm retailerPrice gst stock stockStatus minimumOrderQuantity image images slug')
       .skip(skip).limit(Number(limit));
 
     return res.status(200).json({
