@@ -38,7 +38,7 @@ function filterProductPricing(product, role) {
     return p;
   }
 
-  return p; // hospital / manufacturer — full data
+  return p; // admin / superadmin — full pricing
 }
 
 function filterList(products, role) {
@@ -346,25 +346,39 @@ exports.updateProduct = async (req, res, next) => {
       return res.status(404).json({ success: false, message: 'Product not found' });
     }
 
-    if (req.body.category) {
-      const category = await Category.findById(req.body.category);
+    // Whitelist updatable fields — avoid mass-assignment of system fields like
+    // rating / reviewCount / slug via a crafted body.
+    const ALLOWED = [
+      'name', 'brand', 'category', 'strength', 'packSize', 'dosageForm',
+      'composition', 'description', 'uses', 'benefits', 'sideEffects', 'storage',
+      'mrp', 'retailerPrice', 'distributorPrice', 'gst', 'stock',
+      'minimumOrderQuantity', 'manufacturingDate', 'expiryDate',
+      'isFeatured', 'isBestseller', 'isNewArrival', 'status', 'tags', 'certifications',
+    ];
+    const update = {};
+    for (const key of ALLOWED) {
+      if (req.body[key] !== undefined) update[key] = req.body[key];
+    }
+
+    if (update.category) {
+      const category = await Category.findById(update.category);
       if (!category) {
         if (req.file) await destroyCloudinaryImage(req.file.filename);
         return res.status(404).json({ success: false, message: 'Category not found' });
       }
-      req.body.categoryName = category.categoryName;
+      update.categoryName = category.categoryName;
     }
 
     // Replace main image: delete old from Cloudinary, save new
     if (req.file) {
       await destroyCloudinaryImage(product.image && product.image.public_id);
-      req.body.image = {
+      update.image = {
         url:       req.file.path,
         public_id: req.file.filename
       };
     }
 
-    product = await Product.findByIdAndUpdate(req.params.id, req.body, {
+    product = await Product.findByIdAndUpdate(req.params.id, update, {
       returnDocument: 'after', runValidators: true
     }).populate('category');
 

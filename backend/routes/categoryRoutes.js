@@ -8,7 +8,7 @@ const categoryController = require('../controllers/categoryController');
 const { verifyToken: protect, authorizeRoles } = require('../middleware/authMiddleware');
 const { uploadCategoryImage, handleUploadError } = require('../middleware/uploadMiddleware');
 
-const isSuperAdmin = authorizeRoles('mfr');
+const adminOnly = authorizeRoles('admin', 'superadmin');
 
 const router = express.Router();
 
@@ -21,6 +21,7 @@ router.get('/:id',         categoryController.getCategory);
 router.post(
   '/',
   protect,
+  adminOnly,
   uploadCategoryImage,
   handleUploadError,
   [
@@ -33,6 +34,7 @@ router.post(
 router.put(
   '/:id',
   protect,
+  adminOnly,
   uploadCategoryImage,
   handleUploadError,
   [
@@ -43,6 +45,6 @@ router.put(
 );
 
 // ── Protected route (SuperAdmin) ──────────────────────────────────────────────
-router.delete('/:id', protect, isSuperAdmin, categoryController.deleteCategory);
+router.delete('/:id', protect, adminOnly, categoryController.deleteCategory);
 
 module.exports = router;
