@@ -1,5 +1,8 @@
 # Environment variables - CRITICAL: Never commit these!
 .env
+migrate.env
+migrate-cluster.js
+set-superadmin.js
 .env.local
 .env.*.local
 .env.development.local
