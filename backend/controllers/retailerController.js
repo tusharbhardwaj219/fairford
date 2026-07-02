@@ -40,10 +40,15 @@ const getProducts = async (req, res) => {
     const filter = { status: 'active' };
 
     if (category) filter.category = category;
-    if (search) filter.$or = [
-      { name:  { $regex: search, $options: 'i' } },
-      { brand: { $regex: search, $options: 'i' } },
-    ];
+    if (search) {
+      // Escape regex metacharacters + cap length so a crafted `search` value
+      // can't trigger ReDoS / catastrophic backtracking.
+      const kw = String(search).slice(0, 80).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      filter.$or = [
+        { name:  { $regex: kw, $options: 'i' } },
+        { brand: { $regex: kw, $options: 'i' } },
+      ];
+    }
 
     const skip     = (Number(page) - 1) * Number(limit);
     const total    = await Product.countDocuments(filter);

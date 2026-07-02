@@ -200,9 +200,13 @@ const getOrderById = async (req, res) => {
 
     if (!order) return res.status(404).json({ success: false, message: 'Order not found' });
 
+    // Guard against a populated ref being null (e.g. the retailer/distributor
+    // record was deleted) — dereferencing ._id would otherwise throw a 500.
+    const retailerId    = order.retailer    && order.retailer._id    && order.retailer._id.toString();
+    const distributorId = order.distributor && order.distributor._id && order.distributor._id.toString();
     const isOwner =
-      (req.user.role === 'ret'  && order.retailer._id.toString()    === req.user.id) ||
-      (req.user.role === 'dist' && order.distributor._id.toString() === req.user.id);
+      (req.user.role === 'ret'  && retailerId    === req.user.id) ||
+      (req.user.role === 'dist' && distributorId === req.user.id);
 
     if (!isOwner) return res.status(403).json({ success: false, message: 'Access denied' });
 

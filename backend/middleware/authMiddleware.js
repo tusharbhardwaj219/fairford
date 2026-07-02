@@ -57,6 +57,9 @@ const optionalAuth = async (req, res, next) => {
   if (header && header.startsWith('Bearer ')) {
     const token = header.split(' ')[1];
     try {
+      // A revoked (logged-out) token must not silently grant identity on
+      // optional-auth routes either — treat it as anonymous.
+      if (await isBlacklisted(token)) return next();
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
       const Model   = modelForRole(decoded.role);
       if (Model) {

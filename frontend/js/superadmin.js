@@ -16,7 +16,7 @@ function toast(msg, type = 'success') {
   };
   const t = document.createElement('div');
   t.className = `toast toast-${type}`;
-  t.innerHTML = `<span style="font-weight:600;margin-right:4px">${icons[type] || '✓'}</span><span>${msg}</span>`;
+  t.innerHTML = `<span style="font-weight:600;margin-right:4px">${icons[type] || '✓'}</span><span>${esc(msg)}</span>`;
   container.appendChild(t);
   requestAnimationFrame(() => t.classList.add('show'));
   setTimeout(() => {
@@ -113,7 +113,12 @@ async function apiFetch(path, opts = {}) {
    CSV DOWNLOAD UTILITY
 ══════════════════════════════════════════ */
 function downloadCSV(rows, filename) {
-  const csv = rows.map(r => r.map(v => `"${String(v == null ? '' : v).replace(/"/g, '""')}"`).join(',')).join('\n');
+  const csv = rows.map(r => r.map(v => {
+    let s = String(v == null ? '' : v);
+    // Neutralise CSV/Excel formula injection (leading = + - @ tab/CR).
+    if (/^[=+\-@\t\r]/.test(s)) s = "'" + s;
+    return `"${s.replace(/"/g, '""')}"`;
+  }).join(',')).join('\n');
   const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -206,8 +211,8 @@ async function loadPendingWidget() {
       const ini = d.initials || (d.name ? d.name.slice(0,2).toUpperCase() : '??');
       const cc = d.color_class || 'av-pur';
       paList.innerHTML += `<div style="display:flex;align-items:center;gap:12px;padding:12px 20px;border-bottom:1px solid var(--border)">
-        <div class="avatar ${cc}">${ini}</div>
-        <div style="flex:1"><div style="font-size:13px;font-weight:500">${d.name}</div><div style="font-size:11px;color:var(--text-3)">${d.type} · ${d.region}</div></div>
+        <div class="avatar ${cc}">${esc(ini)}</div>
+        <div style="flex:1"><div style="font-size:13px;font-weight:500">${esc(d.name)}</div><div style="font-size:11px;color:var(--text-3)">${esc(d.type)} · ${esc(d.region)}</div></div>
         <span class="badge badge-amber">Pending</span>
         <button class="btn btn-ghost btn-sm" onclick="showPage('approvals')">Review</button>
       </div>`;
@@ -360,12 +365,12 @@ function renderDistributors(data) {
     const cc = d.color_class || 'av-pur';
     const hasOut = d.outstanding && d.outstanding !== '₹0';
     tbody.innerHTML += `<tr>
-      <td><div style="display:flex;align-items:center;gap:8px;cursor:pointer" onclick="openDistributorProfile('${d.id}')"><div class="avatar ${cc}">${initials}</div><strong style="color:var(--pri);text-decoration:underline;text-underline-offset:3px">${d.name || '—'}</strong></div></td>
-      <td>${d.state}</td>
+      <td><div style="display:flex;align-items:center;gap:8px;cursor:pointer" onclick="openDistributorProfile('${d.id}')"><div class="avatar ${cc}">${esc(initials)}</div><strong style="color:var(--pri);text-decoration:underline;text-underline-offset:3px">${esc(d.name) || '—'}</strong></div></td>
+      <td>${esc(d.state)}</td>
       <td style="text-align:center">${d.retailers_count}</td>
-      <td style="font-weight:500">${d.may_gmv}</td>
-      <td style="color:${hasOut ? 'var(--red)' : 'var(--green)'}">${d.outstanding}</td>
-      <td><span class="badge ${d.status === 'active' ? 'badge-green' : 'badge-red'}">${d.status}</span></td>
+      <td style="font-weight:500">${esc(d.may_gmv)}</td>
+      <td style="color:${hasOut ? 'var(--red)' : 'var(--green)'}">${esc(d.outstanding)}</td>
+      <td><span class="badge ${d.status === 'active' ? 'badge-green' : 'badge-red'}">${esc(d.status)}</span></td>
       <td class="tbl-actions">
         <button class="btn btn-ghost btn-sm" onclick="openDistributorModal('${d.id}')">Edit</button>
         <button class="btn btn-danger btn-sm" onclick="deleteDistributor('${d.id}')">Delete</button>
@@ -592,10 +597,10 @@ function renderProducts(data) {
   // placeholder so the column never collapses to whitespace.
   function thumbCell(d) {
     if (d.imageUrl) {
-      return `<td><img src="${d.imageUrl}" alt="" class="prod-thumb" loading="lazy"></td>`;
+      return `<td><img src="${esc(d.imageUrl)}" alt="" class="prod-thumb" loading="lazy"></td>`;
     }
     const initial = String(d.name || '?').trim().charAt(0).toUpperCase() || '?';
-    return `<td><span class="prod-thumb prod-thumb--fallback">${initial}</span></td>`;
+    return `<td><span class="prod-thumb prod-thumb--fallback">${esc(initial)}</span></td>`;
   }
   // data-label is what the responsive "card" view shows next to each cell
   // when the table collapses to a stacked layout on narrow screens.
@@ -603,16 +608,16 @@ function renderProducts(data) {
   data.forEach(d => {
     tbody.innerHTML += `<tr>
       ${thumbCell(d)}
-      <td data-label="Name"><strong>${d.name}</strong></td>
-      <td data-label="SKU" style="font-family:'DM Mono',monospace;font-size:12px">${d.sku}</td>
-      <td data-label="Category"><span class="badge badge-blue">${d.category}</span></td>
+      <td data-label="Name"><strong>${esc(d.name)}</strong></td>
+      <td data-label="SKU" style="font-family:'DM Mono',monospace;font-size:12px">${esc(d.sku)}</td>
+      <td data-label="Category"><span class="badge badge-blue">${esc(d.category)}</span></td>
       <td data-label="MRP">₹${Number(d.mrp || 0).toLocaleString('en-IN')}</td>
       <td data-label="Retailer ₹">₹${Number(d.retailerPrice || 0).toLocaleString('en-IN')}</td>
       <td data-label="Distributor ₹">₹${Number(d.distributorPrice || 0).toLocaleString('en-IN')}</td>
-      <td data-label="Manufacturer" style="font-size:12px">${d.manufacturer}</td>
+      <td data-label="Manufacturer" style="font-size:12px">${esc(d.manufacturer)}</td>
       <td data-label="Stock" style="text-align:center;font-weight:500">${(d.stock || 0).toLocaleString('en-IN')}</td>
-      <td data-label="Status"><span class="badge ${d.status === 'active' ? 'badge-green' : 'badge-gray'}">${d.status}</span></td>
-      <td data-label="Added" style="font-size:12px;color:var(--text-3)">${d.created_date}</td>
+      <td data-label="Status"><span class="badge ${d.status === 'active' ? 'badge-green' : 'badge-gray'}">${esc(d.status)}</span></td>
+      <td data-label="Added" style="font-size:12px;color:var(--text-3)">${esc(d.created_date)}</td>
       <td class="tbl-actions" data-label="">
         <button class="btn btn-ghost btn-sm" onclick="editProduct('${d.id}')">Edit</button>
         <button class="btn btn-danger btn-sm" onclick="deleteProduct('${d.id}')">Delete</button>
@@ -821,10 +826,10 @@ async function loadPricingTable() {
     allPricingRules.forEach(r => {
       const sc = r.status === 'active' ? 'badge-green' : r.status === 'pending' ? 'badge-amber' : 'badge-gray';
       tbody.innerHTML += `<tr>
-        <td><strong>${r.category}</strong></td>
+        <td><strong>${esc(r.category)}</strong></td>
         <td>${r.dist_margin}%</td>
         <td>${r.retail_margin}%</td>
-        <td>${r.gst_rate}</td>
+        <td>${esc(r.gst_rate)}</td>
         <td><span class="badge ${sc}">${r.status.charAt(0).toUpperCase() + r.status.slice(1)}</span></td>
       </tr>`;
     });
@@ -870,10 +875,10 @@ async function loadWallet() {
       const cc = d.color_class || 'av-pur';
       const { badge, label, btn } = settlementUI(d);
       tbody.innerHTML += `<tr>
-        <td><div style="display:flex;align-items:center;gap:8px"><div class="avatar ${cc}">${ini}</div>${d.distributor || '—'}</div></td>
-        <td style="font-family:'DM Mono',monospace;font-size:12px">${d.invoice_no}</td>
-        <td style="font-weight:500">${d.amount}</td>
-        <td>${d.due_date}</td>
+        <td><div style="display:flex;align-items:center;gap:8px"><div class="avatar ${cc}">${esc(ini)}</div>${esc(d.distributor) || '—'}</div></td>
+        <td style="font-family:'DM Mono',monospace;font-size:12px">${esc(d.invoice_no)}</td>
+        <td style="font-weight:500">${esc(d.amount)}</td>
+        <td>${esc(d.due_date)}</td>
         <td><span class="badge ${badge}">${label}</span></td>
         <td>${btn(d.id)}</td>
       </tr>`;
@@ -942,9 +947,9 @@ async function loadSchemes() {
       const badgeClass = s.status === 'active' ? 'badge-green' : s.status === 'upcoming' ? 'badge-amber' : 'badge-gray';
       const dateLabel = s.status === 'upcoming' ? `Starts ${formatDate(s.start_date)}` : `Ends ${formatDate(s.end_date)}`;
       list.innerHTML += `<div class="card" style="border-top:3px solid ${bc}">
-        <div class="card-header"><span class="card-title">${s.name}</span><span class="badge ${badgeClass}">${s.status.charAt(0).toUpperCase() + s.status.slice(1)}</span></div>
+        <div class="card-header"><span class="card-title">${esc(s.name)}</span><span class="badge ${badgeClass}">${s.status.charAt(0).toUpperCase() + s.status.slice(1)}</span></div>
         <div class="card-body">
-          <div style="font-size:12px;color:var(--text-2);margin-bottom:10px">${s.description || s.type + ' · ' + s.category}</div>
+          <div style="font-size:12px;color:var(--text-2);margin-bottom:10px">${esc(s.description || s.type + ' · ' + s.category)}</div>
           <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px"><span style="color:var(--text-2)">Redemptions</span><strong>${s.redemptions.toLocaleString('en-IN')}</strong></div>
           <div class="prog-wrap"><div class="prog-bar ${pc}" style="width:${pct}%"></div></div>
           <div style="font-size:11px;color:var(--text-3);margin-top:4px">Target: ${s.target.toLocaleString('en-IN')} · ${dateLabel}</div>
@@ -1014,9 +1019,9 @@ function renderInventory(data) {
   data.forEach(d => {
     const sc = d.status === 'ok' ? 'badge-green' : d.status === 'low' ? 'badge-amber' : 'badge-red';
     tbody.innerHTML += `<tr>
-      <td><strong>${d.product_name}</strong></td>
-      <td style="font-family:'DM Mono',monospace;font-size:12px">${d.sku}</td>
-      <td><span class="badge badge-blue">${d.category}</span></td>
+      <td><strong>${esc(d.product_name)}</strong></td>
+      <td style="font-family:'DM Mono',monospace;font-size:12px">${esc(d.sku)}</td>
+      <td><span class="badge badge-blue">${esc(d.category)}</span></td>
       <td>${d.total_stock.toLocaleString('en-IN')}</td>
       <td style="color:var(--text-2)">${d.reserved.toLocaleString('en-IN')}</td>
       <td style="font-weight:500">${d.available.toLocaleString('en-IN')}</td>
@@ -1074,12 +1079,12 @@ function renderMappings(data) {
     const ini = d.initials || (d.distributor ? d.distributor.slice(0,2).toUpperCase() : '??');
     const cc = d.color_class || 'av-pur';
     tbody.innerHTML += `<tr>
-      <td><div style="display:flex;align-items:center;gap:8px"><div class="avatar ${cc}">${ini}</div>${d.distributor || '—'}</div></td>
-      <td>${d.state || '—'}</td>
-      <td>${d.district || '—'}</td>
+      <td><div style="display:flex;align-items:center;gap:8px"><div class="avatar ${cc}">${esc(ini)}</div>${esc(d.distributor) || '—'}</div></td>
+      <td>${esc(d.state) || '—'}</td>
+      <td>${esc(d.district) || '—'}</td>
       <td>${d.retailers_mapped}</td>
       <td><div style="display:flex;align-items:center;gap:8px"><div class="prog-wrap" style="width:80px"><div class="prog-bar" style="width:${d.coverage_pct}%"></div></div>${d.coverage_pct}%</div></td>
-      <td style="color:var(--text-3);font-size:12px">${d.last_updated}</td>
+      <td style="color:var(--text-3);font-size:12px">${esc(d.last_updated)}</td>
       <td class="tbl-actions">
         <button class="btn btn-ghost btn-sm" onclick="openMappingModal('${d.id}')">Edit</button>
         <button class="btn btn-danger btn-sm" onclick="deleteMapping('${d.id}')">Delete</button>
@@ -1361,12 +1366,12 @@ async function openDistributorProfile(id) {
       const sc = i.status === 'ok' ? 'badge-green' : i.status === 'low' ? 'badge-amber' : 'badge-red';
       const rowStyle = (i.status === 'low' || i.status === 'critical') ? 'background:var(--amber-bg)' : '';
       return `<tr style="${rowStyle}">
-        <td><strong style="font-size:12px">${i.product_name}</strong></td>
-        <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-2)">${i.sku}</td>
+        <td><strong style="font-size:12px">${esc(i.product_name)}</strong></td>
+        <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-2)">${esc(i.sku)}</td>
         <td style="text-align:center">${i.total_stock.toLocaleString('en-IN')}</td>
         <td style="text-align:center;font-weight:600">${i.available.toLocaleString('en-IN')}</td>
         <td style="text-align:center">${i.reorder_level.toLocaleString('en-IN')}</td>
-        <td><span class="badge ${sc}">${i.status}</span></td>
+        <td><span class="badge ${sc}">${esc(i.status)}</span></td>
       </tr>`;
     }).join('');
 
@@ -1376,11 +1381,11 @@ async function openDistributorProfile(id) {
           <div style="display:flex;align-items:center;gap:14px;flex:1;min-width:0">
             <div class="profile-avatar-lg">${ini}</div>
             <div style="min-width:0">
-              <div style="font-size:18px;font-weight:700;color:#fff;margin-bottom:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${d.name}</div>
+              <div style="font-size:18px;font-weight:700;color:#fff;margin-bottom:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(d.name)}</div>
               <div style="display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:rgba(255,255,255,.75)">
-                ${d.phone ? `<span>📞 ${d.phone}</span>` : ''}
-                ${d.email ? `<span>✉ ${d.email}</span>` : ''}
-                ${d.city ? `<span>📍 ${d.city}, ${d.state}</span>` : `<span>📍 ${d.state || '—'}</span>`}
+                ${d.phone ? `<span>📞 ${esc(d.phone)}</span>` : ''}
+                ${d.email ? `<span>✉ ${esc(d.email)}</span>` : ''}
+                ${d.city ? `<span>📍 ${esc(d.city)}, ${esc(d.state)}</span>` : `<span>📍 ${esc(d.state) || '—'}</span>`}
               </div>
             </div>
           </div>
@@ -1466,7 +1471,7 @@ async function openDistributorProfile(id) {
         </div>
       </div>`;
   } catch (e) {
-    content.innerHTML = `<div style="padding:48px;text-align:center;color:var(--red);font-size:13px">${e.message}</div>`;
+    content.innerHTML = `<div style="padding:48px;text-align:center;color:var(--red);font-size:13px">${esc(e.message)}</div>`;
   }
 }
 
@@ -1563,7 +1568,7 @@ async function openRetailerProfile(id) {
         </div>
       </div>`;
   } catch (e) {
-    content.innerHTML = `<div style="padding:48px;text-align:center;color:var(--red);font-size:13px">${e.message}</div>`;
+    content.innerHTML = `<div style="padding:48px;text-align:center;color:var(--red);font-size:13px">${esc(e.message)}</div>`;
   }
 }
 

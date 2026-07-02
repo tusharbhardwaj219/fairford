@@ -46,7 +46,9 @@ const getAllContacts = async (req, res, next) => {
         const filter = {};
 
         if (search) {
-            filter.name = { $regex: search, $options: 'i' };
+            // Escape regex metacharacters + cap length (ReDoS guard).
+            const kw = String(search).slice(0, 80).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            filter.name = { $regex: kw, $options: 'i' };
         }
         if (status && ['Pending', 'Replied', 'Closed'].includes(status)) {
             filter.status = status;
@@ -137,6 +139,14 @@ const exportToExcel = async (req, res, next) => {
     try {
         const ExcelJS = require('exceljs');
 
+        // Neutralise CSV/Excel formula injection: a cell beginning with = + - @
+        // (or a tab/CR) is treated as a formula by spreadsheet apps. Prefix a
+        // single quote so the value is rendered as literal text.
+        const csvSafe = (v) => {
+            if (typeof v !== 'string') return v;
+            return /^[=+\-@\t\r]/.test(v) ? `'${v}` : v;
+        };
+
         const { status, inquiryType } = req.query;
         const filter = {};
         if (status) filter.status = status;
@@ -172,13 +182,13 @@ const exportToExcel = async (req, res, next) => {
         contacts.forEach((c, i) => {
             sheet.addRow({
                 sno:         i + 1,
-                name:        c.name,
-                email:       c.email,
-                phone:       c.phone,
-                inquiryType: c.inquiryType,
-                message:     c.message,
-                status:      c.status,
-                ipAddress:   c.ipAddress || '',
+                name:        csvSafe(c.name),
+                email:       csvSafe(c.email),
+                phone:       csvSafe(c.phone),
+                inquiryType: csvSafe(c.inquiryType),
+                message:     csvSafe(c.message),
+                status:      csvSafe(c.status),
+                ipAddress:   csvSafe(c.ipAddress || ''),
                 createdAt:   new Date(c.createdAt).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }),
             });
         });

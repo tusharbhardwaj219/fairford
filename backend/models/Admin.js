@@ -24,7 +24,9 @@ const adminSchema = new mongoose.Schema(
     password: {
       type: String,
       required: [true, 'Please provide password'],
-      minlength: [6, 'Password must be at least 6 characters'],
+      // Admins are the most privileged accounts — hold them to at least the
+      // same 12-char minimum enforced for retailers (was 6).
+      minlength: [12, 'Password must be at least 12 characters'],
       select: false // Don't return password by default
     },
     role: {

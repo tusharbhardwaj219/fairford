@@ -11,8 +11,12 @@ const {
 } = require('../controllers/contactController');
 
 const { contactValidationRules, validate } = require('../validators/contactValidator');
+const { verifyToken, authorizeRoles } = require('../middleware/authMiddleware');
 
 const router = express.Router();
+
+// Everything except the public submission form is admin-only.
+const adminOnly = [verifyToken, authorizeRoles('admin', 'superadmin')];
 
 // 10 submissions per 15 minutes per IP — anti-spam
 const contactLimiter = rateLimit({
@@ -106,7 +110,7 @@ router.post('/', contactLimiter, contactValidationRules, validate, submitContact
  *       200:
  *         description: List of contacts with pagination
  */
-router.get('/', getAllContacts);
+router.get('/', ...adminOnly, getAllContacts);
 
 /**
  * @swagger
@@ -134,7 +138,7 @@ router.get('/', getAllContacts);
  *               type: string
  *               format: binary
  */
-router.get('/export', exportToExcel);
+router.get('/export', ...adminOnly, exportToExcel);
 
 /**
  * @swagger
@@ -154,7 +158,7 @@ router.get('/export', exportToExcel);
  *       404:
  *         description: Contact not found
  */
-router.get('/:id', getContactById);
+router.get('/:id', ...adminOnly, getContactById);
 
 /**
  * @swagger
@@ -188,7 +192,7 @@ router.get('/:id', getContactById);
  *       404:
  *         description: Contact not found
  */
-router.put('/:id', updateContactStatus);
+router.put('/:id', ...adminOnly, updateContactStatus);
 
 /**
  * @swagger
@@ -208,6 +212,6 @@ router.put('/:id', updateContactStatus);
  *       404:
  *         description: Contact not found
  */
-router.delete('/:id', deleteContact);
+router.delete('/:id', ...adminOnly, deleteContact);
 
 module.exports = router;

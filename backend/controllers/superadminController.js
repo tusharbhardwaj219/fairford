@@ -10,6 +10,7 @@
    distributor↔territory mapping) are stored in their own collections.
    ===================================================================== */
 
+const crypto      = require('crypto');
 const mongoose    = require('mongoose');
 const Retailer    = require('../models/Retailer');
 const Distributor = require('../models/Distributor');
@@ -42,6 +43,10 @@ const ok = (res, extra = {}) => res.json({ success: true, ...extra });
 async function genUniqueEmail(prefix, domain) {
   return `${prefix}.${Date.now()}${Math.floor(Math.random() * 1000)}@${domain}`;
 }
+
+// High-entropy temp password (upper + lower + digit + special) — replaces the
+// old `Fairford@<4 digits>` which had only ~9000 guessable combinations.
+const strongPassword = () => `Ff9@${crypto.randomBytes(12).toString('base64url')}`;
 
 // ════════════════════════════ DASHBOARD ═══════════════════════════════════════
 exports.dashboard = async (req, res) => {
@@ -156,7 +161,7 @@ exports.createDistributor = async (req, res) => {
     const d = await Distributor.create({
       name, businessName: name,
       email: await genUniqueEmail((name || 'dist').toLowerCase().replace(/[^a-z0-9]/g, ''), 'dist.fairford.local'),
-      password: `Fairford@${Math.floor(1000 + Math.random() * 9000)}`,
+      password: strongPassword(),
       businessAddress: { state },
       status: status || 'active',
       role: 'dist',
@@ -249,7 +254,7 @@ exports.createRetailer = async (req, res) => {
     const r = await Retailer.create({
       name, shopName: name,
       email: await genUniqueEmail((name || 'ret').toLowerCase().replace(/[^a-z0-9]/g, ''), 'ret.fairford.local'),
-      password: `Fairford@${Math.floor(1000 + Math.random() * 9000)}`,
+      password: strongPassword(),
       shopAddress: { city, state: req.body.state || 'Maharashtra' },
       status: status || 'pending',
       role: 'ret',

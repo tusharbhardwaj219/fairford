@@ -7,10 +7,15 @@
      • manages distributors / stockists and their serviceable areas (routing)
    ===================================================================== */
 
+const crypto      = require('crypto');
 const Order       = require('../models/Order');
 const Retailer    = require('../models/Retailer');
 const Distributor = require('../models/Distributor');
 const Product     = require('../models/Product');
+
+// A high-entropy temp password that still satisfies the complexity policy
+// (upper + lower + digit + special). ~72 bits of randomness from the tail.
+const strongPassword = () => `Ff9@${crypto.randomBytes(12).toString('base64url')}`;
 
 // Accept ["a","b"] or "a, b" → ['a','b']
 function toList(v) {
@@ -162,7 +167,7 @@ const createDistributor = async (req, res) => {
     const exists = await Distributor.findOne({ email: email.toLowerCase().trim() });
     if (exists) return res.status(409).json({ success: false, message: 'Email is already registered' });
 
-    const tempPassword = `Fairford@${Math.floor(1000 + Math.random() * 9000)}`;
+    const tempPassword = strongPassword();
     const distributor = await new Distributor({
       name: name.trim(),
       email: email.toLowerCase().trim(),

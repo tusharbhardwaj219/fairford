@@ -118,6 +118,16 @@ function renderStars(rating) {
 /* ----------  CURRENCY  ---------- */
 function inr(n) { return '₹' + Number(n).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
 
+/* ----------  HTML ESCAPE  ----------
+   Product name/brand come from the API and are concatenated into innerHTML in
+   the cart/wishlist panels — escape them so a crafted product string can't
+   inject markup/script. */
+function escHtml(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, function (m) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m];
+  });
+}
+
 function badgeClass(status) {
   return status === "In Stock" ? "in" : status === "Low Stock" ? "low" : "out";
 }
@@ -257,14 +267,14 @@ const store = {
       subtotal += lineTotal;
       gstTotal += (lineTotal * (p.gst || 12)) / 100;
       var thumb = p.image
-        ? '<img src="' + p.image + '" alt="' + p.name + '" class="fline-img">'
-        : '<div class="fline-svg">' + (typeof productImageSVG === 'function' ? productImageSVG(p.category) : p.name.charAt(0)) + '</div>';
+        ? '<img src="' + escHtml(p.image) + '" alt="' + escHtml(p.name) + '" class="fline-img">'
+        : '<div class="fline-svg">' + (typeof productImageSVG === 'function' ? productImageSVG(p.category) : escHtml(p.name.charAt(0))) + '</div>';
       html +=
         '<div class="fline">' +
           '<div class="fline-thumb">' + thumb + '</div>' +
           '<div class="fline-info">' +
-            '<p class="fline-name">' + p.name + '</p>' +
-            '<p class="fline-comp">' + p.brand + (p.packSize ? ' · ' + p.packSize : '') + '</p>' +
+            '<p class="fline-name">' + escHtml(p.name) + '</p>' +
+            '<p class="fline-comp">' + escHtml(p.brand) + (p.packSize ? ' · ' + escHtml(p.packSize) : '') + '</p>' +
             '<p class="fline-rate">' + inr(p.retailerPrice).replace('.00','') + ' / unit · MOQ ' + (p.moq || 1) + '</p>' +
             '<div class="fqty">' +
               '<button class="fqty-btn" data-qminus="' + p.id + '" aria-label="Decrease">' + SVG_MINUS + '</button>' +
@@ -339,14 +349,14 @@ const store = {
       var p = products.find(function(x) { return x.id === id; });
       if (!p) return;
       var thumb = p.image
-        ? '<img src="' + p.image + '" alt="' + p.name + '" class="fline-img">'
-        : '<div class="fline-svg">' + (typeof productImageSVG === 'function' ? productImageSVG(p.category) : p.name.charAt(0)) + '</div>';
+        ? '<img src="' + escHtml(p.image) + '" alt="' + escHtml(p.name) + '" class="fline-img">'
+        : '<div class="fline-svg">' + (typeof productImageSVG === 'function' ? productImageSVG(p.category) : escHtml(p.name.charAt(0))) + '</div>';
       html +=
         '<div class="fwish-line">' +
           '<div class="fline-thumb">' + thumb + '</div>' +
           '<div class="fline-info">' +
-            '<p class="fline-name">' + p.name + '</p>' +
-            '<p class="fline-comp">' + p.brand + (p.packSize ? ' · ' + p.packSize : '') + '</p>' +
+            '<p class="fline-name">' + escHtml(p.name) + '</p>' +
+            '<p class="fline-comp">' + escHtml(p.brand) + (p.packSize ? ' · ' + escHtml(p.packSize) : '') + '</p>' +
             '<p class="fline-rate fline-rate--price">' + inr(p.retailerPrice).replace('.00','') + '</p>' +
           '</div>' +
           '<div class="fwish-actions">' +
@@ -381,7 +391,7 @@ function renderHeader(active) {
   <div class="topbar__container">
     <ul class="topbar__contact" aria-label="Contact information">
       <li class="topbar__item">
-        <a href="tel:+919958584020" class="topbar__link" aria-label="Call us">
+        <a href="tel:+918595939723" class="topbar__link" aria-label="Call us">
           <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384"/></svg>
           <span>+91 8595939723</span>
         </a>
@@ -430,7 +440,7 @@ function renderHeader(active) {
   <div class="container header-inner">
     <a href="index.html" class="logo" aria-label="Fair Ford Pharma home">
       <span class="logo-mark" aria-hidden="true">
-        <img src=https://res.cloudinary.com/dp4yririh/image/upload/v1781166637/LOGO_ja5rle.png alt="Fair Ford Pharmaceuticals Pvt. Ltd. logo" width="60" height="60">
+        <img src=https://res.cloudinary.com/dp4yririh/image/upload/v1782967649/fairford/site/m5d8pmtzdjr4dcgctvuc.png alt="Fair Ford Pharmaceuticals Pvt. Ltd. logo" width="60" height="60">
       </span>
       <span class="logo-text">
         <span class="logo-name">Fair Ford</span>
@@ -442,8 +452,8 @@ function renderHeader(active) {
       <ul class="nav-list">
         <li><a href="index.html" class="${navCls('home')}">Home</a></li>
         <li><a href="product.html" class="${navCls('products')}">Products</a></li>
-        <li><a href="About.html" class="${navCls('about')}" target="_blank">About</a></li>
-        <li><a href="contactus.html" class="${navCls('contact')}" target="_blank">Contact</a></li>
+        <li><a href="About.html" class="${navCls('about')}">About</a></li>
+        <li><a href="contactus.html" class="${navCls('contact')}">Contact</a></li>
         <li><a href="uphaar.html" class="nav-link nav-link--promo"><span class="promo-dot" aria-hidden="true"></span>Uphaar</a></li>
       </ul>
     </nav>
@@ -489,7 +499,7 @@ function renderHeader(active) {
   <div class="drawer-header">
     <a href="index.html" class="logo">
       <span class="logo-mark" aria-hidden="true">
-        <img src=https://res.cloudinary.com/dp4yririh/image/upload/v1781166637/LOGO_ja5rle.png alt="Fair Ford Pharmaceuticals Pvt. Ltd. logo" width="60" height="60">
+        <img src=https://res.cloudinary.com/dp4yririh/image/upload/v1782967649/fairford/site/m5d8pmtzdjr4dcgctvuc.png alt="Fair Ford Pharmaceuticals Pvt. Ltd. logo" width="60" height="60">
       </span>
       <span class="logo-text">
         <span class="logo-name">Fair Ford</span>

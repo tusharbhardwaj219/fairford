@@ -6,7 +6,7 @@ const getTransporter = () => nodemailer.createTransport({
   service: 'gmail',
   auth: {
     user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASSWORD
+    pass: process.env.EMAIL_PASS
   }
 });
 
@@ -96,11 +96,14 @@ exports.unsubscribe = async (req, res) => {
     const { email, token } = req.body;
 
     if (!email) return res.status(400).json({ success: false, message: 'Email is required' });
+    // Require the token from the emailed unsubscribe link, otherwise anyone
+    // could unsubscribe an arbitrary address just by knowing the email.
+    if (!token) return res.status(400).json({ success: false, message: 'Unsubscribe token is required' });
 
     const subscriber = await Newsletter.findOne({ email: email.toLowerCase() });
     if (!subscriber) return res.status(404).json({ success: false, message: 'Subscriber not found' });
 
-    if (token && subscriber.unsubscribeToken !== token) {
+    if (subscriber.unsubscribeToken !== token) {
       return res.status(401).json({ success: false, message: 'Invalid unsubscribe token' });
     }
 
