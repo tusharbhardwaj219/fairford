@@ -166,6 +166,12 @@ app.use('/api/dist-inventory', distInventoryRoutes);
 app.use('/frontend', express.static(path.join(__dirname, '..', 'frontend')));
 app.use(express.static(path.join(__dirname, '..', 'image')));
 
+// Serve the frontend pages at the site root so clean page URLs resolve —
+// /product.html, /login&signup.html, /retailer.html, /superadmin.html, etc.
+// Previously only '/' was routed, so every other page (and the post-login
+// redirect targets) returned the 404 JSON handler.
+app.use(express.static(path.join(__dirname, '..', 'frontend', 'public')));
+
 app.get('/', (_req, res) =>
   res.sendFile(path.join(__dirname, '..', 'frontend', 'public', 'index.html'))
 );
