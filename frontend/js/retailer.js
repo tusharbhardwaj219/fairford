@@ -157,9 +157,13 @@ function updateCartUI() {
     return;
   }
 
-  let subtotal = 0;
+  let subtotal = 0, gstAcc = 0;
   body.innerHTML = rows.map(({ c, p }) => {
-    subtotal += (p.retailerPrice || 0) * c.qty;
+    const lineTotal = (p.retailerPrice || 0) * c.qty;
+    subtotal += lineTotal;
+    // Per-item GST (5/12/18) to match how the backend computes the order total,
+    // instead of a flat 12% that could disagree with the charged amount.
+    gstAcc += lineTotal * ((p.gst || 12) / 100);
     return '<div class="rt-cart-line">' +
       '<div class="rt-cart-info">' +
         '<p class="rt-cart-name">' + esc(p.name) + '</p>' +
@@ -174,7 +178,7 @@ function updateCartUI() {
     '</div>';
   }).join('');
 
-  const gst = Math.round(subtotal * 0.12);
+  const gst = Math.round(gstAcc);
   $('ttSub').textContent = inr(subtotal);
   $('ttGst').textContent = inr(gst);
   $('ttGrand').textContent = inr(subtotal + gst);
