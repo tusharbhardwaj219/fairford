@@ -79,6 +79,7 @@ gcloud compute security-policies rules create 2000 --security-policy=fairford-ar
 ```
 
 ## Phase 7 — Global HTTPS Load Balancer
+**Recommended:** `.\scripts\gcp-setup-lb.ps1` (prints the LB IP + cert status at the end). Manual equivalent:
 ```powershell
 gcloud compute network-endpoint-groups create fairford-neg --region=asia-south1 --network-endpoint-type=serverless --cloud-run-service=fairford-pharma
 gcloud compute backend-services create fairford-backend --global --load-balancing-scheme=EXTERNAL_MANAGED --security-policy=fairford-armor
