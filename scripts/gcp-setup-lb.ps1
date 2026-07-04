@@ -15,7 +15,7 @@ Write-Host "`n3) Reserve a global LB IP"
 gcloud compute addresses create fairford-lb-ip --global
 
 Write-Host "`n4) Google-managed SSL cert (apex + www)"
-gcloud compute ssl-certificates create fairford-cert --global --domains=fairfordpharma.com,www.fairfordpharma.com
+gcloud compute ssl-certificates create fairford-cert --global --domains="fairfordpharma.com,www.fairfordpharma.com"
 
 Write-Host "`n5) URL map -> backend"
 gcloud compute url-maps create fairford-urlmap --default-service=fairford-backend
