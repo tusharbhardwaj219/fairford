@@ -1,5 +1,9 @@
 # Fair Ford Pharma — Go-Live on Google Cloud Run
 
+> **Going for the hardened build?** Use [`SECURE_DEPLOY.md`](SECURE_DEPLOY.md) — Secret Manager,
+> Cloud Armor WAF, HTTPS load balancer, VPC/NAT static IP with Atlas locked down, LB-only ingress.
+> This file is the simpler baseline (env-vars file, direct Cloud Run, Atlas `0.0.0.0/0`).
+
 One Node process (in `backend/`) serves the API **and** the static frontend/images.
 We deploy it as a container on **Cloud Run** — Cloud Build compiles the `Dockerfile`
 in the cloud (no local Docker needed), and Cloud Run gives automatic HTTPS + scaling.
