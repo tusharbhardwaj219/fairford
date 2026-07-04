@@ -55,11 +55,20 @@ This pulls non-secret env (cloud name, EMAIL_USER, ADMIN_EMAIL) from `.env.yaml`
 6 secrets via `--set-secrets`, runs under the dedicated SA, `--min-instances 1`, and routes
 egress through the VPC/NAT. On success it prints the `*.run.app` Service URL → smoke-test it.
 
+> **If the build fails with `…-compute@developer… does not have storage.objects.get`:** the
+> default Cloud Build (compute) service account is missing build roles (Google no longer
+> auto-grants them). Fix once, then re-run the deploy:
+> ```powershell
+> gcloud projects add-iam-policy-binding fair-ford-pharma --member="serviceAccount:436195425441-compute@developer.gserviceaccount.com" --role="roles/cloudbuild.builds.builder"
+> ```
+
 ## Phase 5 — Lock Atlas to the static IP
 Atlas → Network Access → add the **NAT IP** from Phase 3 → **remove `0.0.0.0/0`**.
 Re-hit `/api/health` to confirm the DB is still reachable through the NAT IP.
 
 ## Phase 6 — Cloud Armor WAF policy
+**Recommended:** `.\scripts\gcp-setup-waf.ps1` (OWASP rules at sensitivity 1 to limit false
+positives, per-IP rate limiting, Adaptive Protection — with the CEL quoting handled). Manual equivalent:
 ```powershell
 gcloud compute security-policies create fairford-armor --description="Fair Ford WAF"
 gcloud compute security-policies update fairford-armor --enable-layer7-ddos-defense
