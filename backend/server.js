@@ -164,6 +164,7 @@ app.use('/api/dist-inventory', distInventoryRoutes);
 
 // ── STATIC / FRONTEND ─────────────────────────────────────────────────────────
 app.use('/frontend', express.static(path.join(__dirname, '..', 'frontend')));
+app.use('/image', express.static(path.join(__dirname, '..', 'image')));
 app.use(express.static(path.join(__dirname, '..', 'frontend', 'public')));
 
 app.get('/', (_req, res) =>
