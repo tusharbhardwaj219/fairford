@@ -164,12 +164,54 @@ app.use('/api/dist-inventory', distInventoryRoutes);
 
 // ── STATIC / FRONTEND ─────────────────────────────────────────────────────────
 app.use('/frontend', express.static(path.join(__dirname, '..', 'frontend')));
-app.use('/image', express.static(path.join(__dirname, '..', 'image')));
+app.use(express.static(path.join(__dirname, '..', 'image')));
+
+// Serve the frontend pages at the site root so clean page URLs resolve —
+// /product.html, /login&signup.html, /retailer.html, /superadmin.html, etc.
+// Previously only '/' was routed, so every other page (and the post-login
+// redirect targets) returned the 404 JSON handler.
 app.use(express.static(path.join(__dirname, '..', 'frontend', 'public')));
 
 app.get('/', (_req, res) =>
   res.sendFile(path.join(__dirname, '..', 'frontend', 'public', 'index.html'))
 );
+
+// ── SEO: robots.txt + sitemap.xml ───────────────────────────────────────────────
+// Prefer a real public origin; fall back to the production domain (FRONTEND_URL
+// defaults to localhost in dev, which is useless in a sitemap).
+const SITE_URL = (process.env.FRONTEND_URL && !process.env.FRONTEND_URL.includes('localhost'))
+  ? process.env.FRONTEND_URL.replace(/\/$/, '')
+  : 'https://www.fairfordpharma.com';
+
+app.get('/robots.txt', (_req, res) => {
+  res.type('text/plain').send(
+    'User-agent: *\n' +
+    'Allow: /\n' +
+    // Keep private/authenticated surfaces out of the index.
+    'Disallow: /superadmin.html\n' +
+    'Disallow: /admin.html\n' +
+    'Disallow: /retailer.html\n' +
+    'Disallow: /distributor.html\n' +
+    'Disallow: /api/\n\n' +
+    `Sitemap: ${SITE_URL}/sitemap.xml\n`
+  );
+});
+
+app.get('/sitemap.xml', (_req, res) => {
+  const pages = ['/', '/product.html', '/About.html', '/contactus.html', '/uphaar.html',
+                 '/registration.html', '/login&signup.html', '/privacy&policy.html', '/T&C.html'];
+  // Page names contain literal & (login&signup.html etc.), which must be
+  // XML-escaped inside <loc> or the sitemap is malformed.
+  const xmlEsc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const urls = pages
+    .map(p => `  <url><loc>${xmlEsc(SITE_URL + (p === '/' ? '/' : p))}</loc></url>`)
+    .join('\n');
+  res.type('application/xml').send(
+    '<?xml version="1.0" encoding="UTF-8"?>\n' +
+    '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
+    urls + '\n</urlset>\n'
+  );
+});
 
 // ── 404 ───────────────────────────────────────────────────────────────────────
 app.use((_req, res) =>

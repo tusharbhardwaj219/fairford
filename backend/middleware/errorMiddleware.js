@@ -19,10 +19,15 @@ const errorMiddleware = (err, req, res, next) => {
   if (err.name === 'TokenExpiredError')  return res.status(401).json({ success: false, message: 'Token has expired' });
   if (err.name === 'CastError')          return res.status(400).json({ success: false, message: 'Invalid ID format' });
 
+  // Don't leak raw internal error text on unexpected 5xx errors in production —
+  // it can expose stack frames, driver messages, and query internals.
+  const isDev = process.env.NODE_ENV === 'development';
+  if (statusCode >= 500 && !isDev) message = 'Internal Server Error';
+
   return res.status(statusCode).json({
     success: false,
     message,
-    ...(process.env.NODE_ENV === 'development' && { stack: err.stack }),
+    ...(isDev && { stack: err.stack }),
   });
 };
 
