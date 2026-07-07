@@ -1,0 +1,17 @@
+# Never copy these into the Cloud Run image
+**/node_modules
+node_modules
+backend/node_modules
+
+# Secrets must come from Cloud Run env vars — never baked into the image
+**/.env
+**/.env.*
+.env.yaml
+
+# VCS, docs, local-only tooling
+.git
+.gitignore
+*.md
+backend/migrate-cluster.js
+backend/set-superadmin.js
+backend/migrate.env
