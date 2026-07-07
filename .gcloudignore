@@ -17,3 +17,6 @@ backend/node_modules
 backend/migrate-cluster.js
 backend/set-superadmin.js
 backend/migrate.env
+
+# Large e-catalogue PDF (80MB) — served from a public Cloud Storage bucket, not from the container.
+image/FF_E-CATALOGUE_2026-27.pdf
