@@ -11,6 +11,9 @@
     "set-admin": "node setAdmin.js"
   },
   "type": "commonjs",
+  "engines": {
+    "node": ">=20"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",

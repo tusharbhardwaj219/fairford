@@ -1,5 +1,8 @@
 # Environment variables - CRITICAL: Never commit these!
 .env
+migrate.env
+migrate-cluster.js
+set-superadmin.js
 .env.local
 .env.*.local
 .env.development.local
@@ -8,7 +11,7 @@
 
 # Dependencies
 node_modules/
-package-lock.json
+# NOTE: package-lock.json is intentionally COMMITTED for reproducible installs.
 yarn.lock
 pnpm-lock.yaml
 

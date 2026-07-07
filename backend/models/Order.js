@@ -69,13 +69,25 @@ const orderSchema = new mongoose.Schema({
   notes: String,
 }, { timestamps: true });
 
+// Per-day atomic counter so concurrent orders can't collide on orderNumber.
+// countDocuments()+1 was racy: two orders placed at once computed the same
+// number, and the unique index then rejected the second with a 500.
+const counterSchema = new mongoose.Schema({
+  _id: String,
+  seq: { type: Number, default: 0 },
+});
+const Counter = mongoose.models.OrderCounter || mongoose.model('OrderCounter', counterSchema);
+
 orderSchema.pre('save', async function () {
   if (this.orderNumber) return;
-  const count = await mongoose.model('Order').countDocuments();
-  const pad = String(count + 1).padStart(5, '0');
   const date = new Date();
   const ymd = `${date.getFullYear()}${String(date.getMonth() + 1).padStart(2, '0')}${String(date.getDate()).padStart(2, '0')}`;
-  this.orderNumber = `ORD-${ymd}-${pad}`;
+  const counter = await Counter.findByIdAndUpdate(
+    `order-${ymd}`,
+    { $inc: { seq: 1 } },
+    { new: true, upsert: true }
+  );
+  this.orderNumber = `ORD-${ymd}-${String(counter.seq).padStart(5, '0')}`;
 });
 
 orderSchema.index({ retailer: 1, createdAt: -1 });
