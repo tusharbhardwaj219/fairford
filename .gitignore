@@ -1,0 +1,5 @@
+# Repo-root ignores (backend/ has its own .gitignore for the app).
+# Cloud Run secrets file — NEVER commit this.
+.env.yaml
+.env
+*.env.yaml
