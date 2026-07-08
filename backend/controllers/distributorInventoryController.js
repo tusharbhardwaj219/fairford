@@ -5,6 +5,8 @@ const DistributorDispatch = require('../models/DistributorDispatch');
 const DistributorReturn   = require('../models/DistributorReturn');
 const Distributor         = require('../models/Distributor');
 const Product             = require('../models/Product');
+const Order               = require('../models/Order');
+const Retailer            = require('../models/Retailer');
 
 // ── Shared aggregation helper: lookup approved returns per (dist, prod, batch) ──
 function returnLookupStage() {
@@ -743,6 +745,176 @@ exports.getProducts = async (req, res) => {
       .select('name brand image')
       .sort({ name: 1 });
     res.json({ success: true, data: products });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+// ════════════════════════════════════════════════════════════════════════════════
+// RETAILER ORDERS  (placed at checkout → routed to a distributor)
+// These give the admin a single place to see who ordered what, whether it's paid,
+// and to move each order forward (approve → dispatch → deliver) or cancel it.
+// ════════════════════════════════════════════════════════════════════════════════
+
+// Flatten an Order doc into the row/detail shape the dashboard renders.
+function shapeOrder(o) {
+  const r    = o.retailer || {};
+  const addr = o.deliveryAddress || r.shopAddress || {};
+  const items = o.items || [];
+  return {
+    id:              String(o._id),
+    orderNumber:     o.orderNumber || '—',
+    retailerName:    r.shopName || r.name || 'Retailer',
+    contactName:     r.name || '',
+    phone:           r.phone || '',
+    email:           r.email || '',
+    addressLine:     [addr.street, addr.city, addr.state, addr.pincode].filter(Boolean).join(', '),
+    city:            addr.city || '',
+    distributorName: o.distributor ? (o.distributor.businessName || o.distributor.name || '—') : '—',
+    itemCount:       items.reduce((s, i) => s + (i.quantity || 0), 0),
+    itemsSummary:    items.map(i => `${i.productName} ×${i.quantity}`).join(', '),
+    subtotal:        o.subtotal   || 0,
+    gstAmount:       o.gstAmount  || 0,
+    totalAmount:     o.totalAmount || 0,
+    status:          o.status,
+    paymentStatus:   o.paymentStatus,
+    paymentMethod:   o.paymentMethod || 'cash',
+    deliveryPriority: o.deliveryPriority || 'standard',
+    createdAt:       o.createdAt,
+    expectedDelivery: o.expectedDelivery,
+  };
+}
+
+const rxEsc = s => String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+// GET /api/dist-inventory/orders
+exports.getOrders = async (req, res) => {
+  try {
+    const page  = Math.max(1, parseInt(req.query.page)  || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 20));
+    const { search = '', status = '', paymentStatus = '', distributorId = '', dateFrom = '', dateTo = '' } = req.query;
+
+    const filter = {};
+    if (status)        filter.status = status;
+    if (paymentStatus) filter.paymentStatus = paymentStatus;
+    if (distributorId && mongoose.isValidObjectId(distributorId)) filter.distributor = distributorId;
+    if (dateFrom || dateTo) {
+      filter.createdAt = {};
+      if (dateFrom) filter.createdAt.$gte = new Date(dateFrom);
+      if (dateTo)   { const d = new Date(dateTo); d.setHours(23, 59, 59, 999); filter.createdAt.$lte = d; }
+    }
+    if (search) {
+      const rx = new RegExp(rxEsc(search), 'i');
+      // Match on order number, or on a retailer whose name/shop/phone matches.
+      const rets = await Retailer.find({ $or: [{ name: rx }, { shopName: rx }, { phone: rx }] }).select('_id').lean();
+      filter.$or = [{ orderNumber: rx }];
+      if (rets.length) filter.$or.push({ retailer: { $in: rets.map(r => r._id) } });
+    }
+
+    const total = await Order.countDocuments(filter);
+    const orders = await Order.find(filter)
+      .populate('retailer',    'name shopName phone email shopAddress')
+      .populate('distributor', 'businessName name')
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .lean();
+
+    res.json({
+      success: true,
+      data: { items: orders.map(shapeOrder), total, page, pages: Math.ceil(total / limit) },
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+// GET /api/dist-inventory/orders/:id
+exports.getOrderDetail = async (req, res) => {
+  try {
+    if (!mongoose.isValidObjectId(req.params.id)) {
+      return res.status(404).json({ success: false, message: 'Order not found' });
+    }
+    const o = await Order.findById(req.params.id)
+      .populate('retailer',    'name shopName phone email shopAddress gstNumber drugLicenseNumber')
+      .populate('distributor', 'businessName name email phone')
+      .lean();
+    if (!o) return res.status(404).json({ success: false, message: 'Order not found' });
+
+    const r = o.retailer || {};
+    res.json({
+      success: true,
+      data: {
+        ...shapeOrder(o),
+        gstNumber:        r.gstNumber || '',
+        drugLicense:      r.drugLicenseNumber || '',
+        distributorEmail: o.distributor && o.distributor.email || '',
+        items: (o.items || []).map(i => ({
+          name: i.productName, brand: i.brand || '', qty: i.quantity,
+          unitPrice: i.unitPrice, totalPrice: i.totalPrice,
+        })),
+        timeline: (o.timeline || []).map(t => ({ status: t.status, note: t.note, timestamp: t.timestamp })),
+      },
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+// PUT /api/dist-inventory/orders/:id/status  — admin moves the order forward / cancels
+const ORDER_FLOW = ['pending', 'approved', 'dispatched', 'delivered'];
+exports.updateOrderStatus = async (req, res) => {
+  try {
+    const { status, note } = req.body;
+    if (!['approved', 'dispatched', 'delivered', 'cancelled'].includes(status)) {
+      return res.status(400).json({ success: false, message: 'Invalid status' });
+    }
+    const order = await Order.findById(req.params.id);
+    if (!order) return res.status(404).json({ success: false, message: 'Order not found' });
+    if (['delivered', 'cancelled', 'returned'].includes(order.status)) {
+      return res.status(400).json({ success: false, message: `Order already ${order.status}` });
+    }
+
+    if (status === 'cancelled') {
+      if (!['pending', 'approved'].includes(order.status)) {
+        return res.status(400).json({ success: false, message: `Cannot cancel a ${order.status} order` });
+      }
+      order.status = 'cancelled';
+      order.timeline.push({ status: 'cancelled', note: note || 'Cancelled by admin' });
+      await order.save();
+      // Return the stock that placing the order had taken.
+      for (const it of order.items) {
+        await Product.findByIdAndUpdate(it.product, { $inc: { stock: it.quantity } });
+      }
+      return res.json({ success: true, message: 'Order cancelled', data: { id: String(order._id), status: order.status } });
+    }
+
+    // Forward-only: can jump ahead (e.g. pending → dispatched) but never backward.
+    if (ORDER_FLOW.indexOf(status) <= ORDER_FLOW.indexOf(order.status)) {
+      return res.status(400).json({ success: false, message: `Cannot move order from ${order.status} to ${status}` });
+    }
+    order.status = status;
+    if (status === 'delivered') order.actualDelivery = new Date();
+    order.timeline.push({ status, note: note || `Marked ${status} by admin` });
+    await order.save();
+    res.json({ success: true, message: `Order ${status}`, data: { id: String(order._id), status: order.status } });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+// PUT /api/dist-inventory/orders/:id/payment  — mark COD paid / unpaid
+exports.updateOrderPayment = async (req, res) => {
+  try {
+    const { paymentStatus } = req.body;
+    if (!['unpaid', 'partial', 'paid'].includes(paymentStatus)) {
+      return res.status(400).json({ success: false, message: 'Invalid payment status' });
+    }
+    const order = await Order.findByIdAndUpdate(
+      req.params.id, { paymentStatus }, { returnDocument: 'after' }
+    );
+    if (!order) return res.status(404).json({ success: false, message: 'Order not found' });
+    res.json({ success: true, message: 'Payment updated', data: { id: String(order._id), paymentStatus: order.paymentStatus } });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }

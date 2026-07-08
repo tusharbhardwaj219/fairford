@@ -17,4 +17,10 @@ router.get('/notifications',  ctrl.getNotifications);
 router.get('/distributors',   ctrl.getDistributors);
 router.get('/products',       ctrl.getProducts);
 
+// Retailer orders (from checkout) — view details + distribute/manage
+router.get('/orders',             ctrl.getOrders);
+router.get('/orders/:id',         ctrl.getOrderDetail);
+router.put('/orders/:id/status',  ctrl.updateOrderStatus);
+router.put('/orders/:id/payment', ctrl.updateOrderPayment);
+
 module.exports = router;

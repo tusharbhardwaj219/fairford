@@ -50,6 +50,10 @@
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
     Inventory
   </button>
+  <button class="tab-btn" data-tab="orders">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+    Orders
+  </button>
   <button class="tab-btn" data-tab="dispatches">
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
     Dispatches
@@ -192,6 +196,76 @@
     </div>
   </section>
 
+  <!-- ────────── ORDERS TAB ────────── -->
+  <section id="tab-orders" class="tab-panel">
+
+    <div class="section-hdr">
+      <div>
+        <h2>Retailer Orders</h2>
+        <p>Orders placed at checkout — view customer details, payment &amp; distribute them</p>
+      </div>
+    </div>
+
+    <!-- Filter Bar for Orders -->
+    <div class="filter-bar">
+      <div class="search-wrap">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        <input type="text" class="filter-input" id="ordSearch" placeholder="Search order #, retailer, phone…">
+      </div>
+      <select class="filter-select" id="ordStatusFilter">
+        <option value="">All Statuses</option>
+        <option value="pending">Pending</option>
+        <option value="approved">Approved</option>
+        <option value="dispatched">Dispatched</option>
+        <option value="delivered">Delivered</option>
+        <option value="returned">Returned</option>
+        <option value="cancelled">Cancelled</option>
+      </select>
+      <select class="filter-select" id="ordPayFilter">
+        <option value="">All Payments</option>
+        <option value="unpaid">Unpaid</option>
+        <option value="partial">Partial</option>
+        <option value="paid">Paid</option>
+      </select>
+      <select class="filter-select" id="ordDistFilter">
+        <option value="">All Distributors</option>
+      </select>
+      <div class="filter-date-group">
+        <span>From</span>
+        <input type="date" class="date-input" id="ordDateFrom">
+        <span>To</span>
+        <input type="date" class="date-input" id="ordDateTo">
+      </div>
+    </div>
+
+    <div class="action-bar">
+      <span class="result-count" id="ordResultCount"><strong>0</strong> orders</span>
+    </div>
+
+    <div class="table-card">
+      <div class="table-wrapper">
+        <table id="ordersTable">
+          <thead>
+            <tr>
+              <th>Order #</th>
+              <th>Retailer</th>
+              <th>Items</th>
+              <th>Total</th>
+              <th>Payment</th>
+              <th>Status</th>
+              <th>Date</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="ordersTbody">
+            <tr><td colspan="8"><div class="skeleton skel-row"></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="pagination-bar" id="ordPagination"></div>
+    </div>
+  </section>
+
   <!-- ────────── DISPATCHES TAB ────────── -->
   <section id="tab-dispatches" class="tab-panel">
 
@@ -307,7 +381,7 @@
 <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
 <aside class="drawer" id="productDrawer" role="dialog" aria-modal="true">
   <div class="drawer-hdr">
-    <h2>Product Detail</h2>
+    <h2 id="drawerTitle">Product Detail</h2>
     <button class="drawer-close" onclick="closeDrawer()" aria-label="Close">✕</button>
   </div>
   <div class="drawer-body" id="drawerBody">

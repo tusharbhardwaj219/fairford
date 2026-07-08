@@ -136,6 +136,24 @@ body {
 .badge.delivered { background: var(--green-bg); color: var(--green); }
 .badge.cancelled, .badge.returned { background: var(--red-bg); color: var(--red); }
 
+/* Order row actions + inline detail panel */
+.rt-order-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.rt-order-detail {
+  margin-top: 12px; padding-top: 12px;
+  border-top: 1px dashed var(--border);
+  font-size: 13px; color: var(--text);
+}
+.rt-od-sec { margin-bottom: 12px; }
+.rt-od-sec:last-child { margin-bottom: 0; }
+.rt-od-sec > strong {
+  display: block; font-size: 11px; text-transform: uppercase; letter-spacing: .04em;
+  color: var(--muted); margin-bottom: 6px;
+}
+.rt-od-sec p { margin: 0; }
+.rt-od-line { display: flex; justify-content: space-between; gap: 12px; padding: 3px 0; }
+.rt-od-total { border-top: 1px solid var(--border); margin-top: 4px; padding-top: 6px; font-weight: 700; }
+.rt-od-tl { font-size: 12px; color: var(--muted); text-transform: capitalize; padding: 2px 0; }
+
 /* ── Toast ── */
 .rt-toast {
   position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(120%);

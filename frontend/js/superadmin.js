@@ -34,6 +34,18 @@ function esc(s) {
   ));
 }
 
+/* Fallback for a product thumbnail whose image URL fails to load (dead/removed
+   Cloudinary asset). Replaces the broken <img> with the initial-letter box so
+   the table never shows a broken-image icon. Referenced from thumbCell()'s
+   inline onerror. */
+function thumbFail(img) {
+  img.onerror = null;
+  const span = document.createElement('span');
+  span.className = 'prod-thumb prod-thumb--fallback';
+  span.textContent = img.getAttribute('data-initial') || '?';
+  img.replaceWith(span);
+}
+
 /* ══════════════════════════════════════════
    NAVIGATION
 ══════════════════════════════════════════ */
@@ -596,10 +608,13 @@ function renderProducts(data) {
   // Build thumbnail <td>: real image if uploaded, otherwise an initial-letter
   // placeholder so the column never collapses to whitespace.
   function thumbCell(d) {
-    if (d.imageUrl) {
-      return `<td><img src="${esc(d.imageUrl)}" alt="" class="prod-thumb" loading="lazy"></td>`;
-    }
     const initial = String(d.name || '?').trim().charAt(0).toUpperCase() || '?';
+    if (d.imageUrl) {
+      // If the stored image URL 404s (e.g. the Cloudinary asset was removed),
+      // onerror swaps in the same initial-letter placeholder instead of showing
+      // a broken-image icon. data-initial avoids inline-escaping pitfalls.
+      return `<td><img src="${esc(d.imageUrl)}" alt="" class="prod-thumb" loading="lazy" data-initial="${esc(initial)}" onerror="thumbFail(this)"></td>`;
+    }
     return `<td><span class="prod-thumb prod-thumb--fallback">${esc(initial)}</span></td>`;
   }
   // data-label is what the responsive "card" view shows next to each cell
