@@ -11,6 +11,7 @@ const state = {
   inv:  { page: 1, pages: 1, total: 0, items: [], search: '', distId: '', status: '' },
   disp: { page: 1, pages: 1, total: 0, items: [], search: '', distId: '', dateFrom: '', dateTo: '' },
   ret:  { page: 1, pages: 1, total: 0, items: [], search: '', distId: '', status: '', dateFrom: '', dateTo: '' },
+  ord:  { page: 1, pages: 1, total: 0, items: [], search: '', distId: '', status: '', payment: '', dateFrom: '', dateTo: '' },
   distributors: [],
   products: [],
   drawer: { open: false, productId: null, distributorId: null, batchNumber: null },
@@ -55,6 +56,36 @@ function fmtDate(d) {
 }
 function todayStr() {
   return new Date().toISOString().split('T')[0];
+}
+
+// ─── HTML escape (retailer name/address are user-supplied) ─────────────────────
+function esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, m => (
+    { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]
+  ));
+}
+
+// ─── Order status + payment badges ─────────────────────────────────────────────
+function orderStatusBadge(status) {
+  const map = {
+    pending:    ['badge-pending', 'Pending'],
+    approved:   ['badge-info',    'Approved'],
+    dispatched: ['badge-info',    'Dispatched'],
+    delivered:  ['badge-success', 'Delivered'],
+    returned:   ['badge-warning', 'Returned'],
+    cancelled:  ['badge-danger',  'Cancelled'],
+  };
+  const [cls, label] = map[status] || ['badge-info', status || '—'];
+  return `<span class="badge ${cls}">${label}</span>`;
+}
+function payBadge(status) {
+  const map = {
+    paid:    ['badge-success', 'Paid'],
+    partial: ['badge-warning', 'Partial'],
+    unpaid:  ['badge-danger',  'Unpaid'],
+  };
+  const [cls, label] = map[status] || ['badge-danger', status || 'Unpaid'];
+  return `<span class="badge ${cls}">${label}</span>`;
 }
 
 // ─── Status badge ─────────────────────────────────────────────────────────────
@@ -437,10 +468,201 @@ async function updateReturn(id, status) {
 }
 
 // ════════════════════════════════════════════════════════════════════════════════
+// ORDERS TABLE (retailer orders placed at checkout)
+// ════════════════════════════════════════════════════════════════════════════════
+async function loadOrders(page = 1) {
+  state.ord.page = page;
+  const params = new URLSearchParams({
+    page, limit: 20,
+    search:        state.ord.search,
+    status:        state.ord.status,
+    paymentStatus: state.ord.payment,
+    distributorId: state.ord.distId,
+    dateFrom:      state.ord.dateFrom,
+    dateTo:        state.ord.dateTo
+  });
+
+  const tbody = document.getElementById('ordersTbody');
+  const count = document.getElementById('ordResultCount');
+  tbody.innerHTML = `<tr><td colspan="8"><div class="skeleton skel-row"></div></td></tr>`;
+
+  try {
+    const { data } = await api(`/orders?${params}`);
+    state.ord = { ...state.ord, ...data };
+    if (count) count.innerHTML = `<strong>${data.total.toLocaleString()}</strong> orders`;
+
+    if (!data.items.length) {
+      tbody.innerHTML = emptyRow(8, '🧾', 'No orders', 'No orders match your current filters.');
+      document.getElementById('ordPagination').innerHTML = '';
+      return;
+    }
+    tbody.innerHTML = data.items.map(o => `
+      <tr>
+        <td><span class="batch-tag">${esc(o.orderNumber)}</span></td>
+        <td>
+          <div class="prod-name">${esc(o.retailerName)}</div>
+          <div class="prod-brand">${esc(o.phone || o.city || '')}</div>
+        </td>
+        <td>
+          <div class="prod-name">${o.itemCount} item${o.itemCount === 1 ? '' : 's'}</div>
+          <div class="prod-brand ord-items-sum">${esc(o.itemsSummary)}</div>
+        </td>
+        <td><strong>₹${Number(o.totalAmount).toLocaleString('en-IN')}</strong></td>
+        <td>${payBadge(o.paymentStatus)}<div class="prod-brand" style="text-transform:capitalize">${esc(o.paymentMethod)}</div></td>
+        <td>${orderStatusBadge(o.status)}</td>
+        <td class="muted">${fmtDate(o.createdAt)}</td>
+        <td>
+          <div class="row-actions">
+            <button class="btn btn-outline btn-sm" onclick="openOrderDrawer('${o.id}')">View / Manage</button>
+          </div>
+        </td>
+      </tr>`).join('');
+
+    renderPagination('ordPagination', data.page, data.pages, data.total, 'loadOrders');
+  } catch (e) {
+    tbody.innerHTML = emptyRow(8, '⚠️', 'Load failed', e.message);
+    toast('error', 'Orders Load Failed', e.message);
+  }
+}
+
+function clearOrdFilters() {
+  ['ordSearch','ordStatusFilter','ordPayFilter','ordDistFilter','ordDateFrom','ordDateTo'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
+  });
+  Object.assign(state.ord, { search: '', status: '', payment: '', distId: '', dateFrom: '', dateTo: '' });
+  loadOrders(1);
+}
+
+async function openOrderDrawer(id) {
+  document.getElementById('drawerTitle').textContent = 'Order Details';
+  document.getElementById('productDrawer').classList.add('open');
+  document.getElementById('drawerOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  state.drawer.open = true;
+  await loadOrderDrawer(id);
+}
+
+async function loadOrderDrawer(id) {
+  const body = document.getElementById('drawerBody');
+  body.innerHTML = `<div style="padding:20px">${[1,2,3].map(() => `<div class="skeleton skel-row" style="margin-bottom:12px"></div>`).join('')}</div>`;
+  try {
+    const { data: o } = await api(`/orders/${id}`);
+
+    const itemRows = o.items.length
+      ? o.items.map(i => `
+          <tr>
+            <td>${esc(i.name)}${i.brand ? `<div class="prod-brand">${esc(i.brand)}</div>` : ''}</td>
+            <td>${i.qty}</td>
+            <td>₹${Number(i.unitPrice).toLocaleString('en-IN')}</td>
+            <td>₹${Number(i.totalPrice).toLocaleString('en-IN')}</td>
+          </tr>`).join('')
+      : `<tr><td colspan="4" style="text-align:center;padding:16px;color:var(--text-muted)">No items</td></tr>`;
+
+    const tlRows = (o.timeline || []).length
+      ? o.timeline.slice().reverse().map(t => `
+          <div class="ord-tl-item">
+            <span class="ord-tl-dot"></span>
+            <div><strong style="text-transform:capitalize">${esc(t.status)}</strong>
+            <div class="prod-brand">${esc(t.note || '')} · ${fmtDate(t.timestamp)}</div></div>
+          </div>`).join('')
+      : '<div class="prod-brand">No history yet.</div>';
+
+    // Admin actions: move the order one step forward, or cancel it.
+    const terminal = ['delivered', 'cancelled', 'returned'].includes(o.status);
+    const nextBtn = {
+      pending:    `<button class="btn btn-success btn-sm" onclick="progressOrder('${o.id}','approved')">Approve</button>`,
+      approved:   `<button class="btn btn-success btn-sm" onclick="progressOrder('${o.id}','dispatched')">Dispatch</button>`,
+      dispatched: `<button class="btn btn-success btn-sm" onclick="progressOrder('${o.id}','delivered')">Mark Delivered</button>`,
+    }[o.status] || '';
+    const cancelBtn = ['pending', 'approved'].includes(o.status)
+      ? `<button class="btn btn-ghost btn-sm" onclick="progressOrder('${o.id}','cancelled')">Cancel Order</button>` : '';
+    const payBtn = o.paymentStatus !== 'paid'
+      ? `<button class="btn btn-outline btn-sm" onclick="setOrderPayment('${o.id}','paid')">Mark Paid</button>`
+      : `<button class="btn btn-outline btn-sm" onclick="setOrderPayment('${o.id}','unpaid')">Mark Unpaid</button>`;
+
+    body.innerHTML = `
+      <div class="ord-detail-hdr">
+        <div>
+          <div class="ord-num">${esc(o.orderNumber)}</div>
+          <div class="ord-badges">${orderStatusBadge(o.status)} ${payBadge(o.paymentStatus)}
+            <span class="badge badge-info" style="text-transform:capitalize">${esc(o.paymentMethod)}</span></div>
+        </div>
+        <div class="ord-total">₹${Number(o.totalAmount).toLocaleString('en-IN')}</div>
+      </div>
+
+      <div class="drawer-section">
+        <h4>Customer Details</h4>
+        <div class="ord-info-grid">
+          <div class="ord-info"><label>Shop / Name</label><span>${esc(o.retailerName)}</span></div>
+          <div class="ord-info"><label>Contact Person</label><span>${esc(o.contactName || '—')}</span></div>
+          <div class="ord-info"><label>Phone</label><span>${esc(o.phone || '—')}</span></div>
+          <div class="ord-info"><label>Email</label><span>${esc(o.email || '—')}</span></div>
+          <div class="ord-info ord-info-wide"><label>Delivery Address</label><span>${esc(o.addressLine || '—')}</span></div>
+          <div class="ord-info"><label>GST No.</label><span>${esc(o.gstNumber || '—')}</span></div>
+          <div class="ord-info"><label>Drug License</label><span>${esc(o.drugLicense || '—')}</span></div>
+          <div class="ord-info"><label>Routed To</label><span>${esc(o.distributorName || '—')}</span></div>
+        </div>
+      </div>
+
+      <div class="drawer-section">
+        <h4>Items Ordered</h4>
+        <div style="overflow-x:auto">
+          <table class="mini-table">
+            <thead><tr><th>Product</th><th>Qty</th><th>Rate</th><th>Amount</th></tr></thead>
+            <tbody>${itemRows}</tbody>
+          </table>
+        </div>
+        <div class="ord-totals">
+          <div><span>Subtotal</span><strong>₹${Number(o.subtotal).toLocaleString('en-IN')}</strong></div>
+          <div><span>GST</span><strong>₹${Number(o.gstAmount).toLocaleString('en-IN')}</strong></div>
+          <div class="ord-grand"><span>Total (COD)</span><strong>₹${Number(o.totalAmount).toLocaleString('en-IN')}</strong></div>
+        </div>
+      </div>
+
+      <div class="drawer-section">
+        <h4>Manage / Distribute</h4>
+        ${terminal ? `<p class="prod-brand" style="margin-bottom:10px">This order is ${esc(o.status)} — no further action needed.</p>` : ''}
+        <div class="ord-actions">${nextBtn}${cancelBtn}${payBtn}</div>
+      </div>
+
+      <div class="drawer-section">
+        <h4>History</h4>
+        <div class="ord-timeline">${tlRows}</div>
+      </div>`;
+  } catch (e) {
+    body.innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div><h3>Load Failed</h3><p>${esc(e.message)}</p></div>`;
+  }
+}
+
+async function progressOrder(id, status) {
+  if (status === 'cancelled' && !confirm('Cancel this order? Stock will be returned to inventory.')) return;
+  try {
+    await api(`/orders/${id}/status`, { method: 'PUT', body: { status } });
+    toast('success', 'Order Updated', `Order set to ${status}.`);
+    loadOrderDrawer(id);
+    loadOrders(state.ord.page);
+  } catch (e) {
+    toast('error', 'Update Failed', e.message);
+  }
+}
+
+async function setOrderPayment(id, paymentStatus) {
+  try {
+    await api(`/orders/${id}/payment`, { method: 'PUT', body: { paymentStatus } });
+    toast('success', 'Payment Updated', `Marked ${paymentStatus}.`);
+    loadOrderDrawer(id);
+    loadOrders(state.ord.page);
+  } catch (e) {
+    toast('error', 'Update Failed', e.message);
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════════════════
 // PRODUCT DETAIL DRAWER
 // ════════════════════════════════════════════════════════════════════════════════
 function openDrawer(productId, distributorId, batchNumber) {
   state.drawer = { open: true, productId, distributorId, batchNumber };
+  document.getElementById('drawerTitle').textContent = 'Product Detail';
   document.getElementById('productDrawer').classList.add('open');
   document.getElementById('drawerOverlay').classList.add('open');
   document.body.style.overflow = 'hidden';
@@ -697,7 +919,7 @@ function populateFilterDropdowns() {
     return `<option value="">${none}</option>` +
       arr.map(d => `<option value="${d._id}">${d.name}</option>`).join('');
   };
-  ['invDistFilter', 'dispDistFilter', 'retDistFilter'].forEach(id => {
+  ['invDistFilter', 'dispDistFilter', 'retDistFilter', 'ordDistFilter'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.innerHTML = makeOpts(state.distributors, 'All Distributors');
   });
@@ -777,6 +999,7 @@ function switchTab(tabName) {
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tabName));
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === `tab-${tabName}`));
   if (tabName === 'inventory'  && !state.inv.items.length)  loadInventory(1);
+  if (tabName === 'orders'     && !state.ord.items.length)  loadOrders(1);
   if (tabName === 'dispatches' && !state.disp.items.length) loadDispatches(1);
   if (tabName === 'returns'    && !state.ret.items.length)  loadReturns(1);
 }
@@ -871,6 +1094,29 @@ async function init() {
   });
   document.getElementById('retDateTo').addEventListener('change', e => {
     state.ret.dateTo = e.target.value; loadReturns(1);
+  });
+
+  // Orders filters
+  let ordSearchTimer;
+  document.getElementById('ordSearch').addEventListener('input', e => {
+    clearTimeout(ordSearchTimer);
+    state.ord.search = e.target.value;
+    ordSearchTimer = setTimeout(() => loadOrders(1), 380);
+  });
+  document.getElementById('ordStatusFilter').addEventListener('change', e => {
+    state.ord.status = e.target.value; loadOrders(1);
+  });
+  document.getElementById('ordPayFilter').addEventListener('change', e => {
+    state.ord.payment = e.target.value; loadOrders(1);
+  });
+  document.getElementById('ordDistFilter').addEventListener('change', e => {
+    state.ord.distId = e.target.value; loadOrders(1);
+  });
+  document.getElementById('ordDateFrom').addEventListener('change', e => {
+    state.ord.dateFrom = e.target.value; loadOrders(1);
+  });
+  document.getElementById('ordDateTo').addEventListener('change', e => {
+    state.ord.dateTo = e.target.value; loadOrders(1);
   });
 
   // Escape key closes modals/drawer

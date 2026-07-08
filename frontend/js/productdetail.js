@@ -245,7 +245,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
       <div class="pd-main-img" id="pd-main-img" role="button" tabindex="0" aria-label="Zoom product image">
         ${hasImg
-          ? `<img class="pd-main-img-el" id="pd-main-img-el" src="${esc(imgs[0])}" alt="${esc(p.name)}" />`
+          ? `<img class="pd-main-img-el" id="pd-main-img-el" src="${esc(imgs[0])}" alt="${esc(p.name)}" data-cat="${cat}" data-fallback-class="pd-img-ph" onerror="productImgFallback(this)" />`
           : `<div class="pd-img-ph">
                <div class="pd-img-ph-icon">${categoryIcon(catName)}</div>
                <div class="pd-img-ph-txt">${esc(p.name)}</div>

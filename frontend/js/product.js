@@ -230,9 +230,10 @@ document.addEventListener('DOMContentLoaded', async function () {
             </div>`;
         }
 
-        // Product image: uploaded photo or category-themed SVG illustration
+        // Product image: uploaded photo or category-themed SVG illustration.
+        // onerror swaps a dead image URL for the category SVG (see productImgFallback).
         const media = p.image
-            ? `<img src="${p.image}" alt="${p.name}" class="pl-img" loading="lazy">`
+            ? `<img src="${p.image}" alt="${p.name}" class="pl-img" loading="lazy" data-cat="${escHtml(p.category)}" data-fallback-class="pl-img-svg" onerror="productImgFallback(this)">`
             : `<div class="pl-img-svg">${productImageSVG(p.category)}</div>`;
 
         const cartLabel = out
