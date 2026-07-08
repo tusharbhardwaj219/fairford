@@ -1,0 +1,22 @@
+# Files NOT uploaded to Cloud Build by `gcloud run deploy --source .`
+# (Dockerfile + .dockerignore are intentionally NOT listed — the build needs them.)
+.git
+.gitignore
+.gcloudignore
+**/node_modules
+node_modules
+backend/node_modules
+
+# Secrets
+**/.env
+**/.env.*
+.env.yaml
+
+# Docs / local-only tooling
+*.md
+backend/migrate-cluster.js
+backend/set-superadmin.js
+backend/migrate.env
+
+# Large e-catalogue PDF (80MB) — served from a public Cloud Storage bucket, not from the container.
+image/FF_E-CATALOGUE_2026-27.pdf
