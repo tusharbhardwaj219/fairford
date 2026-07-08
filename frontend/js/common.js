@@ -42,6 +42,24 @@ const ICONS = {
   wallet: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/></svg>'
 };
 
+/* ----------  PRODUCT IMAGE FALLBACK  ----------
+   Graceful fallback when a product <img> fails to load (e.g. its hosted asset
+   was removed and the URL now 404s). Swaps the broken image for the category
+   SVG illustration so the storefront never shows a broken-image icon. Reads the
+   category from data-cat and the wrapper class from data-fallback-class.
+   Referenced from inline onerror handlers across the storefront. */
+function productImgFallback(img) {
+  if (!img || img.dataset.fellBack) return;   // guard against loops
+  img.dataset.fellBack = '1';
+  img.onerror = null;
+  var cat  = img.getAttribute('data-cat') || '';
+  var cls  = img.getAttribute('data-fallback-class') || 'pl-img-svg';
+  var wrap = document.createElement('div');
+  wrap.className = cls;
+  wrap.innerHTML = (typeof productImageSVG === 'function') ? productImageSVG(cat) : '';
+  if (img.parentNode) img.replaceWith(wrap);
+}
+
 /* ----------  PRODUCT IMAGE: category-based SVG illustration  ----------
    Returns an <svg> string. Keeps the marketplace image-perfect with zero
    external/broken assets, and gives every category a recognisable form. */
@@ -267,7 +285,7 @@ const store = {
       subtotal += lineTotal;
       gstTotal += (lineTotal * (p.gst || 12)) / 100;
       var thumb = p.image
-        ? '<img src="' + escHtml(p.image) + '" alt="' + escHtml(p.name) + '" class="fline-img">'
+        ? '<img src="' + escHtml(p.image) + '" alt="' + escHtml(p.name) + '" class="fline-img" data-cat="' + escHtml(p.category) + '" data-fallback-class="fline-svg" onerror="productImgFallback(this)">'
         : '<div class="fline-svg">' + (typeof productImageSVG === 'function' ? productImageSVG(p.category) : escHtml(p.name.charAt(0))) + '</div>';
       html +=
         '<div class="fline">' +
@@ -349,7 +367,7 @@ const store = {
       var p = products.find(function(x) { return x.id === id; });
       if (!p) return;
       var thumb = p.image
-        ? '<img src="' + escHtml(p.image) + '" alt="' + escHtml(p.name) + '" class="fline-img">'
+        ? '<img src="' + escHtml(p.image) + '" alt="' + escHtml(p.name) + '" class="fline-img" data-cat="' + escHtml(p.category) + '" data-fallback-class="fline-svg" onerror="productImgFallback(this)">'
         : '<div class="fline-svg">' + (typeof productImageSVG === 'function' ? productImageSVG(p.category) : escHtml(p.name.charAt(0))) + '</div>';
       html +=
         '<div class="fwish-line">' +
