@@ -6,3 +6,6 @@
 
 # Large e-catalogue PDF (80MB) — served from a public Cloud Storage bucket, not committed.
 image/FF_E-CATALOGUE_2026-27.pdf
+
+# Dependencies — never commit
+backend/node_modules/
