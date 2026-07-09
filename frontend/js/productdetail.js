@@ -5,7 +5,7 @@
    → renders role-based pricing (never exposes the other role's price).
    ===================================================================== */
 
-const API_BASE = 'http://localhost:5000/api';
+const API_BASE = '/api';
 
 document.addEventListener('DOMContentLoaded', function () {
 

@@ -1,4 +1,4 @@
-const API_AUTH = 'http://localhost:5000/api/auth';
+const API_AUTH = '/api/auth';
 
 let currentStep  = 1;
 let selectedRole = '';

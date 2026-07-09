@@ -452,8 +452,8 @@ function renderHeader(active) {
       <ul class="nav-list">
         <li><a href="index.html" class="${navCls('home')}">Home</a></li>
         <li><a href="product.html" class="${navCls('products')}">Products</a></li>
-        <li><a href="About.html" class="${navCls('about')}">About</a></li>
-        <li><a href="contactus.html" class="${navCls('contact')}">Contact</a></li>
+        <li><a href="About.html" class="${navCls('about')}" target="_blank">About</a></li>
+        <li><a href="contactus.html" class="${navCls('contact')}" target="_blank">Contact</a></li>
         <li><a href="uphaar.html" class="nav-link nav-link--promo"><span class="promo-dot" aria-hidden="true"></span>Uphaar</a></li>
       </ul>
     </nav>
