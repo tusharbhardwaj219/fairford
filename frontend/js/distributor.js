@@ -1,9 +1,25 @@
 /**
+<<<<<<< HEAD
  * Fair Ford · Distributor page
  * Login/signup forms when unauthenticated; fulfillment dashboard when logged in.
  */
 "use strict";
 
+=======
+ * Fair Ford · Distributor fulfillment page (minimal)
+ * Shows the distributor's own coverage info (read-only — admin managed) and
+ * the queue of orders routed to them by the nearest-distributor matcher, with
+ * approve / dispatch / deliver / cancel actions against the existing
+ * distributor-scoped order endpoints (GET/PUT /api/orders...).
+ */
+"use strict";
+
+// ── Auth guard ──
+(function () {
+  if (!localStorage.getItem('ff_token')) window.location.replace('/login&signup.html');
+})();
+
+>>>>>>> 97ed528f357d5809933e40419aa9027881cc3eb3
 const $ = (id) => document.getElementById(id);
 let ORDERS = [];
 let STATUS_FILTER = '';
@@ -22,13 +38,18 @@ function toast(msg) {
 function logout() {
   if (window.showLogoutConfirm) {
     window.showLogoutConfirm(function () {
+<<<<<<< HEAD
       window.lcDoLogout();
       showAuth();
+=======
+      window.lcDoLogout('/login&signup.html');
+>>>>>>> 97ed528f357d5809933e40419aa9027881cc3eb3
     });
   } else {
     localStorage.removeItem('ff_token');
     localStorage.removeItem('ff_user');
     sessionStorage.removeItem('ff_user');
+<<<<<<< HEAD
     showAuth();
   }
 }
@@ -145,6 +166,12 @@ window.handleSignup = async function (e) {
    API HELPER
 ══════════════════════════════════════════ */
 
+=======
+    window.location.replace('/login&signup.html');
+  }
+}
+
+>>>>>>> 97ed528f357d5809933e40419aa9027881cc3eb3
 async function apiFetch(path, options = {}) {
   const token = localStorage.getItem('ff_token');
   const res = await fetch('/api' + path, {
@@ -161,10 +188,14 @@ async function apiFetch(path, options = {}) {
   return data;
 }
 
+<<<<<<< HEAD
 /* ══════════════════════════════════════════
    DASHBOARD — Profile + coverage (read-only)
 ══════════════════════════════════════════ */
 
+=======
+/* ── Profile + coverage (read-only) ── */
+>>>>>>> 97ed528f357d5809933e40419aa9027881cc3eb3
 async function loadProfile() {
   try {
     const { user } = await apiFetch('/auth/profile');
@@ -179,10 +210,14 @@ async function loadProfile() {
   } catch (e) { toast('⚠ ' + e.message); }
 }
 
+<<<<<<< HEAD
 /* ══════════════════════════════════════════
    DASHBOARD — Orders
 ══════════════════════════════════════════ */
 
+=======
+/* ── Orders ── */
+>>>>>>> 97ed528f357d5809933e40419aa9027881cc3eb3
 async function loadOrders() {
   try {
     const q = new URLSearchParams({ limit: '100' });
@@ -191,6 +226,10 @@ async function loadOrders() {
     ORDERS = data.orders || [];
     renderOrders();
   } catch (e) {
+<<<<<<< HEAD
+=======
+    // Pending (un-activated) accounts can't list orders yet — show neutral state
+>>>>>>> 97ed528f357d5809933e40419aa9027881cc3eb3
     $('dtOrders').innerHTML = '<p class="rt-empty">No orders yet.</p>';
   }
 }
@@ -251,10 +290,14 @@ async function cancelOrder(id) {
   } catch (e) { toast('⚠ ' + e.message); }
 }
 
+<<<<<<< HEAD
 /* ══════════════════════════════════════════
    EVENTS
 ══════════════════════════════════════════ */
 
+=======
+/* ── Events ── */
+>>>>>>> 97ed528f357d5809933e40419aa9027881cc3eb3
 document.addEventListener('click', (e) => {
   const t = e.target;
   if (t.dataset.approve) approveOrder(t.dataset.approve);
@@ -265,6 +308,7 @@ document.addEventListener('click', (e) => {
 $('dtStatusFilter').addEventListener('change', (e) => { STATUS_FILTER = e.target.value; loadOrders(); });
 $('dtLogout').addEventListener('click', logout);
 
+<<<<<<< HEAD
 /* ══════════════════════════════════════════
    INIT — decide auth vs dashboard
 ══════════════════════════════════════════ */
@@ -289,3 +333,8 @@ $('dtLogout').addEventListener('click', logout);
     showAuth();
   }
 })();
+=======
+/* ── Init ── */
+loadProfile();
+loadOrders();
+>>>>>>> 97ed528f357d5809933e40419aa9027881cc3eb3
