@@ -68,7 +68,6 @@ function productImageSVG(category) {
   switch (category) {
     case "Tablets": // blister pack
       return `<svg viewBox="0 0 120 100" xmlns="http://www.w3.org/2000/svg">
-        <img src="image/vic.jpg" alt="vitamin c tablet" width="100%" height="100%">
         <rect x="14" y="18" width="92" height="64" rx="8" fill="#cfe8e1"/>
         <rect x="14" y="18" width="92" height="64" rx="8" fill="none" stroke="${c2}" stroke-width="2.5" opacity=".5"/>
         ${[0,1,2].map(r=>[0,1,2,3].map(col=>`<circle cx="${28+col*22}" cy="${34+r*18}" r="7.5" fill="#fff"/><circle cx="${28+col*22}" cy="${34+r*18}" r="7.5" fill="none" stroke="${c1}" stroke-width="2"/><line x1="${28+col*22-7.5}" y1="${34+r*18}" x2="${28+col*22+7.5}" y2="${34+r*18}" stroke="${c1}" stroke-width="1.4" opacity=".6"/>`).join("")).join("")}
