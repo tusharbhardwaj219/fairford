@@ -109,9 +109,9 @@ async function handleLogin(e) {
     btn.style.background = 'linear-gradient(135deg,#12b886,#0ca678)';
     btn.style.boxShadow  = '0 4px 22px rgba(18,184,134,0.45)';
 
-    setTimeout(function () {
-      window.location.replace(data.redirectTo || getPostLoginRedirect());
-    }, 600);
+    var saved = getPostLoginRedirect();
+    var dest  = (saved && saved !== 'index.html') ? saved : (data.redirectTo || '/index.html');
+    window.location.href = dest;
 
   } catch (err) {
     showMsg('Could not reach the server. Is it running on port 5000?');

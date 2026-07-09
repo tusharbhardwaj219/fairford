@@ -1,16 +1,8 @@
 /**
- * Fair Ford · Distributor fulfillment page (minimal)
- * Shows the distributor's own coverage info (read-only — admin managed) and
- * the queue of orders routed to them by the nearest-distributor matcher, with
- * approve / dispatch / deliver / cancel actions against the existing
- * distributor-scoped order endpoints (GET/PUT /api/orders...).
+ * Fair Ford · Distributor page
+ * Login/signup forms when unauthenticated; fulfillment dashboard when logged in.
  */
 "use strict";
-
-// ── Auth guard ──
-(function () {
-  if (!localStorage.getItem('ff_token')) window.location.replace('/login&signup.html');
-})();
 
 const $ = (id) => document.getElementById(id);
 let ORDERS = [];
@@ -30,15 +22,128 @@ function toast(msg) {
 function logout() {
   if (window.showLogoutConfirm) {
     window.showLogoutConfirm(function () {
-      window.lcDoLogout('/login&signup.html');
+      window.lcDoLogout();
+      showAuth();
     });
   } else {
     localStorage.removeItem('ff_token');
     localStorage.removeItem('ff_user');
     sessionStorage.removeItem('ff_user');
-    window.location.replace('/login&signup.html');
+    showAuth();
   }
 }
+
+/* ══════════════════════════════════════════
+   AUTH UI
+══════════════════════════════════════════ */
+
+function showAuth() {
+  $('dtAuthSection').style.display = '';
+  $('dtDashboard').style.display = 'none';
+}
+
+function showDashboard() {
+  $('dtAuthSection').style.display = 'none';
+  $('dtDashboard').style.display = '';
+  loadProfile();
+  loadOrders();
+}
+
+window.switchTab = function (tab) {
+  const isLogin = tab === 'login';
+  $('tabLogin').classList.toggle('active', isLogin);
+  $('tabSignup').classList.toggle('active', !isLogin);
+  $('loginForm').classList.toggle('active', isLogin);
+  $('signupForm').classList.toggle('active', !isLogin);
+  $('dtSwitch').innerHTML = isLogin
+    ? 'Don\'t have an account? <a onclick="switchTab(\'signup\')">Sign up</a>'
+    : 'Already have an account? <a onclick="switchTab(\'login\')">Login</a>';
+  $('dtAuthErr').classList.remove('show');
+};
+
+function showErr(msg) {
+  const el = $('dtAuthErr');
+  const span = $('dtAuthErrText');
+  if (span) span.textContent = msg;
+  else el.textContent = msg;
+  el.classList.add('show');
+}
+
+window.handleLogin = async function (e) {
+  e.preventDefault();
+  const btn = $('loginBtn');
+  btn.disabled = true; btn.textContent = 'Logging in…';
+  $('dtAuthErr').classList.remove('show');
+  try {
+    const res = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: $('loginEmail').value.trim(),
+        password: $('loginPass').value,
+      }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Login failed');
+    if (data.user && data.user.role !== 'dist') {
+      throw new Error('This portal is for distributors only. Please use the appropriate login page.');
+    }
+    localStorage.setItem('ff_token', data.token);
+    localStorage.setItem('ff_user', JSON.stringify(data.user));
+    showDashboard();
+  } catch (err) {
+    showErr(err.message);
+  } finally {
+    btn.disabled = false; btn.textContent = 'Sign In';
+  }
+  return false;
+};
+
+window.handleSignup = async function (e) {
+  e.preventDefault();
+  const btn = $('signupBtn');
+  const pass = $('regPass').value;
+  const confirm = $('regConfirm').value;
+  if (pass !== confirm) { showErr('Passwords do not match'); return false; }
+
+  btn.disabled = true; btn.textContent = 'Creating account…';
+  $('dtAuthErr').classList.remove('show');
+  try {
+    const res = await fetch('/api/auth/signup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: $('regName').value.trim(),
+        email: $('regEmail').value.trim(),
+        password: pass,
+        confirmPassword: confirm,
+        role: 'dist',
+        businessName: $('regBusiness').value.trim(),
+        phone: $('regPhone').value.trim(),
+        gstNumber: $('regGst').value.trim(),
+        address: $('regAddress').value.trim(),
+        city: $('regCity').value.trim(),
+        state: $('regState').value.trim(),
+        pincode: $('regPincode').value.trim(),
+      }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Signup failed');
+    localStorage.setItem('ff_token', data.token);
+    localStorage.setItem('ff_user', JSON.stringify(data.user));
+    toast('Account created — awaiting admin approval');
+    showDashboard();
+  } catch (err) {
+    showErr(err.message);
+  } finally {
+    btn.disabled = false; btn.textContent = 'Create Distributor Account';
+  }
+  return false;
+};
+
+/* ══════════════════════════════════════════
+   API HELPER
+══════════════════════════════════════════ */
 
 async function apiFetch(path, options = {}) {
   const token = localStorage.getItem('ff_token');
@@ -56,7 +161,10 @@ async function apiFetch(path, options = {}) {
   return data;
 }
 
-/* ── Profile + coverage (read-only) ── */
+/* ══════════════════════════════════════════
+   DASHBOARD — Profile + coverage (read-only)
+══════════════════════════════════════════ */
+
 async function loadProfile() {
   try {
     const { user } = await apiFetch('/auth/profile');
@@ -71,7 +179,10 @@ async function loadProfile() {
   } catch (e) { toast('⚠ ' + e.message); }
 }
 
-/* ── Orders ── */
+/* ══════════════════════════════════════════
+   DASHBOARD — Orders
+══════════════════════════════════════════ */
+
 async function loadOrders() {
   try {
     const q = new URLSearchParams({ limit: '100' });
@@ -80,7 +191,6 @@ async function loadOrders() {
     ORDERS = data.orders || [];
     renderOrders();
   } catch (e) {
-    // Pending (un-activated) accounts can't list orders yet — show neutral state
     $('dtOrders').innerHTML = '<p class="rt-empty">No orders yet.</p>';
   }
 }
@@ -141,7 +251,10 @@ async function cancelOrder(id) {
   } catch (e) { toast('⚠ ' + e.message); }
 }
 
-/* ── Events ── */
+/* ══════════════════════════════════════════
+   EVENTS
+══════════════════════════════════════════ */
+
 document.addEventListener('click', (e) => {
   const t = e.target;
   if (t.dataset.approve) approveOrder(t.dataset.approve);
@@ -152,6 +265,27 @@ document.addEventListener('click', (e) => {
 $('dtStatusFilter').addEventListener('change', (e) => { STATUS_FILTER = e.target.value; loadOrders(); });
 $('dtLogout').addEventListener('click', logout);
 
-/* ── Init ── */
-loadProfile();
-loadOrders();
+/* ══════════════════════════════════════════
+   INIT — decide auth vs dashboard
+══════════════════════════════════════════ */
+
+(function init() {
+  const token = localStorage.getItem('ff_token');
+  const raw = localStorage.getItem('ff_user');
+  let user = null;
+  try { user = JSON.parse(raw); } catch (_) {}
+
+  if (token && user && user.role === 'dist') {
+    showDashboard();
+  } else if (token && user && user.role === 'ret') {
+    window.location.replace('/retailer.html');
+  } else if (token && user && (user.role === 'admin' || user.role === 'superadmin')) {
+    window.location.replace('/superadmin.html');
+  } else {
+    if (token) {
+      localStorage.removeItem('ff_token');
+      localStorage.removeItem('ff_user');
+    }
+    showAuth();
+  }
+})();

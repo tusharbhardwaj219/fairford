@@ -213,22 +213,14 @@ document.addEventListener('DOMContentLoaded', async function () {
         const stockCls = out ? 'pl-stock-out' : low ? 'pl-stock-low' : 'pl-stock-in';
 
         // Role-aware pricing block
-        let pricingHTML;
-        if (IS_DIST) {
-            const save = (p.mrp && p.mrp > 0) ? Math.round(((p.mrp - price) / p.mrp) * 100) : 0;
-            pricingHTML = `<div class="pl-price-row">
+        const save = (p.mrp && p.mrp > 0) ? Math.round(((p.mrp - price) / p.mrp) * 100) : 0;
+        const priceLabel = IS_DIST ? 'Trade Margin' : 'You Save';
+        const pricingHTML = `<div class="pl-price-row">
               <span class="pl-price-main">${inr(price).replace('.00', '')}</span>
               ${p.mrp ? `<span class="pl-price-mrp">MRP ${inr(p.mrp).replace('.00', '')}</span>` : ''}
               ${save > 0 ? `<span class="pl-discount-badge">${save}% OFF</span>` : ''}
             </div>
-            ${save > 0 ? `<div class="pl-margin-note">Trade Margin: ${save}%</div>` : ''}`;
-        } else {
-            // Retailer: price ONLY — never show MRP or discount
-            pricingHTML = `<div class="pl-price-row">
-              <span class="pl-price-main">${inr(price).replace('.00', '')}</span>
-              <span class="pl-price-label">Retailer Price</span>
-            </div>`;
-        }
+            ${save > 0 ? `<div class="pl-margin-note">${priceLabel}: ${save}%</div>` : ''}`;
 
         // Product image: uploaded photo or category-themed SVG illustration.
         // onerror swaps a dead image URL for the category SVG (see productImgFallback).

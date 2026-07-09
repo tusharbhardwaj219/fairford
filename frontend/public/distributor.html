@@ -3,69 +3,266 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Fair Ford — Distributor</title>
-  <link rel="stylesheet" href="/frontend/css/retailer.css" />
+  <title>Fair Ford — Distributor Portal</title>
+  <link rel="stylesheet" href="/frontend/css/distributor.css" />
 </head>
 <body>
-  <header class="rt-header">
-    <div class="rt-brand">Fair Ford Pharma <small>Distributor fulfillment</small></div>
-    <div class="rt-user">
-      <span id="dtUserName">…</span>
-      <button class="rt-logout" id="dtLogout">Logout</button>
-    </div>
-  </header>
 
-  <main class="rt-wrap">
-    <!-- KYC / status banner -->
-    <div class="rt-banner warn" id="dtBanner">
-      Your account is <strong>pending approval</strong>. You'll be able to view and fulfil orders
-      once an admin activates your account.
-    </div>
+  <!-- ══════════ AUTH SECTION (shown when not logged in) ══════════ -->
+  <div class="da-auth-wrap" id="dtAuthSection" style="display:none;">
 
-    <!-- Coverage (read-only — managed by admin) -->
-    <section class="rt-card">
-      <h2>My coverage <span class="sub">to change territory or pincodes, contact Fair Ford admin</span></h2>
-      <div class="rt-form-row">
-        <div class="rt-field" style="flex:1 1 220px;">
-          <label>Business name</label>
-          <input id="dfBusiness" type="text" disabled />
-        </div>
-        <div class="rt-field" style="flex:1 1 220px;">
-          <label>Base address</label>
-          <input id="dfAddress" type="text" disabled />
-        </div>
-        <div class="rt-field">
-          <label>Territory</label>
-          <input id="dfTerritory" type="text" disabled />
-        </div>
-        <div class="rt-field">
-          <label>Serviceable pincodes</label>
-          <input id="dfPincodes" type="text" disabled />
-        </div>
-        <div class="rt-field">
-          <label>Contact</label>
-          <input id="dfContact" type="text" disabled />
-        </div>
+    <!-- Brand panel (left on desktop, top on mobile) -->
+    <div class="da-brand-panel">
+      <div class="da-brand-logo">
+        <h1>Fair Ford Pharma</h1>
+        <p>Distributor Portal</p>
       </div>
-    </section>
 
-    <!-- Orders -->
-    <section class="rt-card">
-      <h2>Order queue <span class="sub">orders routed to you by nearest-distributor matching</span></h2>
-      <select class="rt-search" id="dtStatusFilter">
-        <option value="">All statuses</option>
-        <option value="pending">Pending</option>
-        <option value="approved">Approved</option>
-        <option value="dispatched">Dispatched</option>
-        <option value="delivered">Delivered</option>
-        <option value="returned">Returned</option>
-        <option value="cancelled">Cancelled</option>
-      </select>
-      <div id="dtOrders">
-        <p class="rt-empty">Loading orders…</p>
+      <ul class="da-features">
+        <li>
+          <div class="da-feat-icon">
+            <svg viewBox="0 0 24 24"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.63L18.3 9.37a1 1 0 0 0-.79-.37H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></svg>
+          </div>
+          <div class="da-feat-text">
+            <strong>Territory-Based Routing</strong>
+            <span>Orders auto-routed to you by retailer pincode and city coverage</span>
+          </div>
+        </li>
+        <li>
+          <div class="da-feat-icon">
+            <svg viewBox="0 0 24 24"><path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/><rect x="6" y="10" width="4" height="10" rx="1"/><rect x="14" y="6" width="4" height="14" rx="1"/></svg>
+          </div>
+          <div class="da-feat-text">
+            <strong>Order Management</strong>
+            <span>Approve, dispatch, and track deliveries from a single dashboard</span>
+          </div>
+        </li>
+        <li>
+          <div class="da-feat-icon">
+            <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+          </div>
+          <div class="da-feat-text">
+            <strong>Verified Network</strong>
+            <span>Admin-approved accounts with KYC verification for trusted partnerships</span>
+          </div>
+        </li>
+        <li>
+          <div class="da-feat-icon">
+            <svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+          </div>
+          <div class="da-feat-text">
+            <strong>Real-Time Notifications</strong>
+            <span>Email alerts on new orders so you never miss a fulfilment request</span>
+          </div>
+        </li>
+      </ul>
+
+      <div class="da-brand-footer">
+        &copy; 2026 Fair Ford Pharma. All rights reserved.
       </div>
-    </section>
-  </main>
+    </div>
+
+    <!-- Form panel (right on desktop, bottom on mobile) -->
+    <div class="da-form-panel">
+      <div class="da-form-card">
+
+        <a href="/index.html" class="da-back">
+          <svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>
+          Back to storefront
+        </a>
+
+        <div class="da-form-header">
+          <h2>Distributor Access</h2>
+          <p>Sign in to manage your orders or create a new distributor account</p>
+        </div>
+
+        <div class="da-tabs">
+          <button class="da-tab active" id="tabLogin" onclick="switchTab('login')">Login</button>
+          <button class="da-tab" id="tabSignup" onclick="switchTab('signup')">Create Account</button>
+        </div>
+
+        <div class="da-err" id="dtAuthErr">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <span id="dtAuthErrText"></span>
+        </div>
+
+        <!-- ── Login form ── -->
+        <form class="da-auth-form active" id="loginForm" onsubmit="return handleLogin(event)">
+          <div class="da-field">
+            <label>Email</label>
+            <div class="da-input-wrap">
+              <svg viewBox="0 0 24 24"><path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
+              <input type="email" id="loginEmail" required placeholder="you@company.com" autocomplete="email" />
+            </div>
+          </div>
+          <div class="da-field">
+            <label>Password</label>
+            <div class="da-input-wrap">
+              <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              <input type="password" id="loginPass" required placeholder="Enter your password" autocomplete="current-password" />
+            </div>
+          </div>
+          <button class="da-submit" type="submit" id="loginBtn">Sign In</button>
+        </form>
+
+        <!-- ── Signup form ── -->
+        <form class="da-auth-form" id="signupForm" onsubmit="return handleSignup(event)">
+          <div class="da-row">
+            <div class="da-field">
+              <label>Full Name <span class="req">*</span></label>
+              <div class="da-input-wrap">
+                <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <input type="text" id="regName" required placeholder="Your name" autocomplete="name" />
+              </div>
+            </div>
+            <div class="da-field">
+              <label>Email <span class="req">*</span></label>
+              <div class="da-input-wrap">
+                <svg viewBox="0 0 24 24"><path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
+                <input type="email" id="regEmail" required placeholder="you@company.com" autocomplete="email" />
+              </div>
+            </div>
+          </div>
+
+          <div class="da-field">
+            <label>Business / Company Name</label>
+            <div class="da-input-wrap">
+              <svg viewBox="0 0 24 24"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></svg>
+              <input type="text" id="regBusiness" placeholder="Your distribution company" />
+            </div>
+          </div>
+
+          <div class="da-row">
+            <div class="da-field">
+              <label>Phone</label>
+              <div class="da-input-wrap">
+                <svg viewBox="0 0 24 24"><path d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384"/></svg>
+                <input type="tel" id="regPhone" placeholder="10-digit mobile" />
+              </div>
+            </div>
+            <div class="da-field">
+              <label>GST Number</label>
+              <div class="da-input-wrap">
+                <svg viewBox="0 0 24 24"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>
+                <input type="text" id="regGst" placeholder="e.g. 27AABCU9603R1ZM" />
+              </div>
+            </div>
+          </div>
+
+          <div class="da-field">
+            <label>Address</label>
+            <div class="da-input-wrap">
+              <svg viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+              <input type="text" id="regAddress" placeholder="Street address" />
+            </div>
+          </div>
+
+          <div class="da-row">
+            <div class="da-field">
+              <label>City</label>
+              <input class="no-icon" type="text" id="regCity" placeholder="City" />
+            </div>
+            <div class="da-field">
+              <label>State</label>
+              <input class="no-icon" type="text" id="regState" placeholder="State" />
+            </div>
+            <div class="da-field">
+              <label>PIN Code</label>
+              <input class="no-icon" type="text" id="regPincode" placeholder="6-digit" maxlength="6" />
+            </div>
+          </div>
+
+          <div class="da-field">
+            <label>Password <span class="req">*</span></label>
+            <div class="da-input-wrap">
+              <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              <input type="password" id="regPass" required placeholder="Create a strong password" autocomplete="new-password" />
+            </div>
+            <div class="da-pw-hint">Min 12 characters with uppercase, lowercase, number, and special character (@$!%*?&amp;)</div>
+          </div>
+
+          <div class="da-field">
+            <label>Confirm Password <span class="req">*</span></label>
+            <div class="da-input-wrap">
+              <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              <input type="password" id="regConfirm" required placeholder="Repeat your password" autocomplete="new-password" />
+            </div>
+          </div>
+
+          <button class="da-submit" type="submit" id="signupBtn">Create Distributor Account</button>
+        </form>
+
+        <div class="da-switch" id="dtSwitch">
+          Don't have an account? <a onclick="switchTab('signup')">Sign up</a>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══════════ DASHBOARD (shown when logged in) ══════════ -->
+  <div id="dtDashboard" style="display:none;">
+    <header class="rt-header">
+      <div class="rt-brand">Fair Ford Pharma <small>Distributor fulfillment</small></div>
+      <div class="rt-user">
+        <span id="dtUserName">&hellip;</span>
+        <button class="rt-logout" id="dtLogout">Logout</button>
+      </div>
+    </header>
+
+    <main class="rt-wrap">
+      <!-- KYC / status banner -->
+      <div class="rt-banner warn" id="dtBanner">
+        Your account is <strong>pending approval</strong>. You'll be able to view and fulfil orders
+        once an admin activates your account.
+      </div>
+
+      <!-- Coverage (read-only — managed by admin) -->
+      <section class="rt-card">
+        <h2>My coverage <span class="sub">to change territory or pincodes, contact Fair Ford admin</span></h2>
+        <div class="rt-form-row">
+          <div class="rt-field" style="flex:1 1 220px;">
+            <label>Business name</label>
+            <input id="dfBusiness" type="text" disabled />
+          </div>
+          <div class="rt-field" style="flex:1 1 220px;">
+            <label>Base address</label>
+            <input id="dfAddress" type="text" disabled />
+          </div>
+          <div class="rt-field">
+            <label>Territory</label>
+            <input id="dfTerritory" type="text" disabled />
+          </div>
+          <div class="rt-field">
+            <label>Serviceable pincodes</label>
+            <input id="dfPincodes" type="text" disabled />
+          </div>
+          <div class="rt-field">
+            <label>Contact</label>
+            <input id="dfContact" type="text" disabled />
+          </div>
+        </div>
+      </section>
+
+      <!-- Orders -->
+      <section class="rt-card">
+        <h2>Order queue <span class="sub">orders routed to you by nearest-distributor matching</span></h2>
+        <select class="rt-search" id="dtStatusFilter">
+          <option value="">All statuses</option>
+          <option value="pending">Pending</option>
+          <option value="approved">Approved</option>
+          <option value="dispatched">Dispatched</option>
+          <option value="delivered">Delivered</option>
+          <option value="returned">Returned</option>
+          <option value="cancelled">Cancelled</option>
+        </select>
+        <div id="dtOrders">
+          <p class="rt-empty">Loading orders&hellip;</p>
+        </div>
+      </section>
+    </main>
+  </div>
 
   <div class="rt-toast" id="dtToast"></div>
 

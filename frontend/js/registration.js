@@ -222,7 +222,7 @@ async function submitForm() {
     mobile:            mobile,
     password:          password,
     confirmPassword:   document.getElementById('pw2') ? document.getElementById('pw2').value : password,
-    role:              roleMap[selectedRole] || 'retailer',
+    role:              roleMap[selectedRole] || 'ret',
     businessName:      v('bizName'),
     drugLicenseNumber: v('dlNum'),
     gstNumber:         v('bizGst') || undefined,

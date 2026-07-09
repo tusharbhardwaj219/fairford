@@ -36,11 +36,10 @@ const signup = async (req, res, next) => {
       state, city, address, pincode
     } = req.body;
 
-    // Only retailers self-register. Distributors/stockists are onboarded by an admin.
-    if (role !== 'ret') {
+    if (role !== 'ret' && role !== 'dist') {
       return res.status(400).json({
         success: false,
-        message: 'Self sign-up is available for retailers only.'
+        message: 'Self sign-up is available for retailers and distributors only.'
       });
     }
 
@@ -59,28 +58,34 @@ const signup = async (req, res, next) => {
       });
     }
 
-    // Prepare user data — map frontend field names to the Retailer schema
-    const userData = {
-      name: name.trim(),
-      email: email.toLowerCase(),
-      password,
-      role,
-      phone: mobile || phone,
-      shopName: businessName,
-      drugLicenseNumber,
-      gstNumber,
-      shopAddress: {
-        street: address,
-        city,
-        state,
-        pincode
-      }
-    };
+    // Prepare user data — map frontend field names to the model schema
+    let userData;
+    if (role === 'dist') {
+      userData = {
+        name: name.trim(),
+        email: email.toLowerCase(),
+        password,
+        role,
+        phone: mobile || phone,
+        businessName,
+        drugLicenseNumber,
+        gstNumber,
+        businessAddress: { street: address, city, state, pincode },
+      };
+    } else {
+      userData = {
+        name: name.trim(),
+        email: email.toLowerCase(),
+        password,
+        role,
+        phone: mobile || phone,
+        shopName: businessName,
+        drugLicenseNumber,
+        gstNumber,
+        shopAddress: { street: address, city, state, pincode },
+      };
+    }
 
-    // Retailers are no longer tied to a single distributor — each order is routed
-    // to the nearest serviceable distributor/stockist at checkout (routingService).
-
-    // Create user
     const newUser = await Model.create(userData);
 
     // Generate token

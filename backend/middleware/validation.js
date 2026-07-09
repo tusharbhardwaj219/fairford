@@ -60,9 +60,8 @@ const validateSignup = (req, res, next) => {
     return fail(res, 'Passwords do not match');
   }
 
-  // Only retailers can self-register; distributors are admin-onboarded
-  if (role !== 'ret') {
-    return fail(res, 'Self sign-up is available for Retailer / Chemist accounts only. Contact admin to onboard other account types.');
+  if (role !== 'ret' && role !== 'dist') {
+    return fail(res, 'Self sign-up is available for Retailer and Distributor accounts only.');
   }
 
   next();

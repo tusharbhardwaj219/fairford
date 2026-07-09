@@ -221,7 +221,7 @@ async function loadKPIs() {
       <div style="grid-column:1/-1;display:flex;flex-direction:column;align-items:center;padding:48px 20px;background:#fff;border-radius:12px;border:1px solid #E2E8F0;text-align:center">
         <div style="font-size:2.5rem;margin-bottom:12px">${isAuth ? '🔐' : '⚠️'}</div>
         <h3 style="margin:0 0 8px;color:#0F4C81;font-size:1.1rem">${isAuth ? 'Admin Login Required' : 'Failed to load dashboard'}</h3>
-        <p style="color:#64748B;margin:0 0 20px;font-size:.9rem">${e.message}</p>
+        <p style="color:#64748B;margin:0 0 20px;font-size:.9rem">${esc(e.message)}</p>
         <a href="/admin.html" style="padding:9px 22px;background:#0F4C81;color:#fff;border-radius:8px;text-decoration:none;font-size:.9rem;font-weight:500">Login as Admin</a>
       </div>`;
   }
@@ -279,7 +279,7 @@ async function loadRecentDispatches() {
   } catch (e) {
     const tbody = document.getElementById('recentDispatchesTbody');
     const isAuth = /token|expired|denied|session/i.test(e.message);
-    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:24px;color:#94A3B8;font-size:.85rem">${isAuth ? '🔐 Login as admin to view dispatches' : '⚠️ ' + e.message}</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:24px;color:#94A3B8;font-size:.85rem">${isAuth ? '🔐 Login as admin to view dispatches' : '⚠️ ' + esc(e.message)}</td></tr>`;
   }
 }
 
@@ -801,7 +801,7 @@ async function loadDrawerContent(productId, distributorId, batchNumber) {
         </div>
       </div>`;
   } catch (e) {
-    body.innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div><h3>Load Failed</h3><p>${e.message}</p></div>`;
+    body.innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div><h3>Load Failed</h3><p>${esc(e.message)}</p></div>`;
   }
 }
 

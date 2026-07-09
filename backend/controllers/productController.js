@@ -32,9 +32,11 @@ function filterProductPricing(product, role) {
   }
 
   if (role === 'ret') {
-    delete p.mrp;
     delete p.distributorPrice;
     delete p.gst;
+    if (p.mrp && p.retailerPrice) {
+      p.discount = Number(((p.mrp - p.retailerPrice) / p.mrp * 100).toFixed(1));
+    }
     return p;
   }
 

@@ -1,0 +1,541 @@
+/* =====================================================================
+   distributor.css — Distributor portal (Fair Ford Pharma)
+   Auth (login/signup) + fulfillment dashboard
+   ===================================================================== */
+
+:root {
+  --primary: #0F4C81;
+  --primary-dark: #0b3a63;
+  --primary-light: #1a6cb5;
+  --accent: #0ea5e9;
+  --bg: #f4f6f9;
+  --card: #ffffff;
+  --border: #e3e8ef;
+  --text: #1f2937;
+  --muted: #6b7280;
+  --green: #1D9E75;
+  --green-bg: #e1f5ee;
+  --amber-bg: #fff8e6;
+  --amber: #b7791f;
+  --red: #d85a30;
+  --red-bg: #faece7;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   AUTH SECTION — Split layout: brand panel + form panel
+═══════════════════════════════════════════════════════════════ */
+
+.da-auth-wrap {
+  min-height: 100vh;
+  display: flex;
+  background: #f0f4f8;
+}
+
+/* ── Brand panel (left) ── */
+.da-brand-panel {
+  flex: 0 0 420px;
+  background: linear-gradient(160deg, #0F4C81 0%, #1565a8 40%, #0a8ed9 100%);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 60px 48px;
+  position: relative;
+  overflow: hidden;
+}
+
+.da-brand-panel::before {
+  content: '';
+  position: absolute;
+  top: -60px;
+  right: -60px;
+  width: 260px;
+  height: 260px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.06);
+}
+
+.da-brand-panel::after {
+  content: '';
+  position: absolute;
+  bottom: -80px;
+  left: -40px;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.04);
+}
+
+.da-brand-logo {
+  position: relative;
+  z-index: 1;
+  margin-bottom: 36px;
+}
+
+.da-brand-logo h1 {
+  font-size: 28px;
+  font-weight: 800;
+  margin: 0 0 6px;
+  letter-spacing: .3px;
+}
+
+.da-brand-logo p {
+  font-size: 14px;
+  opacity: .85;
+  margin: 0;
+  font-weight: 400;
+}
+
+.da-features {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.da-features li {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 22px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.da-features li:last-child { margin-bottom: 0; }
+
+.da-feat-icon {
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.da-feat-icon svg {
+  width: 18px;
+  height: 18px;
+  stroke: #fff;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.da-feat-text strong {
+  display: block;
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+
+.da-feat-text span {
+  font-size: 13px;
+  opacity: .75;
+}
+
+.da-brand-footer {
+  margin-top: auto;
+  padding-top: 40px;
+  font-size: 12px;
+  opacity: .5;
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Form panel (right) ── */
+.da-form-panel {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 32px;
+  overflow-y: auto;
+}
+
+.da-form-card {
+  width: 100%;
+  max-width: 520px;
+}
+
+.da-form-header {
+  margin-bottom: 28px;
+}
+
+.da-form-header h2 {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 6px;
+}
+
+.da-form-header p {
+  font-size: 14px;
+  color: var(--muted);
+  margin: 0;
+}
+
+/* ── Tab buttons ── */
+.da-tabs {
+  display: flex;
+  gap: 4px;
+  background: #eef2f7;
+  border-radius: 10px;
+  padding: 4px;
+  margin-bottom: 24px;
+}
+
+.da-tab {
+  flex: 1;
+  text-align: center;
+  padding: 10px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--muted);
+  background: none;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all .2s ease;
+}
+
+.da-tab.active {
+  background: #fff;
+  color: var(--primary);
+  box-shadow: 0 1px 4px rgba(0,0,0,.08);
+}
+
+.da-tab:hover:not(.active) {
+  color: var(--text);
+}
+
+/* ── Form layout ── */
+.da-auth-form { display: none; }
+.da-auth-form.active { display: block; }
+
+.da-field {
+  margin-bottom: 16px;
+}
+
+.da-field label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+
+.da-field label .req { color: var(--red); }
+
+.da-input-wrap {
+  position: relative;
+}
+
+.da-input-wrap svg {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  stroke: var(--muted);
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  pointer-events: none;
+}
+
+.da-field input {
+  width: 100%;
+  padding: 11px 14px 11px 38px;
+  border: 1.5px solid var(--border);
+  border-radius: 9px;
+  font-size: 14px;
+  color: var(--text);
+  background: #fff;
+  outline: none;
+  transition: border-color .2s, box-shadow .2s;
+}
+
+.da-field input.no-icon {
+  padding-left: 14px;
+}
+
+.da-field input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(15,76,129,.1);
+}
+
+.da-field input::placeholder {
+  color: #b0b8c4;
+}
+
+.da-row {
+  display: flex;
+  gap: 12px;
+}
+
+.da-row > .da-field { flex: 1; min-width: 0; }
+
+.da-pw-hint {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 5px;
+  line-height: 1.4;
+}
+
+/* ── Error ── */
+.da-err {
+  background: var(--red-bg);
+  color: var(--red);
+  padding: 11px 16px;
+  border-radius: 9px;
+  font-size: 13px;
+  margin-bottom: 16px;
+  display: none;
+  align-items: center;
+  gap: 8px;
+}
+
+.da-err.show { display: flex; }
+
+.da-err svg {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  stroke: var(--red);
+  fill: none;
+  stroke-width: 2;
+}
+
+/* ── Submit button ── */
+.da-submit {
+  width: 100%;
+  padding: 13px;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+  color: #fff;
+  border: none;
+  border-radius: 9px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity .2s, box-shadow .2s, transform .1s;
+  margin-top: 8px;
+  letter-spacing: .3px;
+}
+
+.da-submit:hover {
+  opacity: .92;
+  box-shadow: 0 4px 16px rgba(15,76,129,.3);
+}
+
+.da-submit:active {
+  transform: scale(.985);
+}
+
+.da-submit:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* ── Switch link ── */
+.da-switch {
+  text-align: center;
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 20px;
+}
+
+.da-switch a {
+  color: var(--primary);
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.da-switch a:hover { text-decoration: underline; }
+
+/* ── Section divider ── */
+.da-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 20px 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.da-divider::before,
+.da-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* ── Back to home ── */
+.da-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--muted);
+  text-decoration: none;
+  margin-bottom: 20px;
+  transition: color .15s;
+}
+
+.da-back:hover { color: var(--primary); }
+
+.da-back svg {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   RESPONSIVE — Mobile: stacked layout
+═══════════════════════════════════════════════════════════════ */
+
+@media (max-width: 900px) {
+  .da-auth-wrap {
+    flex-direction: column;
+  }
+
+  .da-brand-panel {
+    flex: none;
+    padding: 36px 24px 28px;
+  }
+
+  .da-features { display: none; }
+  .da-brand-footer { display: none; }
+
+  .da-brand-logo h1 { font-size: 22px; }
+
+  .da-form-panel {
+    padding: 24px 20px;
+  }
+
+  .da-row {
+    flex-direction: column;
+    gap: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .da-brand-panel {
+    padding: 28px 20px 22px;
+  }
+
+  .da-form-panel {
+    padding: 20px 16px;
+  }
+
+  .da-form-header h2 { font-size: 20px; }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   DASHBOARD — Reuses retailer pattern (rt-* classes)
+═══════════════════════════════════════════════════════════════ */
+
+/* ── Header ── */
+.rt-header {
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--primary); color: #fff;
+  padding: 14px 24px; position: sticky; top: 0; z-index: 20;
+}
+.rt-brand { font-size: 18px; font-weight: 700; letter-spacing: .3px; }
+.rt-brand small { display: block; font-size: 11px; font-weight: 400; opacity: .8; }
+.rt-user { display: flex; align-items: center; gap: 14px; font-size: 14px; }
+.rt-logout {
+  background: #ef4444; color: #fff; border: 1px solid #dc2626;
+  padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 13px;
+  transition: background .15s, box-shadow .15s;
+}
+.rt-logout:hover { background: #dc2626; box-shadow: 0 4px 12px rgba(239,68,68,.35); }
+
+/* ── Layout ── */
+.rt-wrap { max-width: 1180px; margin: 0 auto; padding: 22px 18px 60px; }
+
+.rt-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 12px; padding: 18px; margin-bottom: 20px;
+}
+.rt-card h2 { margin: 0 0 14px; font-size: 16px; color: var(--primary); }
+.rt-card h2 .sub { font-size: 12px; color: var(--muted); font-weight: 400; margin-left: 6px; }
+
+/* ── Banner ── */
+.rt-banner {
+  border-radius: 10px; padding: 12px 16px; margin-bottom: 18px; font-size: 14px;
+  display: none;
+}
+.rt-banner.show { display: block; }
+.rt-banner.warn { background: var(--amber-bg); border: 1px solid #f0d9a0; color: var(--amber); }
+
+/* ── Form rows ── */
+.rt-form-row { display: flex; flex-wrap: wrap; gap: 12px; }
+.rt-field { flex: 1 1 160px; display: flex; flex-direction: column; gap: 4px; }
+.rt-field label { font-size: 12px; color: var(--muted); }
+.rt-field input {
+  padding: 9px 11px; border: 1px solid var(--border); border-radius: 7px; font-size: 14px;
+}
+.rt-field input:focus { outline: none; border-color: var(--primary); }
+
+/* ── Buttons ── */
+.btn {
+  border: none; border-radius: 8px; padding: 10px 16px; font-size: 14px;
+  cursor: pointer; font-weight: 600;
+}
+.btn-primary { background: var(--primary); color: #fff; }
+.btn-primary:hover { background: var(--primary-dark); }
+.btn-primary:disabled { opacity: .55; cursor: not-allowed; }
+.btn-ghost { background: #eef2f7; color: var(--primary); }
+.btn-sm { padding: 6px 12px; font-size: 13px; }
+.btn-danger { background: var(--red-bg); color: var(--red); }
+
+/* ── Search/filter ── */
+.rt-search {
+  width: 100%; padding: 11px 14px; border: 1px solid var(--border);
+  border-radius: 8px; font-size: 14px; margin-bottom: 14px;
+}
+
+/* ── Orders ── */
+.rt-order { border: 1px solid var(--border); border-radius: 10px; padding: 14px; margin-bottom: 12px; }
+.rt-order-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+.rt-order-id { font-weight: 700; font-size: 14px; }
+.rt-order-meta { font-size: 12px; color: var(--muted); margin: 6px 0 0; }
+.rt-order-items { font-size: 13px; color: var(--text); margin: 8px 0 0; }
+.badge { font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; text-transform: capitalize; }
+.badge.pending { background: var(--amber-bg); color: var(--amber); }
+.badge.approved, .badge.dispatched { background: #e6f1fb; color: var(--primary); }
+.badge.delivered { background: var(--green-bg); color: var(--green); }
+.badge.cancelled, .badge.returned { background: var(--red-bg); color: var(--red); }
+
+/* ── Toast ── */
+.rt-toast {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(120%);
+  background: #111827; color: #fff; padding: 12px 20px; border-radius: 8px; font-size: 14px;
+  z-index: 50; transition: transform .3s ease; max-width: 90%; text-align: center;
+}
+.rt-toast.show { transform: translateX(-50%) translateY(0); }
+
+.rt-empty { color: var(--muted); font-size: 14px; text-align: center; padding: 24px 0; }

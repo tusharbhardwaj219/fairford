@@ -6,9 +6,15 @@
  */
 "use strict";
 
-// ── Auth guard ──
+// ── Auth guard (retailer only) ──
 (function () {
-  if (!localStorage.getItem('ff_token')) window.location.replace('/login&signup.html');
+  var token = localStorage.getItem('ff_token');
+  if (!token) { window.location.replace('/login&signup.html'); return; }
+  try {
+    var user = JSON.parse(localStorage.getItem('ff_user'));
+    if (user && user.role === 'dist') { window.location.replace('/distributor.html'); return; }
+    if (user && (user.role === 'admin' || user.role === 'superadmin')) { window.location.replace('/superadmin.html'); return; }
+  } catch (e) {}
 })();
 
 const $ = (id) => document.getElementById(id);
@@ -101,7 +107,7 @@ async function saveAddress() {
 /* ── Products ── */
 async function loadProducts(search) {
   try {
-    const q = new URLSearchParams({ limit: '100' });
+    const q = new URLSearchParams({ limit: '500' });
     if (search) q.set('search', search);
     const data = await apiFetch('/retailer/products?' + q.toString());
     PRODUCTS = (data.data && data.data.products) || [];
@@ -209,7 +215,10 @@ async function placeOrder() {
     const dist = data.order && data.order.distributor;
     toast('✓ Order ' + ((data.order && data.order.orderNumber) || 'placed') +
       (dist ? ' → ' + (dist.businessName || dist.name) : ''));
-    loadOrders();
+    updateCartUI();
+    await loadOrders();
+    const ordersSection = $('rtOrders');
+    if (ordersSection) ordersSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
   } catch (e) {
     toast('⚠ ' + e.message);
   } finally {

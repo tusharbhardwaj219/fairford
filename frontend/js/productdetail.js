@@ -73,8 +73,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const userPrice = role === 'dist'
       ? (sp.distributorPrice || sp.retailerPrice || 0)
       : (sp.retailerPrice || 0);
-    // Retailers must never see MRP
-    const mrp      = role === 'ret' ? 0 : (sp.mrp || 0);
+    const mrp      = sp.mrp || 0;
     const discount = mrp > 0 ? Math.round(((mrp - userPrice) / mrp) * 100) : 0;
 
     render({
@@ -161,8 +160,8 @@ document.addEventListener('DOMContentLoaded', function () {
       ? (p.distributorPrice || p.userPrice || p.netPrice || 0)
       : (p.retailerPrice    || p.userPrice || p.netPrice || 0);
 
-    const mrp      = IS_RET ? 0 : (p.mrp || 0);
-    const discount = (p.discount != null && !IS_RET)
+    const mrp      = p.mrp || 0;
+    const discount = p.discount != null
       ? p.discount
       : (mrp > 0 ? Math.round(((mrp - userPrice) / mrp) * 100) : 0);
 
@@ -276,17 +275,17 @@ document.addEventListener('DOMContentLoaded', function () {
     const starsHtml = ratNum ? buildStars(Number(ratingVal)) : '';
 
     // Price cards
-    const mrpBadge = !IS_RET && mrp > 0 ? `
+    const mrpBadge = mrp > 0 ? `
       <div class="pd-price-card">
         <div class="pd-price-card-label">MRP</div>
         <div class="pd-price-card-amount pd-price-striked">₹${mrp.toLocaleString('en-IN')}</div>
       </div>` : '';
 
-    const saveBadge = !IS_RET && discount > 0 ? `
+    const saveBadge = discount > 0 ? `
       <div class="pd-price-card pd-price-card-accent">
         <div class="pd-price-card-label">You Save</div>
         <div class="pd-price-card-amount">${discount}% <span style="font-size:.9rem">off</span></div>
-        <div class="pd-price-card-note">${IS_DIST ? 'Distributor deal' : 'Trade price'}</div>
+        <div class="pd-price-card-note">${IS_DIST ? 'Distributor deal' : 'Retail discount'}</div>
       </div>` : '';
 
     const infoHtml = `
