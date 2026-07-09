@@ -3,11 +3,7 @@
 $ErrorActionPreference = 'Stop'
 $root    = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 $envYaml = Join-Path $root '.env.yaml'
-<<<<<<< HEAD
-if (-not (Test-Path $envYaml)) { throw ".env.yaml not found — create it first." }
-=======
 if (-not (Test-Path $envYaml)) { throw ".env.yaml not found - create it first." }
->>>>>>> 7b8157416c78cb72b2fea0f0889a667e69b309ee
 
 $map = @{}
 foreach ($ln in Get-Content $envYaml) {
