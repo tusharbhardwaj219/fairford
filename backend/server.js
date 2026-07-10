@@ -10,8 +10,16 @@ const path           = require('path');
 
 const connectDB      = require('./config/database');
 const errorMiddleware = require('./middleware/errorMiddleware');
+const { verifyMailTransport } = require('./services/emailService');
 
 const app = express();
+
+// ── PROXY ────────────────────────────────────────────────────────────────────
+// The app runs behind a reverse proxy (Cloud Run / load balancer). Without this,
+// req.ip is the proxy's address, so express-rate-limit keys every client into a
+// single bucket (brute-force protection void, collective throttling) and stored
+// IPs are useless. Trust the first proxy hop so req.ip = the real client IP.
+app.set('trust proxy', 1);
 
 // ── SECURITY ─────────────────────────────────────────────────────────────────
 // Content-Security-Policy tuned for this static, inline-heavy frontend:
@@ -27,7 +35,7 @@ app.use(helmet({
       scriptSrc:      ["'self'", "'unsafe-inline'", 'https://cdnjs.cloudflare.com', 'https://cdn.jsdelivr.net'],
       scriptSrcAttr:  ["'unsafe-inline'"], // inline onclick handlers used across the pages
       styleSrc:       ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com', 'https://cdnjs.cloudflare.com', 'https://cdn.jsdelivr.net'],
-      fontSrc:        ["'self'", 'data:', 'https://fonts.gstatic.com', 'https://cdnjs.cloudflare.com'],
+      fontSrc:        ["'self'", 'data:', 'https://fonts.gstatic.com', 'https://cdnjs.cloudflare.com', 'https://cdn.jsdelivr.net'],
       imgSrc:         ["'self'", 'data:', 'https:'],
       connectSrc:     ["'self'"],
       frameSrc:       ["'self'", 'https://www.google.com'], // contact-page Google Maps embed
@@ -214,9 +222,22 @@ app.get('/sitemap.xml', (_req, res) => {
 });
 
 // ── 404 ───────────────────────────────────────────────────────────────────────
-app.use((_req, res) =>
-  res.status(404).json({ success: false, message: 'Route not found' })
-);
+// API misses return JSON; a mistyped page URL gets a small HTML page instead of
+// a raw JSON blob.
+app.use((req, res) => {
+  if (req.path.startsWith('/api/')) {
+    return res.status(404).json({ success: false, message: 'Route not found' });
+  }
+  res.status(404).type('html').send(
+    '<!doctype html><meta charset="utf-8"><title>Page not found — Fair Ford Pharma</title>' +
+    '<div style="font-family:system-ui,sans-serif;max-width:520px;margin:18vh auto;text-align:center;color:#1a1f2b">' +
+    '<h1 style="font-size:64px;margin:0;color:#002C5F">404</h1>' +
+    '<p style="font-size:18px;margin:8px 0 4px">This page could not be found.</p>' +
+    '<p style="color:#6b7482">It may have moved or the link is incorrect.</p>' +
+    '<p style="margin-top:24px"><a href="/" style="color:#2f6cae;font-weight:600;text-decoration:none">&larr; Back to home</a></p>' +
+    '</div>'
+  );
+});
 
 // ── GLOBAL ERROR HANDLER ──────────────────────────────────────────────────────
 app.use(errorMiddleware);
@@ -226,6 +247,7 @@ const PORT = process.env.PORT || 5000;
 
 const startServer = async () => {
   await connectDB();
+  verifyMailTransport(); // non-blocking: warns if email is misconfigured
   app.listen(PORT, () => {
     console.log(`\n  Fair Ford Pharma API`);
     console.log(`  Server : http://localhost:${PORT}`);

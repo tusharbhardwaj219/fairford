@@ -23,6 +23,61 @@ function modelForRole(role) {
 }
 
 /**
+ * Map one multer/Cloudinary file (from upload.fields()) into the persisted
+ * document shape. Returns undefined when the field wasn't uploaded so the
+ * document simply stays unset on the model.
+ */
+function docFromFile(fileArr) {
+  const f = Array.isArray(fileArr) ? fileArr[0] : fileArr;
+  if (!f || !f.path) return undefined;
+  return {
+    url:          f.path,                 // Cloudinary secure_url
+    publicId:     f.filename,             // Cloudinary public_id
+    fileName:     f.originalname || null,
+    resourceType: f.mimetype || null,     // e.g. application/pdf, image/png
+    uploadedAt:   new Date(),
+  };
+}
+
+/**
+ * Build the `documents` object from the four uploaded registration files.
+ * `req.files` is keyed by field name (see uploadDealerDocs).
+ */
+function buildDocuments(files) {
+  if (!files) return undefined;
+  const documents = {};
+  const map = {
+    drugLicense:     files.drugLicense,
+    gstCertificate:  files.gstCertificate,
+    panCard:         files.panCard,
+    cancelledCheque: files.cancelledCheque,
+  };
+  let any = false;
+  for (const key of Object.keys(map)) {
+    const doc = docFromFile(map[key]);
+    if (doc) { documents[key] = doc; any = true; }
+  }
+  return any ? documents : undefined;
+}
+
+/**
+ * Best-effort removal of already-uploaded Cloudinary assets when signup fails
+ * after the files were stored (e.g. duplicate email), so we don't orphan them.
+ */
+async function cleanupUploadedDocs(files) {
+  if (!files) return;
+  const all = [];
+  for (const key of Object.keys(files)) {
+    (files[key] || []).forEach(f => { if (f && f.filename) all.push(f.filename); });
+  }
+  await Promise.all(all.map(id =>
+    cloudinary.uploader.destroy(id, { resource_type: 'image' }).catch(() =>
+      cloudinary.uploader.destroy(id, { resource_type: 'raw' }).catch(() => {})
+    )
+  ));
+}
+
+/**
  * POST /api/auth/signup
  * Register a new user (distributor or retailer)
  * Validation is done in middleware (validateSignup)
@@ -37,6 +92,7 @@ const signup = async (req, res, next) => {
     } = req.body;
 
     if (role !== 'ret' && role !== 'dist') {
+      await cleanupUploadedDocs(req.files);
       return res.status(400).json({
         success: false,
         message: 'Self sign-up is available for retailers and distributors only.'
@@ -46,17 +102,25 @@ const signup = async (req, res, next) => {
     // Get appropriate model for role
     const Model = modelForRole(role);
     if (!Model) {
+      await cleanupUploadedDocs(req.files);
       return res.status(400).json({ success: false, message: 'Invalid role' });
     }
 
-    // Check if email already registered
-    const existingUser = await Model.findOne({ email: email.toLowerCase() });
-    if (existingUser) {
-      return res.status(409).json({
-        success: false,
-        message: 'Email is already registered'
-      });
+    // Check if email already registered — across ALL identity collections, not
+    // just the current role's. Emails are unique per-collection, so without this
+    // the same address could exist as both a retailer and a distributor and only
+    // the first-found could ever log in. (Audit M-3)
+    const emailLower = email.toLowerCase();
+    for (const M of [Retailer, Distributor, Admin]) {
+      const clash = await M.findOne({ email: emailLower }).select('_id');
+      if (clash) {
+        await cleanupUploadedDocs(req.files);
+        return res.status(409).json({ success: false, message: 'Email is already registered' });
+      }
     }
+
+    // Registration documents uploaded to Cloudinary (see uploadDealerDocs).
+    const documents = buildDocuments(req.files);
 
     // Prepare user data — map frontend field names to the model schema
     let userData;
@@ -86,6 +150,8 @@ const signup = async (req, res, next) => {
       };
     }
 
+    if (documents) userData.documents = documents;
+
     const newUser = await Model.create(userData);
 
     // Generate token
@@ -98,6 +164,8 @@ const signup = async (req, res, next) => {
       user: newUser.toSafe ? newUser.toSafe() : { _id: newUser._id, name: newUser.name, email: newUser.email, role: newUser.role }
     });
   } catch (err) {
+    // Don't orphan uploaded Cloudinary assets if the DB write failed.
+    await cleanupUploadedDocs(req.files);
     console.error('[auth:signup]', err);
     next(err);
   }
@@ -154,6 +222,16 @@ const login = async (req, res, next) => {
       return res.status(401).json({
         success: false,
         message: 'Invalid email or password'
+      });
+    }
+
+    // Deactivated admin accounts (Admin.isActive === false) must not be able to
+    // log in. Retailers/distributors use `status` instead (enforced downstream by
+    // requireActive). Checked after the password so it can't be used to enumerate.
+    if (user.isActive === false) {
+      return res.status(403).json({
+        success: false,
+        message: 'This account has been deactivated. Please contact support.',
       });
     }
 

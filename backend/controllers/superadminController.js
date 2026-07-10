@@ -286,6 +286,88 @@ exports.deleteRetailer = async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 };
 
+// ════════════════════════ DEALER DOCUMENTS ════════════════════════════════════
+// Read-only view of the registration documents each dealer (retailer) uploaded
+// to Cloudinary at signup. Nothing is uploaded or managed here — we only surface
+// the existing Cloudinary secure_urls so the Super Admin can review/download them.
+
+const DOC_KEYS = [
+  ['drugLicense',     'Drug License'],
+  ['gstCertificate',  'GST Certificate'],
+  ['panCard',         'PAN Card'],
+  ['cancelledCheque', 'Cancelled Cheque / Bank Passbook'],
+];
+
+const docPresent = (doc) => !!(doc && doc.url);
+
+// Force-download variant of a Cloudinary URL via the fl_attachment delivery flag.
+function toDownloadUrl(url) {
+  if (!url) return '';
+  return url.includes('/upload/') ? url.replace('/upload/', '/upload/fl_attachment/') : url;
+}
+
+function dealerDocSummary(r) {
+  const docs = r.documents || {};
+  const uploaded = DOC_KEYS.filter(([k]) => docPresent(docs[k])).length;
+  return {
+    id:           sid(r),
+    name:         str(r.name),
+    firmName:     str(r.shopName || r.businessName || '—'),
+    email:        str(r.email),
+    phone:        str(r.phone),
+    status:       str(r.status || 'pending'),
+    uploaded,
+    total:        DOC_KEYS.length,
+    docStatus:    uploaded === DOC_KEYS.length ? 'complete' : uploaded === 0 ? 'none' : 'partial',
+    registeredAt: fmtDate(r.createdAt),
+  };
+}
+
+exports.listDealerDocs = async (req, res) => {
+  try {
+    const rets = await Retailer.find().sort({ createdAt: -1 }).limit(1000);
+    res.json(rets.map(dealerDocSummary));
+  } catch (e) { res.status(500).json({ error: e.message }); }
+};
+
+exports.getDealerDocs = async (req, res) => {
+  try {
+    if (!isOid(req.params.id)) return res.status(404).json({ error: 'Dealer not found' });
+    const r = await Retailer.findById(req.params.id);
+    if (!r) return res.status(404).json({ error: 'Dealer not found' });
+
+    const a = r.shopAddress || {};
+    const docs = r.documents || {};
+    const documents = DOC_KEYS.map(([key, label]) => {
+      const d = docs[key];
+      const present = docPresent(d);
+      return {
+        key, label,
+        uploaded:     present,
+        url:          present ? str(d.url) : '',
+        downloadUrl:  present ? toDownloadUrl(d.url) : '',
+        fileName:     present ? str(d.fileName) : '',
+        resourceType: present ? str(d.resourceType) : '',
+        uploadedAt:   present && d.uploadedAt ? fmtDate(d.uploadedAt) : '',
+      };
+    });
+
+    res.json({
+      id:                sid(r),
+      name:              str(r.name),
+      firmName:          str(r.shopName || r.businessName || '—'),
+      email:             str(r.email),
+      phone:             str(r.phone),
+      status:            str(r.status || 'pending'),
+      address:           [a.street, a.city, a.state, a.pincode].filter(Boolean).join(', ') || '—',
+      gstNumber:         str(r.gstNumber),
+      drugLicenseNumber: str(r.drugLicenseNumber),
+      registeredAt:      fmtDate(r.createdAt),
+      documents,
+    });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+};
+
 // ════════════════════════════ PRODUCTS ════════════════════════════════════════
 function skuOf(p) { return str(p.slug || `FF-${sid(p).slice(-6).toUpperCase()}`); }
 

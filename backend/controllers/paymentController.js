@@ -62,123 +62,27 @@ const getOutstanding = async (req, res) => {
   }
 };
 
-// POST /api/payments — pay against an order
-const createPayment = async (req, res) => {
-  try {
-    const { orderId, amount, method, notes } = req.body;
-
-    if (!orderId || !amount || !method) {
-      return res.status(400).json({ success: false, message: 'orderId, amount, and method are required' });
-    }
-
-    const order = await Order.findById(orderId);
-    if (!order) return res.status(404).json({ success: false, message: 'Order not found' });
-
-    if (order.retailer.toString() !== req.user.id) {
-      return res.status(403).json({ success: false, message: 'Access denied' });
-    }
-
-    const retailer = await Retailer.findById(req.user._id);
-    if (!retailer) return res.status(404).json({ success: false, message: 'Retailer not found' });
-
-    const payAmount = Number(amount);
-
-    if (method === 'wallet') {
-      if (retailer.wallet.balance < payAmount) {
-        return res.status(400).json({ success: false, message: 'Insufficient wallet balance' });
-      }
-      retailer.wallet.balance -= payAmount;
-    }
-
-    retailer.creditUsed = Math.max(0, retailer.creditUsed - payAmount);
-    await retailer.save();
-
-    order.paymentStatus = retailer.creditUsed <= 0 ? 'paid' : 'partial';
-    order.paymentMethod = method;
-    await order.save();
-
-    const payment = await Payment.create({
-      retailer:    retailer._id,
-      distributor: order.distributor,
-      order:       order._id,
-      amount:      payAmount,
-      paymentType: 'order_payment',
-      method,
-      status:      'completed',
-      paidAt:      new Date(),
-      notes,
-    });
-
-    if (method === 'wallet') {
-      await WalletTransaction.create({
-        userId:        retailer._id,
-        userType:      'retailer',
-        type:          'debit',
-        amount:        payAmount,
-        balance:       retailer.wallet.balance,
-        description:   `Payment for order ${order.orderNumber}`,
-        reference:     payment._id,
-        referenceType: 'payment',
-      });
-    }
-
-    return res.status(201).json({ success: true, message: 'Payment processed', payment });
-  } catch (err) {
-    console.error('[payment:create]', err);
-    return res.status(500).json({ success: false, message: 'Internal server error' });
-  }
+// POST /api/payments — DISABLED (Audit C-1)
+// Orders are cash-on-delivery and their paymentStatus is set by staff through the
+// admin panel (PUT /api/dist-inventory/orders/:id/payment). A client-initiated
+// call must never mutate wallet balance, credit, or an order's paymentStatus —
+// doing so let a retailer self-credit and mark their own orders "paid". There is
+// no payment gateway wired, so this endpoint is intentionally turned off.
+const createPayment = async (_req, res) => {
+  return res.status(403).json({
+    success: false,
+    message: 'Online payments are unavailable. Orders are cash on delivery; payment is confirmed by our team on delivery.',
+  });
 };
 
-// POST /api/wallet/recharge — add funds to retailer wallet
-const rechargeWallet = async (req, res) => {
-  try {
-    if (req.user.role !== 'ret') {
-      return res.status(403).json({ success: false, message: 'Only retailers can recharge wallet' });
-    }
-
-    const { amount, reference } = req.body;
-    if (!amount || Number(amount) <= 0) {
-      return res.status(400).json({ success: false, message: 'Valid amount required' });
-    }
-
-    const retailer = await Retailer.findById(req.user._id);
-    if (!retailer) return res.status(404).json({ success: false, message: 'Retailer not found' });
-
-    const rechargeAmount = Number(amount);
-    retailer.wallet.balance += rechargeAmount;
-    await retailer.save();
-
-    const payment = await Payment.create({
-      retailer:    retailer._id,
-      distributor: retailer.distributor,
-      amount:      rechargeAmount,
-      paymentType: 'wallet_recharge',
-      method:      'online',
-      status:      'completed',
-      reference:   reference || '',
-      paidAt:      new Date(),
-    });
-
-    await WalletTransaction.create({
-      userId:        retailer._id,
-      userType:      'retailer',
-      type:          'credit',
-      amount:        rechargeAmount,
-      balance:       retailer.wallet.balance,
-      description:   'Wallet recharge',
-      reference:     payment._id,
-      referenceType: 'recharge',
-    });
-
-    return res.status(200).json({
-      success: true,
-      message: 'Wallet recharged successfully',
-      walletBalance: retailer.wallet.balance,
-    });
-  } catch (err) {
-    console.error('[payment:recharge]', err);
-    return res.status(500).json({ success: false, message: 'Internal server error' });
-  }
+// POST /api/payments/wallet/recharge — DISABLED (Audit C-1)
+// Self-crediting the wallet with a client-supplied amount and no gateway was a
+// free-balance vulnerability. Re-enable only behind a verified payment provider.
+const rechargeWallet = async (_req, res) => {
+  return res.status(403).json({
+    success: false,
+    message: 'Wallet recharge is currently unavailable.',
+  });
 };
 
 // GET /api/wallet/transactions

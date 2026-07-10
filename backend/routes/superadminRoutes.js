@@ -21,6 +21,10 @@ router.get('/distributors/:id', c.getDistributor);
 router.put('/distributors/:id', c.updateDistributor);
 router.delete('/distributors/:id', c.deleteDistributor);
 
+// Dealer Documents (read-only view of retailer registration documents)
+router.get('/dealer-documents', c.listDealerDocs);
+router.get('/dealer-documents/:id', c.getDealerDocs);
+
 // Retailers
 router.get('/retailers', c.listRetailers);
 router.post('/retailers', c.createRetailer);

@@ -17,10 +17,13 @@ const generateToken = (id, role) => {
     );
   }
 
+  // Shorter-lived access tokens limit the blast radius if a token is ever stolen
+  // (e.g. via XSS). Override with JWT_EXPIRES_IN in the environment; keep the
+  // fallback tight rather than the old 7-day default.
   return jwt.sign(
     { id, role },
     process.env.JWT_SECRET,
-    { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
+    { expiresIn: process.env.JWT_EXPIRES_IN || '1d' }
   );
 };
 

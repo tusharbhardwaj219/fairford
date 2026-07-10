@@ -40,6 +40,41 @@ const categoryUpload     = multer({ storage: createStorage('categories'),    fil
 const userUpload         = multer({ storage: createStorage('users'),         fileFilter, limits });
 const prescriptionUpload = multer({ storage: createStorage('prescriptions'), fileFilter, limits });
 
+// ── Dealer registration documents (Drug License, GST, PAN, Cancelled Cheque) ──
+// These may be PDFs *or* images, so unlike the image-only storage above we use
+// resource_type 'auto' (Cloudinary keeps PDFs viewable in-browser) and apply no
+// image transformation (which would break a raw/PDF asset). Files land in
+// fairford/documents. Reviewed by the Super Admin "Dealer Documents" panel.
+const dealerDocsStorage = new CloudinaryStorage({
+  cloudinary,
+  params: (req, file) => ({
+    folder: 'fairford/documents',
+    resource_type: 'auto',
+    // Keep the original extension so the delivered URL opens correctly.
+    public_id: `${Date.now()}-${(file.fieldname || 'doc')}`,
+  }),
+});
+
+const dealerDocsFileFilter = (req, file, cb) => {
+  const allowed = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+  if (allowed.includes(file.mimetype)) return cb(null, true);
+  cb(new Error('Only PDF, JPEG, PNG, and WebP files are allowed for documents.'), false);
+};
+
+const dealerDocsUpload = multer({
+  storage: dealerDocsStorage,
+  fileFilter: dealerDocsFileFilter,
+  limits,
+});
+
+// Field names MUST match the FormData keys the registration form sends.
+exports.uploadDealerDocs = dealerDocsUpload.fields([
+  { name: 'drugLicense',     maxCount: 1 },
+  { name: 'gstCertificate',  maxCount: 1 },
+  { name: 'panCard',         maxCount: 1 },
+  { name: 'cancelledCheque', maxCount: 1 },
+]);
+
 exports.uploadProductImage      = productUpload.single('image');
 exports.uploadProductImages     = productUpload.array('images', 5);
 exports.uploadCategoryImage     = categoryUpload.single('categoryImage');
@@ -67,8 +102,9 @@ exports.handleUploadError = (err, req, res, next) => {
       msg.includes('api_key') ||
       msg.includes('api_secret');
     if (isCloudinaryAuthErr) {
-      console.warn('[upload] Cloudinary not configured — skipping image upload:', msg);
+      console.warn('[upload] Cloudinary not configured — skipping file upload:', msg);
       req.file = undefined;
+      req.files = undefined;
       return next();
     }
     return res.status(400).json({ success: false, message: err.message });

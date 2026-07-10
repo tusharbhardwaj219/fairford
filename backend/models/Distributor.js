@@ -14,6 +14,15 @@ const kycDocSchema = new mongoose.Schema({
   status: { type: String, enum: ['pending', 'verified', 'rejected'], default: 'pending' },
 }, { _id: false });
 
+// Registration document uploaded to Cloudinary at signup (see Retailer.js).
+const registrationDocSchema = new mongoose.Schema({
+  url:          { type: String, default: null },
+  publicId:     { type: String, default: null },
+  fileName:     { type: String, default: null },
+  resourceType: { type: String, default: null },
+  uploadedAt:   { type: Date,   default: null },
+}, { _id: false });
+
 const distributorSchema = new mongoose.Schema({
   name:         { type: String, required: true, trim: true },
   email:        { type: String, required: true, unique: true, lowercase: true, trim: true },
@@ -30,6 +39,13 @@ const distributorSchema = new mongoose.Schema({
   serviceablePincodes: [{ type: String, trim: true }],
   status:       { type: String, enum: ['pending', 'active', 'suspended'], default: 'pending' },
   kycDocuments: [kycDocSchema],
+  // Registration documents uploaded to Cloudinary during signup (see Retailer.js).
+  documents: {
+    drugLicense:     registrationDocSchema,
+    gstCertificate:  registrationDocSchema,
+    panCard:         registrationDocSchema,
+    cancelledCheque: registrationDocSchema,
+  },
   wallet: {
     balance:     { type: Number, default: 0 },
     lastUpdated: { type: Date, default: Date.now },

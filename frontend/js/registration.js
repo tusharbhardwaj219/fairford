@@ -3,6 +3,18 @@ const API_AUTH = '/api/auth';
 let currentStep  = 1;
 let selectedRole = '';
 
+// Registration document files chosen by the dealer, keyed by the backend field
+// name the signup API expects. Populated by handleUpload(), sent by submitForm().
+const uploadedDocs = {};
+
+// Maps each upload zone in the form to its backend document field name.
+const UPLOAD_ZONE_FIELD = {
+  uz1: 'drugLicense',
+  uz2: 'gstCertificate',
+  uz3: 'panCard',
+  uz4: 'cancelledCheque',
+};
+
 const roleLabels = {
   dist: 'Distributor / Stockist',
   ret:  'Retailer / Chemist',
@@ -242,17 +254,39 @@ async function submitForm() {
     return;
   }
 
+  // Mandatory registration documents (Cancelled Cheque is optional in the form).
+  const requiredDocs = [
+    ['drugLicense',    'Drug License (Both Parts)'],
+    ['gstCertificate', 'GST Certificate'],
+    ['panCard',        'PAN Card Copy'],
+  ];
+  const missingDocs = requiredDocs.filter(([k]) => !uploadedDocs[k]).map(([, label]) => label);
+  if (missingDocs.length) {
+    alert('Please upload the required documents: ' + missingDocs.join(', '));
+    return;
+  }
+
   const btn = document.getElementById('submitBtn');
   btn.textContent = 'Submitting…';
   btn.disabled    = true;
   btn.style.opacity = '0.7';
 
   try {
+    // Multipart form-data so the four Cloudinary document files ride along with
+    // the text fields. NOTE: do not set Content-Type manually — the browser adds
+    // the correct multipart boundary automatically.
+    const fd = new FormData();
+    Object.keys(payload).forEach(k => {
+      if (payload[k] !== undefined && payload[k] !== null) fd.append(k, payload[k]);
+    });
+    Object.keys(uploadedDocs).forEach(field => {
+      if (uploadedDocs[field]) fd.append(field, uploadedDocs[field]);
+    });
+
     const res  = await fetch(`${API_AUTH}/signup`, {
       method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
-      body:    JSON.stringify(payload)
+      body:    fd
     });
     const data = await res.json();
 
@@ -273,8 +307,10 @@ async function submitForm() {
     document.getElementById('progressBar').style.width = '100%';
     const screen = document.getElementById('successScreen');
     screen.classList.add('show');
-    const ref = 'FF-2025-' + Math.floor(10000 + Math.random() * 90000);
-    document.getElementById('successRef').textContent = 'Application Ref: ' + ref;
+    // Show the real account identifier (the registered email) rather than a
+    // random number that isn't stored anywhere and can't be looked up later.
+    const acctEmail = (data.user && data.user.email) || payload.email;
+    document.getElementById('successRef').textContent = 'Application submitted for: ' + acctEmail;
     for (let i = 1; i <= 5; i++) {
       const el = document.getElementById('sl-' + i);
       el.className = 'step-item done';
@@ -339,11 +375,21 @@ function otpNext(el, idx) {
 
 function handleUpload(input, zoneId, valId) {
   if (input.files && input.files[0]) {
-    const fname = input.files[0].name;
+    const file = input.files[0];
+    // Guard: 5 MB cap (mirrors the backend multer limit) so we fail fast.
+    if (file.size > 5 * 1024 * 1024) {
+      alert('File is too large. Maximum size is 5 MB.');
+      input.value = '';
+      return;
+    }
+    const fname = file.name;
     document.getElementById(valId).textContent = '✓ ' + fname;
     const zone = document.getElementById(zoneId);
     zone.style.borderColor = 'var(--emerald,#10b981)';
     zone.style.background  = 'rgba(18,184,134,0.07)';
+    // Stash the actual file so submitForm() can upload it to Cloudinary.
+    const field = UPLOAD_ZONE_FIELD[zoneId];
+    if (field) uploadedDocs[field] = file;
   }
 }
 

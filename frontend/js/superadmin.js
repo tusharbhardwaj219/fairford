@@ -1,6 +1,6 @@
 const API_BASE = '/api/superadmin';
 
-const pages = ['dashboard','approvals','distributors','retailers','products','pricing','wallet','schemes','inventory','analytics','reports','dist-mapping','settings'];
+const pages = ['dashboard','approvals','distributors','retailers','documents','products','pricing','wallet','schemes','inventory','analytics','reports','dist-mapping','settings'];
 
 /* ══════════════════════════════════════════
    TOAST NOTIFICATIONS
@@ -1592,6 +1592,182 @@ function closeRetProfile() {
 }
 
 /* ══════════════════════════════════════════
+   DEALER DOCUMENTS
+   Read-only review of the registration documents each dealer uploaded to
+   Cloudinary. View opens the secure_url in a new tab; Download uses the
+   fl_attachment variant the API returns. Missing docs disable both buttons.
+══════════════════════════════════════════ */
+let allDealerDocs = [];
+
+// Inline SVG icons for the Dealer Documents UI (no icon-font dependency).
+const SA_ICON_CHECK = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px"><path d="M20 6 9 17l-5-5"/></svg>';
+const SA_ICON_X     = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px"><path d="M18 6 6 18M6 6l12 12"/></svg>';
+const SA_ICON_FIRM  = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-3M9 9h.01M9 12h.01M9 15h.01"/></svg>';
+const SA_ICON_PHONE = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>';
+const SA_ICON_MAIL  = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>';
+
+async function loadDealerDocs() {
+  const tbody = document.getElementById('doc-tbody');
+  if (!tbody) return;
+  tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--text-3);padding:24px">Loading dealers…</td></tr>`;
+  try {
+    allDealerDocs = await apiFetch('/dealer-documents');
+    renderDealerDocs(allDealerDocs);
+    const complete = allDealerDocs.filter(d => d.docStatus === 'complete').length;
+    const sub = document.getElementById('doc-sub');
+    if (sub) sub.textContent = `${allDealerDocs.length} registered dealer${allDealerDocs.length === 1 ? '' : 's'} · ${complete} with all documents uploaded`;
+  } catch (e) {
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--red,#B03332);padding:24px">Could not load dealers: ${esc(e.message)}</td></tr>`;
+  }
+}
+
+function docStatusBadge(d) {
+  if (d.docStatus === 'complete') return `<span class="badge badge-green">${d.uploaded}/${d.total} Uploaded</span>`;
+  if (d.docStatus === 'none')     return `<span class="badge badge-red">Not Uploaded</span>`;
+  return `<span class="badge badge-amber">${d.uploaded}/${d.total} Uploaded</span>`;
+}
+
+function renderDealerDocs(data) {
+  const tbody = document.getElementById('doc-tbody');
+  if (!tbody) return;
+  if (!data.length) {
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--text-3);padding:24px">No registered dealers found</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = '';
+  data.forEach(d => {
+    const sc = d.status === 'active' ? 'badge-green' : d.status === 'pending' ? 'badge-amber' : 'badge-gray';
+    const statusLabel = d.status ? d.status.charAt(0).toUpperCase() + d.status.slice(1) : '—';
+    tbody.innerHTML += `<tr>
+      <td><strong style="color:var(--pri);cursor:pointer;text-decoration:underline;text-underline-offset:3px" onclick="openDealerDocs('${d.id}')">${esc(d.name || '—')}</strong></td>
+      <td style="font-size:12px">${esc(d.firmName || '—')}</td>
+      <td style="font-size:12px">${esc(d.email || '—')}</td>
+      <td style="font-size:12px">${esc(d.phone || '—')}</td>
+      <td><span class="badge ${sc}">${esc(statusLabel)}</span></td>
+      <td>${docStatusBadge(d)}</td>
+      <td class="tbl-actions"><button class="btn btn-ghost btn-sm" onclick="openDealerDocs('${d.id}')">View Documents</button></td>
+    </tr>`;
+  });
+}
+
+function filterDealerDocs() {
+  const search = (document.getElementById('doc-search')?.value || '').toLowerCase();
+  const status = document.getElementById('doc-status-filter')?.value || '';
+  renderDealerDocs(allDealerDocs.filter(d =>
+    (!search ||
+      (d.name || '').toLowerCase().includes(search) ||
+      (d.firmName || '').toLowerCase().includes(search) ||
+      (d.email || '').toLowerCase().includes(search)) &&
+    (!status || d.docStatus === status)
+  ));
+}
+
+// View: open the Cloudinary secure_url in a new tab (PDFs render, images at full res).
+function viewDealerDoc(url) {
+  if (!url) { toast('Document is not available', 'error'); return; }
+  window.open(url, '_blank', 'noopener');
+}
+
+// Download: fl_attachment URL forces the browser to download the original file.
+function downloadDealerDoc(url, fileName) {
+  if (!url) { toast('Document is not available', 'error'); return; }
+  const a = document.createElement('a');
+  a.href = url;
+  if (fileName) a.download = fileName;
+  a.target = '_blank';
+  a.rel = 'noopener';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+}
+
+function docCardHtml(doc) {
+  const okIcon = doc.uploaded
+    ? `<span style="color:#0A7C4E;font-weight:600;display:inline-flex;align-items:center;gap:4px">${SA_ICON_CHECK} Uploaded</span>`
+    : `<span style="color:#B03332;font-weight:600;display:inline-flex;align-items:center;gap:4px">${SA_ICON_X} Not Uploaded</span>`;
+  const meta = doc.uploaded
+    ? `<div class="doc-card-meta">${esc(doc.fileName || 'file')}${doc.uploadedAt ? ' · ' + esc(doc.uploadedAt) : ''}</div>`
+    : `<div class="doc-card-meta">No document uploaded</div>`;
+  const buttons = doc.uploaded
+    ? `<button class="btn btn-ghost btn-sm" onclick="viewDealerDoc('${encodeURI(doc.url)}')">View</button>
+       <button class="btn btn-pri btn-sm" onclick="downloadDealerDoc('${encodeURI(doc.downloadUrl || doc.url)}','${esc(doc.fileName || '')}')">Download</button>`
+    : `<button class="btn btn-ghost btn-sm" disabled style="opacity:.5;cursor:not-allowed">View</button>
+       <button class="btn btn-ghost btn-sm" disabled style="opacity:.5;cursor:not-allowed">Download</button>`;
+  return `<div class="doc-card">
+    <div class="doc-card-head">
+      <div class="doc-card-title">${esc(doc.label)}</div>
+      ${okIcon}
+    </div>
+    ${meta}
+    <div class="doc-card-actions">${buttons}</div>
+  </div>`;
+}
+
+async function openDealerDocs(id) {
+  const modal = document.getElementById('docModal');
+  const content = document.getElementById('docModalContent');
+  if (!modal || !content) return;
+  content.innerHTML = '<div style="padding:60px;text-align:center;color:var(--text-3);font-size:13px">Loading documents…</div>';
+  modal.classList.add('active');
+  try {
+    const r = await apiFetch(`/dealer-documents/${id}`);
+    const sc = r.status === 'active' ? 'badge-green' : r.status === 'pending' ? 'badge-amber' : 'badge-gray';
+    const statusLabel = r.status ? r.status.charAt(0).toUpperCase() + r.status.slice(1) : '—';
+    content.innerHTML = `
+      <div class="profile-header">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
+          <div style="flex:1;min-width:0">
+            <div style="font-size:18px;font-weight:700;color:#fff;margin-bottom:5px">${esc(r.name || '—')}</div>
+            <div style="display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:rgba(255,255,255,.75)">
+              ${r.firmName ? `<span style="display:inline-flex;align-items:center;gap:5px">${SA_ICON_FIRM} ${esc(r.firmName)}</span>` : ''}
+              ${r.phone ? `<span style="display:inline-flex;align-items:center;gap:5px">${SA_ICON_PHONE} ${esc(r.phone)}</span>` : ''}
+              ${r.email ? `<span style="display:inline-flex;align-items:center;gap:5px">${SA_ICON_MAIL} ${esc(r.email)}</span>` : ''}
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+            <span class="badge ${sc}">${esc(statusLabel)}</span>
+            <button class="profile-close-btn" onclick="closeDealerDocs()">×</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="profile-section">
+        <div class="profile-section-title">Dealer Information</div>
+        <div class="profile-grid">
+          <div><div class="profile-field-label">Firm Name</div><div class="profile-field-val">${esc(r.firmName || '—')}</div></div>
+          <div><div class="profile-field-label">Email</div><div class="profile-field-val">${esc(r.email || '—')}</div></div>
+          <div><div class="profile-field-label">Mobile</div><div class="profile-field-val">${esc(r.phone || '—')}</div></div>
+          <div><div class="profile-field-label">Registration Date</div><div class="profile-field-val">${esc(r.registeredAt || '—')}</div></div>
+          <div><div class="profile-field-label">Dealer Status</div><div class="profile-field-val">${esc(statusLabel)}</div></div>
+          <div><div class="profile-field-label">GSTIN</div><div class="profile-field-val" style="font-family:'DM Mono',monospace;font-size:12px">${esc(r.gstNumber || '—')}</div></div>
+          <div style="grid-column:1/-1"><div class="profile-field-label">Address</div><div class="profile-field-val">${esc(r.address || '—')}</div></div>
+        </div>
+      </div>
+
+      <div class="profile-section">
+        <div class="profile-section-title">Uploaded Documents</div>
+        <div class="doc-grid">
+          ${(r.documents || []).map(docCardHtml).join('')}
+        </div>
+      </div>
+
+      <div class="profile-footer">
+        <span></span>
+        <button class="btn btn-ghost" onclick="closeDealerDocs()">Close</button>
+      </div>`;
+  } catch (e) {
+    content.innerHTML = `<div style="padding:48px;text-align:center;color:var(--red,#B03332)">
+      Could not load documents: ${esc(e.message)}
+      <div style="margin-top:16px"><button class="btn btn-ghost" onclick="closeDealerDocs()">Close</button></div>
+    </div>`;
+  }
+}
+
+function closeDealerDocs() {
+  document.getElementById('docModal')?.classList.remove('active');
+}
+
+/* ══════════════════════════════════════════
    LOW STOCK EMAIL
 ══════════════════════════════════════════ */
 async function sendLowStockEmail(id, name, email, items) {
@@ -1667,6 +1843,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     loadApprovalsTable(),
     loadDistributors(),
     loadRetailers(),
+    loadDealerDocs(),
     loadProducts(),
     loadInventory(),
     loadWallet(),

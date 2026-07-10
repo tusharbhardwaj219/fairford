@@ -204,7 +204,8 @@ const getOrderById = async (req, res) => {
     // record was deleted) — dereferencing ._id would otherwise throw a 500.
     const retailerId    = order.retailer    && order.retailer._id    && order.retailer._id.toString();
     const distributorId = order.distributor && order.distributor._id && order.distributor._id.toString();
-    const isOwner =
+    const isAdmin = req.user.role === 'admin' || req.user.role === 'superadmin';
+    const isOwner = isAdmin ||
       (req.user.role === 'ret'  && retailerId    === req.user.id) ||
       (req.user.role === 'dist' && distributorId === req.user.id);
 
@@ -308,22 +309,27 @@ const returnOrder = async (req, res) => {
 // PUT /api/orders/:id/cancel
 const cancelOrder = async (req, res) => {
   try {
-    const order = await Order.findById(req.params.id);
-    if (!order) return res.status(404).json({ success: false, message: 'Order not found' });
+    // Owner scope lives in the query (no order.retailer.toString() that would
+    // throw on a deleted ref). The transition is a single atomic update matched
+    // on a cancellable status, so two concurrent cancels can't both win and
+    // double-restore stock — only the first matches.
+    const ownerFilter =
+      req.user.role === 'ret'  ? { retailer:    req.user._id } :
+      req.user.role === 'dist' ? { distributor: req.user._id } : null;
+    if (!ownerFilter) return res.status(403).json({ success: false, message: 'Access denied' });
 
-    const isOwner =
-      (req.user.role === 'ret'  && order.retailer.toString()    === req.user.id) ||
-      (req.user.role === 'dist' && order.distributor.toString() === req.user.id);
+    const order = await Order.findOneAndUpdate(
+      { _id: req.params.id, ...ownerFilter, status: { $in: ['pending', 'approved'] } },
+      { $set: { status: 'cancelled' }, $push: { timeline: { status: 'cancelled', note: req.body.reason || 'Cancelled' } } },
+      { returnDocument: 'after' }
+    );
 
-    if (!isOwner) return res.status(403).json({ success: false, message: 'Access denied' });
-
-    if (!['pending', 'approved'].includes(order.status)) {
-      return res.status(400).json({ success: false, message: `Cannot cancel order in '${order.status}' status` });
+    if (!order) {
+      // Disambiguate: does the caller own an order with this id at all?
+      const existing = await Order.findOne({ _id: req.params.id, ...ownerFilter }).select('status');
+      if (!existing) return res.status(404).json({ success: false, message: 'Order not found' });
+      return res.status(400).json({ success: false, message: `Cannot cancel order in '${existing.status}' status` });
     }
-
-    order.status = 'cancelled';
-    order.timeline.push({ status: 'cancelled', note: req.body.reason || 'Cancelled' });
-    await order.save();
 
     // Restore central stock (credit/wallet no longer used — cash on delivery)
     for (const item of order.items) {

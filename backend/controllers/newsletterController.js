@@ -2,13 +2,22 @@ const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 const Newsletter = require('../models/Newsletter');
 
-const getTransporter = () => nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
+// Honor explicit SMTP settings when provided, else fall back to Gmail. (Audit H-3)
+const getTransporter = () => {
+  if (process.env.SMTP_HOST) {
+    const port = Number(process.env.SMTP_PORT) || 587;
+    return nodemailer.createTransport({
+      host: process.env.SMTP_HOST,
+      port,
+      secure: port === 465,
+      auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS }
+    });
   }
-});
+  return nodemailer.createTransport({
+    service: 'gmail',
+    auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS }
+  });
+};
 
 const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 const generateUnsubscribeToken = () => crypto.randomBytes(32).toString('hex');

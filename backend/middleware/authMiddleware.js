@@ -40,6 +40,14 @@ const verifyToken = async (req, res, next) => {
       return res.status(401).json({ success: false, message: 'User no longer exists' });
     }
 
+    // Deactivated admins (Admin.isActive === false) are rejected on EVERY route,
+    // including the admin panels which don't use requireActive. The user is loaded
+    // fresh each request, so deactivation takes effect immediately even for a
+    // token issued before it. (Audit R2-H1)
+    if (user.isActive === false) {
+      return res.status(401).json({ success: false, message: 'Account deactivated. Please contact support.' });
+    }
+
     req.user = user;
     req.user.id = user._id.toString();
     req.token = token; // Store token for logout
@@ -87,6 +95,11 @@ const authorizeRoles = (...roles) => (req, res, next) => {
 };
 
 const requireActive = (req, res, next) => {
+  // Deactivated admins (isActive:false) are blocked even if they still hold a
+  // valid token issued before deactivation.
+  if (req.user && req.user.isActive === false) {
+    return res.status(403).json({ success: false, message: 'Account deactivated. Please contact support.' });
+  }
   if (req.user && req.user.status && req.user.status !== 'active') {
     return res.status(403).json({
       success: false,

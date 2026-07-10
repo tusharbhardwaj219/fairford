@@ -14,6 +14,17 @@ const kycDocSchema = new mongoose.Schema({
   status: { type: String, enum: ['pending', 'verified', 'rejected'], default: 'pending' },
 }, { _id: false });
 
+// A single registration document uploaded to Cloudinary at signup. Stores the
+// Cloudinary secure_url plus enough metadata for the Super Admin panel to view
+// (open in a new tab) and download the original file. Nothing is served locally.
+const registrationDocSchema = new mongoose.Schema({
+  url:          { type: String, default: null }, // Cloudinary secure_url
+  publicId:     { type: String, default: null }, // Cloudinary public_id (for delete)
+  fileName:     { type: String, default: null }, // original uploaded file name
+  resourceType: { type: String, default: null }, // mime type, e.g. application/pdf, image/png
+  uploadedAt:   { type: Date,   default: null },
+}, { _id: false });
+
 const retailerSchema = new mongoose.Schema({
   name:      { type: String, required: true, trim: true },
   email:     { type: String, required: true, unique: true, lowercase: true, trim: true },
@@ -30,6 +41,15 @@ const retailerSchema = new mongoose.Schema({
   },
   status:       { type: String, enum: ['pending', 'active', 'suspended'], default: 'pending' },
   kycDocuments: [kycDocSchema],
+  // Registration documents uploaded to Cloudinary during signup. Reviewed by the
+  // Super Admin panel's "Dealer Documents" section. Additive — legacy accounts
+  // simply have this unset.
+  documents: {
+    drugLicense:     registrationDocSchema,
+    gstCertificate:  registrationDocSchema,
+    panCard:         registrationDocSchema,
+    cancelledCheque: registrationDocSchema,
+  },
   creditLimit: { type: Number, default: 100000 },
   creditUsed:  { type: Number, default: 0 },
   wallet: {

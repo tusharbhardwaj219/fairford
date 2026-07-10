@@ -1,22 +1,66 @@
 const nodemailer = require('nodemailer');
 
+// Prefer explicit SMTP settings when provided (SMTP_HOST/SMTP_PORT), otherwise
+// fall back to Gmail's service preset. Previously SMTP_* env vars were ignored,
+// so a non-Gmail sender (or a Gmail account without an App Password) silently
+// failed — breaking password-reset and notification emails. (Audit H-3)
 const createTransporter = () => {
+    if (process.env.SMTP_HOST) {
+        const port = Number(process.env.SMTP_PORT) || 587;
+        return nodemailer.createTransport({
+            host: process.env.SMTP_HOST,
+            port,
+            secure: port === 465, // implicit TLS on 465, STARTTLS otherwise
+            auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
+        });
+    }
     return nodemailer.createTransport({
         service: 'gmail',
-        auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS,
-        },
+        auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
     });
 };
 
+// HTML-escape user-supplied values before embedding them in an email body so a
+// crafted name/message can't inject markup into the recipient's inbox. (Audit M-1)
+const esc = (v) => String(v == null ? '' : v).replace(/[&<>"']/g, (m) => (
+    { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]
+));
+// Strip CR/LF so a value used in a header (subject) can't inject extra headers.
+const oneLine = (v) => String(v == null ? '' : v).replace(/[\r\n]+/g, ' ').trim();
+
+/**
+ * Verify the mail transport at boot (non-blocking). Logs a clear warning if mail
+ * is misconfigured so security emails don't fail silently in production.
+ */
+const verifyMailTransport = async () => {
+    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+        console.warn('[email] EMAIL_USER/EMAIL_PASS not set — outgoing email is disabled.');
+        return;
+    }
+    try {
+        await createTransporter().verify();
+        console.log('[email] Mail transport verified.');
+    } catch (err) {
+        console.warn('[email] Mail transport verification FAILED — emails may not send:', err.message);
+    }
+};
+
 const sendAdminNotification = async (contactData) => {
+    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+        console.warn('[email] EMAIL_USER/EMAIL_PASS not set — skipping contact notification');
+        return;
+    }
     const transporter = createTransporter();
+
+    // Contact-form submissions go to the company inbox. Override with CONTACT_EMAIL
+    // only if a different recipient is ever needed.
+    const recipient = process.env.CONTACT_EMAIL || 'info@fairfordpharma.com';
 
     await transporter.sendMail({
         from: `"Fair Ford Pharmaceuticals" <${process.env.EMAIL_USER}>`,
-        to: process.env.ADMIN_EMAIL,
-        subject: 'New Contact Inquiry',
+        to: recipient,
+        replyTo: contactData.email,   // so replying goes straight to the enquirer
+        subject: oneLine(`New Contact Inquiry — ${contactData.name}`),
         html: `
             <div style="font-family:Arial,sans-serif;padding:20px;background:#f4f4f4;">
               <div style="background:#fff;padding:30px;border-radius:8px;max-width:600px;margin:0 auto;">
@@ -26,29 +70,29 @@ const sendAdminNotification = async (contactData) => {
                 <table style="width:100%;border-collapse:collapse;margin-top:20px;">
                   <tr>
                     <td style="padding:12px 0;border-bottom:1px solid #eee;font-weight:bold;color:#555;width:140px;">Name:</td>
-                    <td style="padding:12px 0;border-bottom:1px solid #eee;color:#333;">${contactData.name}</td>
+                    <td style="padding:12px 0;border-bottom:1px solid #eee;color:#333;">${esc(contactData.name)}</td>
                   </tr>
                   <tr>
                     <td style="padding:12px 0;border-bottom:1px solid #eee;font-weight:bold;color:#555;">Email:</td>
-                    <td style="padding:12px 0;border-bottom:1px solid #eee;color:#333;">${contactData.email}</td>
+                    <td style="padding:12px 0;border-bottom:1px solid #eee;color:#333;">${esc(contactData.email)}</td>
                   </tr>
                   <tr>
                     <td style="padding:12px 0;border-bottom:1px solid #eee;font-weight:bold;color:#555;">Phone:</td>
-                    <td style="padding:12px 0;border-bottom:1px solid #eee;color:#333;">${contactData.phone}</td>
+                    <td style="padding:12px 0;border-bottom:1px solid #eee;color:#333;">${esc(contactData.phone)}</td>
                   </tr>
                   <tr>
                     <td style="padding:12px 0;border-bottom:1px solid #eee;font-weight:bold;color:#555;">Inquiry Type:</td>
-                    <td style="padding:12px 0;border-bottom:1px solid #eee;color:#333;">${contactData.inquiryType}</td>
+                    <td style="padding:12px 0;border-bottom:1px solid #eee;color:#333;">${esc(contactData.inquiryType)}</td>
                   </tr>
                   <tr>
                     <td style="padding:12px 0;font-weight:bold;color:#555;vertical-align:top;">Message:</td>
-                    <td style="padding:12px 0;color:#333;">${contactData.message}</td>
+                    <td style="padding:12px 0;color:#333;">${esc(contactData.message)}</td>
                   </tr>
                 </table>
                 <div style="margin-top:20px;padding:10px;background:#f9f9f9;border-radius:4px;font-size:12px;color:#888;">
                   <p style="margin:4px 0;">Submitted: ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}</p>
-                  <p style="margin:4px 0;">IP Address: ${contactData.ipAddress || 'N/A'}</p>
-                  <p style="margin:4px 0;">User Agent: ${contactData.userAgent || 'N/A'}</p>
+                  <p style="margin:4px 0;">IP Address: ${esc(contactData.ipAddress || 'N/A')}</p>
+                  <p style="margin:4px 0;">User Agent: ${esc(contactData.userAgent || 'N/A')}</p>
                 </div>
               </div>
             </div>
@@ -70,7 +114,7 @@ const sendUserAutoReply = async (name, email) => {
                   <h1 style="color:#0F4C81;font-size:22px;margin:0;">Fair Ford Pharmaceuticals</h1>
                   <p style="color:#888;font-size:13px;margin-top:4px;">Pvt. Ltd.</p>
                 </div>
-                <p style="color:#333;font-size:16px;">Dear <strong>${name}</strong>,</p>
+                <p style="color:#333;font-size:16px;">Dear <strong>${esc(name)}</strong>,</p>
                 <p style="color:#555;line-height:1.8;">Thank you for contacting us.</p>
                 <p style="color:#555;line-height:1.8;">
                   Our team has received your inquiry and will respond within <strong>24 hours</strong>.
@@ -213,4 +257,4 @@ const sendPasswordResetEmail = async (email, name, resetUrl) => {
     });
 };
 
-module.exports = { sendAdminNotification, sendUserAutoReply, sendDistributorOrderNotification, sendPasswordResetEmail };
+module.exports = { sendAdminNotification, sendUserAutoReply, sendDistributorOrderNotification, sendPasswordResetEmail, verifyMailTransport };

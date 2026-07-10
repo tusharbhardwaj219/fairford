@@ -24,15 +24,23 @@ function selectRole(btn, role) {
 }
 
 // ── Password toggle ───────────────────────────────────────────────────────────
+// Inline SVGs (icon font is blocked by the site CSP, so we swap raw SVG markup).
+const EYE_SVG =
+  '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>';
+const EYE_OFF_SVG =
+  '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.9 4.24A9.1 9.1 0 0 1 12 4c6.5 0 10 7 10 7a13.2 13.2 0 0 1-1.67 2.42M6.6 6.6C3.9 8.2 2 12 2 12s3.5 7 10 7a9.1 9.1 0 0 0 3.4-.6M3 3l18 18"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>';
+
 function togglePw() {
   const inp = document.getElementById('password');
   const btn = document.querySelector('.pw-toggle');
   if (inp.type === 'password') {
     inp.type = 'text';
-    btn.innerHTML = '<i class="ri-eye-off-line"></i>';
+    btn.innerHTML = EYE_OFF_SVG;
+    btn.setAttribute('aria-label', 'Hide password');
   } else {
     inp.type = 'password';
-    btn.innerHTML = '<i class="ri-eye-line"></i>';
+    btn.innerHTML = EYE_SVG;
+    btn.setAttribute('aria-label', 'Show password');
   }
 }
 

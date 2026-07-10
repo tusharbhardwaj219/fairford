@@ -80,6 +80,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 6h18l-2 9H5L3 6z"/><circle cx="9" cy="20" r="1"/><circle cx="17" cy="20" r="1"/><path d="M3 6l-1-3H1"/></svg>
     <span class="sb-item-label">Retailers</span>
   </a>
+  <a class="sb-item" data-tooltip="Dealer Documents" onclick="showPage('documents')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg>
+    <span class="sb-item-label">Dealer Documents</span>
+  </a>
   <a class="sb-item" data-tooltip="Products" onclick="showPage('products')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M2 17h20"/><path d="M5 21h14"/></svg>
     <span class="sb-item-label">Products</span>
@@ -395,6 +399,36 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <table class="data">
           <thead><tr><th>Retailer</th><th>City / State</th><th>Type</th><th>Assigned Dist.</th><th>Monthly Orders</th><th>Last Order</th><th>Status &amp; Actions</th></tr></thead>
           <tbody id="ret-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════ PAGE: DEALER DOCUMENTS ══════ -->
+  <div class="page" id="pg-documents">
+    <div class="pg-header">
+      <div>
+        <div class="pg-title">Dealer Documents</div>
+        <div class="pg-sub" id="doc-sub">Registration documents uploaded by dealers</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Registered Dealers</span>
+        <div style="display:flex;gap:8px">
+          <input id="doc-search" class="form-input" placeholder="Search dealer, firm, email…" style="width:220px" oninput="filterDealerDocs()">
+          <select id="doc-status-filter" class="form-input" style="width:150px" onchange="filterDealerDocs()">
+            <option value="">All Documents</option>
+            <option value="complete">All Uploaded</option>
+            <option value="partial">Partially Uploaded</option>
+            <option value="none">Not Uploaded</option>
+          </select>
+        </div>
+      </div>
+      <div class="tbl-wrap">
+        <table class="data">
+          <thead><tr><th>Dealer Name</th><th>Firm Name</th><th>Email</th><th>Mobile</th><th>Registration</th><th>Documents</th><th>Action</th></tr></thead>
+          <tbody id="doc-tbody"></tbody>
         </table>
       </div>
     </div>
@@ -919,6 +953,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- ═════════ RETAILER PROFILE MODAL ═════════ -->
 <div id="retProfileModal" class="modal" onclick="event.target===this&&closeRetProfile()">
   <div class="modal-content profile-modal-content" id="retProfileContent">
+    <div style="padding:48px;text-align:center;color:var(--text-3)">Loading…</div>
+  </div>
+</div>
+
+<!-- ═════════ DEALER DOCUMENTS MODAL ═════════ -->
+<div id="docModal" class="modal" onclick="event.target===this&&closeDealerDocs()">
+  <div class="modal-content profile-modal-content" id="docModalContent">
     <div style="padding:48px;text-align:center;color:var(--text-3)">Loading…</div>
   </div>
 </div>

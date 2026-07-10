@@ -8,7 +8,7 @@ const distOnly = [verifyToken, authorizeRoles('dist'), requireActive];
 const authAny  = [verifyToken];
 
 router.get('/all', ...authAny, getAllSchemes);
-router.get('/:id', getSchemeById);
+router.get('/:id', ...authAny, getSchemeById);
 router.post('/',   ...distOnly, createScheme);
 router.put('/:id', ...distOnly, updateScheme);
 router.delete('/:id', ...distOnly, deleteScheme);
