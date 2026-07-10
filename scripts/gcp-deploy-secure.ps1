@@ -12,7 +12,7 @@ foreach ($ln in Get-Content $envYaml) {
 
 $SA      = 'fairford-run@fair-ford-pharma.iam.gserviceaccount.com'
 $secrets = 'MONGO_URI=MONGO_URI:latest,JWT_SECRET=JWT_SECRET:latest,JWT_REFRESH_SECRET=JWT_REFRESH_SECRET:latest,CLOUDINARY_API_KEY=CLOUDINARY_API_KEY:latest,CLOUDINARY_API_SECRET=CLOUDINARY_API_SECRET:latest,EMAIL_PASS=EMAIL_PASS:latest'
-$envVars = "NODE_ENV=production,FRONTEND_URL=https://fairfordpharma.com,JWT_EXPIRES_IN=7d,CLOUDINARY_CLOUD_NAME=$($map['CLOUDINARY_CLOUD_NAME']),EMAIL_USER=$($map['EMAIL_USER']),ADMIN_EMAIL=$($map['ADMIN_EMAIL'])"
+$envVars = "NODE_ENV=production,FRONTEND_URL=https://fairfordpharma.com,JWT_EXPIRES_IN=1d,CLOUDINARY_CLOUD_NAME=$($map['CLOUDINARY_CLOUD_NAME']),EMAIL_USER=$($map['EMAIL_USER']),ADMIN_EMAIL=$($map['ADMIN_EMAIL'])"
 
 Push-Location $root
 try {

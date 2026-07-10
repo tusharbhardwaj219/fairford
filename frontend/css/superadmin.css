@@ -615,7 +615,7 @@ table.data td .badge+.btn{margin-left:4px}
 /* ════════════════════════════════
    PROFILE MODAL
 ════════════════════════════════ */
-.profile-modal-content{max-width:700px;padding:0;overflow:hidden}
+.profile-modal-content{max-width:700px;padding:0;overflow-y:auto;overflow-x:hidden}
 .profile-header{
   background:linear-gradient(135deg,var(--pri-dark) 0%,var(--pri) 100%);
   padding:24px 28px;
