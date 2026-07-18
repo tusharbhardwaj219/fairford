@@ -446,6 +446,7 @@ document.addEventListener('DOMContentLoaded', function(){
   const total = dots.length;
   let current = 0;
   let autoTimer;
+  let hovering = false;
 
   function goTo(index) {
     current = (index + total) % total;
@@ -456,12 +457,19 @@ document.addEventListener('DOMContentLoaded', function(){
   }
 
   function startAuto() {
+    clearInterval(autoTimer);
     autoTimer = setInterval(function () { goTo(current + 1); }, 5000);
   }
 
-  function resetAuto() {
+  function stopAuto() {
     clearInterval(autoTimer);
-    startAuto();
+  }
+
+  // Restart the timer after a manual jump — unless the cursor is still
+  // resting on the slides, in which case it stays paused.
+  function resetAuto() {
+    if (hovering) stopAuto();
+    else startAuto();
   }
 
   prevBtn.addEventListener('click', function () { goTo(current - 1); resetAuto(); });
@@ -473,6 +481,18 @@ document.addEventListener('DOMContentLoaded', function(){
       resetAuto();
     });
   });
+
+  // Pause while the cursor sits on the slides (or the arrows over them);
+  // resume as soon as it moves off — dots and stats below keep it running.
+  // Skipped on touch-only devices, where a tap fires mouseenter with no
+  // matching mouseleave and would leave the slider stuck.
+  if (window.matchMedia('(hover: hover)').matches) {
+    [track, prevBtn, nextBtn].forEach(function (el) {
+      if (!el) return;
+      el.addEventListener('mouseenter', function () { hovering = true; stopAuto(); });
+      el.addEventListener('mouseleave', function () { hovering = false; startAuto(); });
+    });
+  }
 
   // Touch / swipe support
   let touchStartX = 0;
