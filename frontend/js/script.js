@@ -332,7 +332,7 @@ function renderCart(){
     foot.style.display='block';
     foot.innerHTML = `
       <div class="totals">
-        <div class="totals-row"><span>Subtotal (${entries.length} SKU${entries.length===1?'':'s'})</span><b>${inr(subtotal)}</b></div>
+        <div class="totals-row"><span>Subtotal (${entries.length} item${entries.length===1?'':'s'})</span><b>${inr(subtotal)}</b></div>
         <div class="totals-row"><span>GST (12%, estimate)</span><b>${inr(gst)}</b></div>
         <div class="totals-row grand"><span>Order Total</span><b>${inr(subtotal+gst)}</b></div>
       </div>
@@ -663,7 +663,7 @@ function renderDivisions() {
                 ${getIconSVG(division.icon, division.color)}
             </div>
             <h3 class="division-title">${division.title}</h3>
-            <p class="division-meta">${division.skus} SKUs · ${division.brands} brands</p>
+            <p class="division-meta">${division.brands} brands</p>
             <div class="browse-link">
                 <span>Browse division</span>
                 <span class="browse-arrow">→</span>

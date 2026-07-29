@@ -803,7 +803,7 @@ table.data td .badge+.btn{margin-left:4px}
   #pg-products table.data td:nth-child(11) { display: none; }
 }
 
-/* ≤ 760px — header stacks, filters become full-width, drop SKU + Status too */
+/* ≤ 760px — header stacks, filters become full-width, drop Status too */
 @media (max-width: 760px) {
   #pg-products .pg-header { flex-direction: column; align-items: stretch; gap: 12px; }
   #pg-products .pg-header .btn { width: 100%; justify-content: center; }
@@ -812,10 +812,8 @@ table.data td .badge+.btn{margin-left:4px}
   .prod-filter-search,
   .prod-filter-sel { flex: 1 1 140px; }
 
-  #pg-products table.data th:nth-child(3),  /* SKU */
-  #pg-products table.data td:nth-child(3),
-  #pg-products table.data th:nth-child(10), /* Status */
-  #pg-products table.data td:nth-child(10) { display: none; }
+  #pg-products table.data th:nth-child(9), /* Status */
+  #pg-products table.data td:nth-child(9) { display: none; }
 
   .prod-image-picker { flex-direction: column; }
   .prod-image-preview { width: 100%; height: 180px; }

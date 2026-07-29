@@ -17,23 +17,17 @@ document.addEventListener('DOMContentLoaded', function () {
   const token   = localStorage.getItem('ff_token');
   const userRaw = localStorage.getItem('ff_user');
 
-  if (!token || !userRaw) {
-    // Store intended destination so login can redirect back
-    if (productId) {
-      localStorage.setItem('ff_redirect_product', productId);
+  // Browsing is public. Anonymous visitors see MRP only and are asked to log in
+  // to order (handled in render()). currentUser stays null when logged out.
+  let currentUser = null;
+  if (token && userRaw) {
+    try {
+      currentUser = JSON.parse(userRaw);
+    } catch (_) {
+      localStorage.removeItem('ff_token');
+      localStorage.removeItem('ff_user');
+      currentUser = null;
     }
-    window.location.href = 'login&signup.html';
-    return;
-  }
-
-  let currentUser;
-  try {
-    currentUser = JSON.parse(userRaw);
-  } catch (_) {
-    localStorage.removeItem('ff_token');
-    localStorage.removeItem('ff_user');
-    window.location.href = 'login&signup.html';
-    return;
   }
 
   if (!productId) {
@@ -146,7 +140,8 @@ document.addEventListener('DOMContentLoaded', function () {
   function render(p, user) {
     hideSkeleton();
 
-    const role    = (user && user.role) || 'ret';
+    const IS_ANON = !user;
+    const role    = (user && user.role) || '';
     const IS_DIST = role === 'dist';
     const IS_RET  = role === 'ret';
 
@@ -174,7 +169,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const root = document.getElementById('detail-root');
     root.innerHTML =
       buildBreadcrumb(p, catName) +
-      buildHero(p, inStock, moq, userPrice, mrp, discount, IS_DIST, IS_RET, stock, catName) +
+      buildHero(p, inStock, moq, userPrice, mrp, discount, IS_DIST, IS_RET, stock, catName, IS_ANON) +
       buildHighlights(p, inStock) +
       buildTabs(p, IS_DIST, catName) +
       buildReviews(p) +
@@ -183,7 +178,7 @@ document.addEventListener('DOMContentLoaded', function () {
     root.hidden = false;
 
     // Build sticky bottom widget
-    buildStickyWidget(p, inStock, moq, userPrice, catName);
+    buildStickyWidget(p, inStock, moq, userPrice, catName, IS_ANON);
 
     wireEvents(p, inStock, moq, userPrice);
 
@@ -206,7 +201,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // ── Builder: Hero section ─────────────────────────────────────────────────
 
-  function buildHero(p, inStock, moq, userPrice, mrp, discount, IS_DIST, IS_RET, stock, catName) {
+  function buildHero(p, inStock, moq, userPrice, mrp, discount, IS_DIST, IS_RET, stock, catName, IS_ANON) {
     // Normalise image data: API returns images as [{url, public_id}, ...]
     // while static catalogue entries (or already-flattened sources) may pass plain URL strings.
     // Also fall back to the singular `image` field if the gallery is empty.
@@ -327,13 +322,19 @@ document.addEventListener('DOMContentLoaded', function () {
 
       <div class="pd-price-section">
         <div class="pd-price-cards-row">
+          ${IS_ANON ? `
+          <div class="pd-price-card pd-price-card-main">
+            <div class="pd-price-card-label">MRP</div>
+            <div class="pd-price-card-amount">₹${mrp.toLocaleString('en-IN')}</div>
+            <div class="pd-price-card-note">Log in to see your price</div>
+          </div>` : `
           <div class="pd-price-card pd-price-card-main">
             <div class="pd-price-card-label">${IS_DIST ? 'Distributor Price' : 'Retailer Price'}</div>
             <div class="pd-price-card-amount">₹${userPrice.toLocaleString('en-IN')}</div>
             <div class="pd-price-card-note">per unit • COD</div>
           </div>
           ${mrpBadge}
-          ${saveBadge}
+          ${saveBadge}`}
         </div>
         <div class="pd-tax-note">✓ All prices inclusive of applicable taxes</div>
       </div>
@@ -352,6 +353,11 @@ document.addEventListener('DOMContentLoaded', function () {
         </div>
 
         <div class="pd-cta-row">
+          ${IS_ANON ? `
+          <a class="pd-cta pd-cta-primary" href="login&signup.html" style="text-decoration:none">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+            Login to order
+          </a>` : `
           <button class="pd-cta pd-cta-primary" id="pd-add-cart"
             ${!inStock ? 'disabled' : ''}>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
@@ -361,7 +367,7 @@ document.addEventListener('DOMContentLoaded', function () {
             ${!inStock ? 'disabled' : ''}>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
             Buy Now
-          </button>
+          </button>`}
         </div>
 
         <div class="pd-cta-row pd-cta-row-sec">
@@ -704,10 +710,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // ── Builder: Sticky widget ────────────────────────────────────────────────
 
-  function buildStickyWidget(p, inStock, moq, userPrice, catName) {
+  function buildStickyWidget(p, inStock, moq, userPrice, catName, IS_ANON) {
     const existing = document.getElementById('pd-sticky-widget');
     if (existing) existing.remove();
 
+    const swPrice = IS_ANON ? (p.mrp || 0) : userPrice;
     const widget = document.createElement('div');
     widget.className = 'pd-sticky-widget';
     widget.id = 'pd-sticky-widget';
@@ -716,8 +723,13 @@ document.addEventListener('DOMContentLoaded', function () {
       <div class="pd-sw-thumb">${categoryIcon(catName)}</div>
       <div class="pd-sw-info">
         <div class="pd-sw-name">${esc(p.name)}</div>
-        <div class="pd-sw-price">₹${userPrice.toLocaleString('en-IN')}</div>
+        <div class="pd-sw-price">₹${swPrice.toLocaleString('en-IN')}${IS_ANON ? ' <span style="font-weight:500;font-size:.8em;opacity:.7">MRP</span>' : ''}</div>
       </div>
+      ${IS_ANON ? `
+      <a class="pd-sw-cart" href="login&signup.html" style="text-decoration:none">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+        Login to order
+      </a>` : `
       <div class="pd-sw-qty">
         <button class="pd-sw-qbtn" id="pd-sw-minus">−</button>
         <input class="pd-sw-qinp" type="number" id="pd-sw-qty" value="${moq}" min="${moq}" />
@@ -726,7 +738,7 @@ document.addEventListener('DOMContentLoaded', function () {
       <button class="pd-sw-cart" id="pd-sw-cart" ${!inStock ? 'disabled' : ''}>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
         ${inStock ? 'Add to Cart' : 'Out of Stock'}
-      </button>
+      </button>`}
     </div>`;
     document.body.appendChild(widget);
   }

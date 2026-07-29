@@ -45,7 +45,7 @@ const PRODUCTS = [
     sideEffects: ["Nausea", "Headache", "Dizziness", "Skin rash (rare)"],
     storage: ["Store below 25°C", "Keep away from direct sunlight", "Keep out of reach of children"],
     distributor: { name: "HealthLine Distributors Pvt. Ltd.", location: "Mumbai, Maharashtra", phone: "+91 98200 11223", email: "sales@healthlinedist.in" },
-    delivery: { time: "2–4 business days", coverage: "Pan India (28 states)", shipping: "Free shipping on orders above ₹5,000" }
+    delivery: { time: "2–4 business days", coverage: "Pan India (17 states)", shipping: "Free shipping on orders above ₹5,000" }
   },
   {
     id: "med-002",
