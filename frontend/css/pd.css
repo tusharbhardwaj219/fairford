@@ -928,6 +928,8 @@
   flex-shrink: 0;
 }
 .pd-sw-thumb svg { width: 100%; height: 100%; }
+.pd-sw-thumb img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.pd-sw-thumb-svg { width: 100%; height: 100%; }
 .pd-sw-info { flex: 1; min-width: 0; }
 .pd-sw-name {
   font-size: .85rem;
@@ -1741,6 +1743,15 @@ body.pd-sw-active .back-to-top {
   color: #9CA3AF;
   text-decoration: line-through;
   font-weight: 500;
+}
+/* Small "MRP" tag shown before the price for logged-out visitors. */
+.pl-price-label-inline {
+  font-size: .62rem;
+  font-weight: 700;
+  color: #6B7280;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  align-self: center;
 }
 .pl-discount-badge {
   display: inline-flex;

@@ -2678,6 +2678,31 @@ img {
     border-color: transparent;
 }
 
+/* Extra badge accents used across the Top Selling cards for visual variety. */
+.product-card__badge--green {
+    background: linear-gradient(135deg, #059669, #10b981);
+    color: #fff;
+    border-color: transparent;
+}
+
+.product-card__badge--teal {
+    background: linear-gradient(135deg, #0891b2, #06b6d4);
+    color: #fff;
+    border-color: transparent;
+}
+
+.product-card__badge--purple {
+    background: linear-gradient(135deg, #7c3aed, #9333ea);
+    color: #fff;
+    border-color: transparent;
+}
+
+.product-card__badge--amber {
+    background: linear-gradient(135deg, #d97706, #f59e0b);
+    color: #fff;
+    border-color: transparent;
+}
+
 .product-card__badge i {
     font-size: 10px;
 }

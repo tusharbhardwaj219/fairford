@@ -49,3 +49,4 @@ const Admin = require('./models/Admin');
   console.error('Failed:', err.message);
   process.exit(1);
 });
+

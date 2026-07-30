@@ -253,7 +253,7 @@ const login = async (req, res, next) => {
                      : user.role === 'dist' ? '/distributor.html'
                      : (user.role === 'admin' || user.role === 'superadmin') ? '/superadmin.html'
                      : '/index.html';
-
+ 
     return res.status(200).json({
       success: true,
       message: 'Login successful',

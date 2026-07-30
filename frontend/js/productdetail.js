@@ -17,23 +17,17 @@ document.addEventListener('DOMContentLoaded', function () {
   const token   = localStorage.getItem('ff_token');
   const userRaw = localStorage.getItem('ff_user');
 
-  if (!token || !userRaw) {
-    // Store intended destination so login can redirect back
-    if (productId) {
-      localStorage.setItem('ff_redirect_product', productId);
+  // Viewing a product is open to guests — only adding to the cart requires
+  // login (gated centrally in common.js). Signed-in users get role-based trade
+  // pricing; guests see the public MRP.
+  let currentUser = null;
+  if (userRaw) {
+    try {
+      currentUser = JSON.parse(userRaw);
+    } catch (_) {
+      localStorage.removeItem('ff_token');
+      localStorage.removeItem('ff_user');
     }
-    window.location.href = 'login&signup.html';
-    return;
-  }
-
-  let currentUser;
-  try {
-    currentUser = JSON.parse(userRaw);
-  } catch (_) {
-    localStorage.removeItem('ff_token');
-    localStorage.removeItem('ff_user');
-    window.location.href = 'login&signup.html';
-    return;
   }
 
   if (!productId) {
@@ -105,13 +99,15 @@ document.addEventListener('DOMContentLoaded', function () {
     return;
   }
 
-  // MongoDB ObjectID path — fetch from real API
+  // MongoDB ObjectID path — fetch from real API. The endpoint uses optionalAuth,
+  // so guests get the product with MRP only; the token (when present) unlocks
+  // role-based trade pricing.
+  const authHeaders = { 'Content-Type': 'application/json' };
+  if (token) authHeaders['Authorization'] = `Bearer ${token}`;
+
   fetch(`${API_BASE}/products/${productId}`, {
     method:  'GET',
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type':  'application/json'
-    }
+    headers: authHeaders
   })
   .then(function (res) {
     if (res.status === 401) {
@@ -146,9 +142,10 @@ document.addEventListener('DOMContentLoaded', function () {
   function render(p, user) {
     hideSkeleton();
 
-    const role    = (user && user.role) || 'ret';
-    const IS_DIST = role === 'dist';
-    const IS_RET  = role === 'ret';
+    const role     = (user && user.role) || null;
+    const IS_DIST  = role === 'dist';
+    const IS_RET   = role === 'ret';
+    const IS_GUEST = !role;
 
     // p.category may be a populated Mongoose object — extract the display name
     const catName = p.categoryName
@@ -156,14 +153,16 @@ document.addEventListener('DOMContentLoaded', function () {
       || (typeof p.category === 'string' ? p.category : '')
       || '';
 
-    const userPrice = IS_DIST
+    const tradePrice = IS_DIST
       ? (p.distributorPrice || p.userPrice || p.netPrice || 0)
       : (p.retailerPrice    || p.userPrice || p.netPrice || 0);
 
-    const mrp      = p.mrp || 0;
-    const discount = p.discount != null
+    const mrp = p.mrp || 0;
+    // Guests only ever see MRP; trade price + discount stay behind login.
+    const userPrice = IS_GUEST ? mrp : tradePrice;
+    const discount  = IS_GUEST ? 0 : (p.discount != null
       ? p.discount
-      : (mrp > 0 ? Math.round(((mrp - userPrice) / mrp) * 100) : 0);
+      : (mrp > 0 ? Math.round(((mrp - userPrice) / mrp) * 100) : 0));
 
     const stock   = p.stock || 0;
     const inStock = stock > 0;
@@ -274,14 +273,19 @@ document.addEventListener('DOMContentLoaded', function () {
     // Rating stars
     const starsHtml = ratNum ? buildStars(Number(ratingVal)) : '';
 
-    // Price cards
-    const mrpBadge = mrp > 0 ? `
+    // Price cards. Guests see a single MRP card (with a sign-in nudge); the
+    // struck-MRP and savings cards only make sense once a trade price is shown.
+    const IS_GUEST = !currentUser;
+    const mainLabel = IS_GUEST ? 'MRP' : (IS_DIST ? 'Distributor Price' : 'Retailer Price');
+    const mainNote  = IS_GUEST ? 'per unit • sign in for trade price' : 'per unit • COD';
+
+    const mrpBadge = (!IS_GUEST && mrp > 0) ? `
       <div class="pd-price-card">
         <div class="pd-price-card-label">MRP</div>
         <div class="pd-price-card-amount pd-price-striked">₹${mrp.toLocaleString('en-IN')}</div>
       </div>` : '';
 
-    const saveBadge = discount > 0 ? `
+    const saveBadge = (!IS_GUEST && discount > 0) ? `
       <div class="pd-price-card pd-price-card-accent">
         <div class="pd-price-card-label">You Save</div>
         <div class="pd-price-card-amount">${discount}% <span style="font-size:.9rem">off</span></div>
@@ -328,9 +332,9 @@ document.addEventListener('DOMContentLoaded', function () {
       <div class="pd-price-section">
         <div class="pd-price-cards-row">
           <div class="pd-price-card pd-price-card-main">
-            <div class="pd-price-card-label">${IS_DIST ? 'Distributor Price' : 'Retailer Price'}</div>
+            <div class="pd-price-card-label">${mainLabel}</div>
             <div class="pd-price-card-amount">₹${userPrice.toLocaleString('en-IN')}</div>
-            <div class="pd-price-card-note">per unit • COD</div>
+            <div class="pd-price-card-note">${mainNote}</div>
           </div>
           ${mrpBadge}
           ${saveBadge}
@@ -708,12 +712,29 @@ document.addEventListener('DOMContentLoaded', function () {
     const existing = document.getElementById('pd-sticky-widget');
     if (existing) existing.remove();
 
+    // Show the real product photo in the sticky bar (same image as the hero
+    // gallery). Fall back to the category placeholder only if the product
+    // genuinely has no image on file.
+    const swRawImgs = (p.images && p.images.length) ? p.images : [];
+    let swThumbUrl = '';
+    for (let i = 0; i < swRawImgs.length; i++) {
+      const x = swRawImgs[i];
+      const u = !x ? '' : (typeof x === 'string' ? x : (x.url || ''));
+      if (u) { swThumbUrl = u; break; }
+    }
+    if (!swThumbUrl && p.image) {
+      swThumbUrl = typeof p.image === 'string' ? p.image : (p.image.url || '');
+    }
+    const swThumbHtml = swThumbUrl
+      ? `<img src="${esc(swThumbUrl)}" alt="${esc(p.name)}" data-cat="${esc(catName || '')}" data-fallback-class="pd-sw-thumb-svg" onerror="productImgFallback(this)">`
+      : categoryIcon(catName);
+
     const widget = document.createElement('div');
     widget.className = 'pd-sticky-widget';
     widget.id = 'pd-sticky-widget';
     widget.innerHTML = `
     <div class="pd-sw-inner">
-      <div class="pd-sw-thumb">${categoryIcon(catName)}</div>
+      <div class="pd-sw-thumb">${swThumbHtml}</div>
       <div class="pd-sw-info">
         <div class="pd-sw-name">${esc(p.name)}</div>
         <div class="pd-sw-price">₹${userPrice.toLocaleString('en-IN')}</div>
@@ -782,7 +803,8 @@ document.addEventListener('DOMContentLoaded', function () {
       if (!inStock) return;
       const qty = parseInt(qtyInp.value) || moq;
       if (typeof store !== 'undefined') {
-        store.addToCart(p._id || p.productId, qty);
+        // Guests are redirected to login by addToCart (returns false).
+        if (store.addToCart(p._id || p.productId, qty) === false) return;
         store.syncCounts();
       }
       toast(qty + ' unit(s) added to cart');
@@ -795,7 +817,7 @@ document.addEventListener('DOMContentLoaded', function () {
       if (!inStock) return;
       const qty = parseInt(qtyInp.value) || moq;
       if (typeof store !== 'undefined') {
-        store.addToCart(p._id || p.productId, qty);
+        if (store.addToCart(p._id || p.productId, qty) === false) return;
         store.syncCounts();
       }
       toast('Proceeding to checkout…');

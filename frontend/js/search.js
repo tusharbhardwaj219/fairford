@@ -288,8 +288,8 @@
     if (addBtn && !addBtn.disabled) {
       var id = addBtn.getAttribute('data-add');
       if (typeof store !== 'undefined' && store.addToCart) {
-        store.addToCart(id, 1);
-        if (typeof toast === 'function') toast('Added to cart');
+        // Guests are redirected to login by addToCart (returns false).
+        if (store.addToCart(id, 1) !== false && typeof toast === 'function') toast('Added to cart');
       }
       return;
     }

@@ -6,27 +6,28 @@
 
 document.addEventListener('DOMContentLoaded', async function () {
 
-    /* ---- Auth guard: redirect to login if not logged in ---- */
+    /* ---- Auth state: browsing is open to guests; only the cart needs login.
+       Guests see the public MRP, signed-in users see their trade price. ---- */
     const _rawToken = localStorage.getItem('ff_token');
     const _rawUser  = localStorage.getItem('ff_user');
-    if (!_rawToken || !_rawUser) {
-        // Clear any partial state before redirecting to avoid loops
-        localStorage.removeItem('ff_token');
-        localStorage.removeItem('ff_user');
-        localStorage.setItem('ff_redirect', 'product.html');
-        window.location.replace('login&signup.html');
-        return;
-    }
+    const IS_AUTHED = !!(_rawToken && _rawUser);
 
     /* ---- Determine user role for pricing ---- */
+    // NB: JSON.parse(null) yields null (String(null) === "null"), so guard the
+    // raw value before parsing — otherwise a guest crashes reading `.role`.
     let _user = {};
-    try { _user = JSON.parse(_rawUser); } catch(e) {}
-    const USER_ROLE = (_user.role || 'ret').toLowerCase();
+    try { if (_rawUser) _user = JSON.parse(_rawUser) || {}; } catch(e) { _user = {}; }
+    const USER_ROLE = (_user.role || '').toLowerCase();
     const IS_DIST = USER_ROLE === 'dist';
 
-    /* price field to show based on role */
+    /* Price to display: signed-in users get their role's trade price; guests
+       (and any product missing a trade price) fall back to MRP. */
     function userPrice(p) {
-        return IS_DIST ? p.distributorPrice : p.retailerPrice;
+        if (IS_AUTHED) {
+            const trade = IS_DIST ? p.distributorPrice : p.retailerPrice;
+            if (trade) return trade;
+        }
+        return p.mrp || 0;
     }
 
     /* ---- Inject shared chrome ---- */
@@ -212,15 +213,25 @@ document.addEventListener('DOMContentLoaded', async function () {
         // Stock chip CSS class
         const stockCls = out ? 'pl-stock-out' : low ? 'pl-stock-low' : 'pl-stock-in';
 
-        // Role-aware pricing block
-        const save = (p.mrp && p.mrp > 0) ? Math.round(((p.mrp - price) / p.mrp) * 100) : 0;
-        const priceLabel = IS_DIST ? 'Trade Margin' : 'You Save';
-        const pricingHTML = `<div class="pl-price-row">
+        // Role-aware pricing block. Guests see the MRP with a gentle nudge to
+        // sign in for trade pricing; signed-in users see their price vs MRP.
+        let pricingHTML;
+        if (!IS_AUTHED) {
+            pricingHTML = `<div class="pl-price-row">
+              <span class="pl-price-label-inline">MRP</span>
+              <span class="pl-price-main">${inr(price).replace('.00', '')}</span>
+            </div>
+            <div class="pl-margin-note">Sign in to see your trade price</div>`;
+        } else {
+            const save = (p.mrp && p.mrp > 0) ? Math.round(((p.mrp - price) / p.mrp) * 100) : 0;
+            const priceLabel = IS_DIST ? 'Trade Margin' : 'You Save';
+            pricingHTML = `<div class="pl-price-row">
               <span class="pl-price-main">${inr(price).replace('.00', '')}</span>
               ${p.mrp ? `<span class="pl-price-mrp">MRP ${inr(p.mrp).replace('.00', '')}</span>` : ''}
               ${save > 0 ? `<span class="pl-discount-badge">${save}% OFF</span>` : ''}
             </div>
             ${save > 0 ? `<div class="pl-margin-note">${priceLabel}: ${save}%</div>` : ''}`;
+        }
 
         // Product image: uploaded photo or category-themed SVG illustration.
         // onerror swaps a dead image URL for the category SVG (see productImgFallback).
@@ -374,8 +385,10 @@ document.addEventListener('DOMContentLoaded', async function () {
             return;
         }
         if (cart && !cart.disabled) {
-            store.addToCart(cart.getAttribute('data-cart'), 1);
-            toast('Added to cart');
+            // addToCart returns false for guests (it redirects them to login).
+            if (store.addToCart(cart.getAttribute('data-cart'), 1) !== false) {
+                toast('Added to cart');
+            }
             return;
         }
         if (go) {

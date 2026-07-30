@@ -14,11 +14,12 @@ function filterProductPricing(product, role) {
   const p = product.toObject ? product.toObject() : { ...product };
 
   if (!role) {
-    delete p.mrp;
+    // Guests see the public MRP (the printed list price) so they can browse the
+    // catalogue, but trade prices stay hidden until they sign in.
     delete p.retailerPrice;
     delete p.distributorPrice;
     delete p.gst;
-    p.pricingMessage = 'Please login to view product prices.';
+    p.pricingMessage = 'Sign in to view your trade price.';
     return p;
   }
 

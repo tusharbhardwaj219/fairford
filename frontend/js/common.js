@@ -150,6 +150,24 @@ function badgeClass(status) {
 }
 
 /* ----------  CART / WISHLIST STORE (localStorage-backed)  ---------- */
+// Adding to the cart is a retailer action: guests must sign in first. This is
+// the single gate for every add-to-cart entry point (listing, detail, search,
+// wishlist → cart). Returns true when the visitor may proceed; otherwise it
+// stashes the current page as the post-login return path, nudges them, and
+// sends them to the login screen. Browsing + viewing MRP stays open to guests.
+function ffCanUseCart() {
+  var token = localStorage.getItem('ff_token');
+  var user  = localStorage.getItem('ff_user');
+  if (token && user) return true;
+  try {
+    localStorage.setItem('ff_redirect',
+      (window.location.pathname + window.location.search).replace(/^\//, '') || 'index.html');
+  } catch (e) {}
+  if (typeof toast === 'function') toast('Please sign in to add items to your cart.');
+  setTimeout(function () { window.location.href = 'login&signup.html'; }, 900);
+  return false;
+}
+
 const store = {
   get cart() {
     try { return JSON.parse(localStorage.getItem('ff_cart') || '[]'); } catch(e) { return []; }
@@ -161,6 +179,7 @@ const store = {
   _setWish: function(v) { localStorage.setItem('ff_wish', JSON.stringify(v)); },
 
   addToCart: function(id, qty) {
+    if (!ffCanUseCart()) return false;
     var cart = this.cart;
     var idx = cart.findIndex(function(x) { return x.id === String(id); });
     if (idx >= 0) { cart[idx].qty += (qty || 1); }
@@ -169,6 +188,7 @@ const store = {
     this.syncCounts();
     if (this._openPanel) this._openPanel('ff-cart-panel');
     this._refreshCartPanel();
+    return true;
   },
 
   removeFromCart: function(id) {
@@ -207,7 +227,7 @@ const store = {
   },
 
   moveToCart: function(id) {
-    this.addToCart(id, 1);
+    if (this.addToCart(id, 1) === false) return;
     this._setWish(this.wishlist.filter(function(x) { return x !== String(id); }));
     this.syncCounts();
     this._refreshWishPanel();
