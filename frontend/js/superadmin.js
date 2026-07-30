@@ -602,7 +602,7 @@ function renderProducts(data) {
   const tbody = document.getElementById('prod-tbody');
   if (!tbody) return;
   if (!data.length) {
-    tbody.innerHTML = `<tr><td colspan="12" style="text-align:center;color:var(--text-3);padding:24px">No products found</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="11" style="text-align:center;color:var(--text-3);padding:24px">No products found</td></tr>`;
     return;
   }
   // Build thumbnail <td>: real image if uploaded, otherwise an initial-letter
@@ -624,7 +624,6 @@ function renderProducts(data) {
     tbody.innerHTML += `<tr>
       ${thumbCell(d)}
       <td data-label="Name"><strong>${esc(d.name)}</strong></td>
-      <td data-label="SKU" style="font-family:'DM Mono',monospace;font-size:12px">${esc(d.sku)}</td>
       <td data-label="Category"><span class="badge badge-blue">${esc(d.category)}</span></td>
       <td data-label="MRP">₹${Number(d.mrp || 0).toLocaleString('en-IN')}</td>
       <td data-label="Retailer ₹">₹${Number(d.retailerPrice || 0).toLocaleString('en-IN')}</td>
@@ -646,7 +645,7 @@ function filterProducts() {
   const cat = document.getElementById('prod-cat-filter')?.value || '';
   const status = document.getElementById('prod-status-filter')?.value || '';
   renderProducts(allProducts.filter(d =>
-    (!search || d.name.toLowerCase().includes(search) || d.sku.toLowerCase().includes(search)) &&
+    (!search || d.name.toLowerCase().includes(search)) &&
     (!cat || d.category === cat) &&
     (!status || d.status === status)
   ));
@@ -711,7 +710,6 @@ async function editProduct(id) {
     const product = await apiFetch(`/products/${id}`);
     const form = document.getElementById('productForm');
     form.querySelector('[name=product-name]').value     = product.name || '';
-    form.querySelector('[name=product-sku]').value      = product.sku || '';
     form.querySelector('[name=product-cat]').value      = product.category || '';
     form.querySelector('[name=product-mrp]').value      = product.mrp ?? '';
     form.querySelector('[name=product-retail]').value   = product.retailerPrice ?? '';
@@ -742,7 +740,6 @@ async function saveProduct() {
   const numOrNull = (v) => (v === '' || v == null ? null : Number(v));
   const payload = {
     name:             form.querySelector('[name=product-name]').value.trim(),
-    sku:              form.querySelector('[name=product-sku]').value.trim(),
     category:         form.querySelector('[name=product-cat]').value,
     mrp:              numOrNull(form.querySelector('[name=product-mrp]').value),
     retailerPrice:    numOrNull(form.querySelector('[name=product-retail]').value),
@@ -1027,7 +1024,7 @@ function renderInventory(data) {
   const tbody = document.getElementById('inv-tbody');
   if (!tbody) return;
   if (!data.length) {
-    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:var(--text-3);padding:24px">No inventory found</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--text-3);padding:24px">No inventory found</td></tr>`;
     return;
   }
   tbody.innerHTML = '';
@@ -1035,7 +1032,6 @@ function renderInventory(data) {
     const sc = d.status === 'ok' ? 'badge-green' : d.status === 'low' ? 'badge-amber' : 'badge-red';
     tbody.innerHTML += `<tr>
       <td><strong>${esc(d.product_name)}</strong></td>
-      <td style="font-family:'DM Mono',monospace;font-size:12px">${esc(d.sku)}</td>
       <td><span class="badge badge-blue">${esc(d.category)}</span></td>
       <td>${d.total_stock.toLocaleString('en-IN')}</td>
       <td style="color:var(--text-2)">${d.reserved.toLocaleString('en-IN')}</td>
@@ -1051,7 +1047,6 @@ function filterInventory() {
   renderInventory(allInventory.filter(d =>
     !search ||
     d.product_name.toLowerCase().includes(search) ||
-    d.sku.toLowerCase().includes(search) ||
     d.category.toLowerCase().includes(search)
   ));
 }
@@ -1059,8 +1054,8 @@ function filterInventory() {
 function exportInventoryCSV() {
   if (!allInventory.length) { toast('No inventory data to export', 'error'); return; }
   const rows = [
-    ['Product Name','SKU','Category','Total Stock','Reserved','Available','Reorder Level','Status'],
-    ...allInventory.map(d => [d.product_name,d.sku,d.category,d.total_stock,d.reserved,d.available,d.reorder_level,d.status]),
+    ['Product Name','Category','Total Stock','Reserved','Available','Reorder Level','Status'],
+    ...allInventory.map(d => [d.product_name,d.category,d.total_stock,d.reserved,d.available,d.reorder_level,d.status]),
   ];
   downloadCSV(rows, 'inventory-export.csv');
   toast('Inventory exported');
@@ -1210,8 +1205,8 @@ function exportReport(type) {
     },
     inventory: {
       rows: () => {
-        const rows = [['Product','SKU','Category','Total Stock','Reserved','Available','Reorder Level','Status']];
-        allInventory.forEach(d => rows.push([d.product_name,d.sku,d.category,d.total_stock,d.reserved,d.available,d.reorder_level,d.status]));
+        const rows = [['Product','Category','Total Stock','Reserved','Available','Reorder Level','Status']];
+        allInventory.forEach(d => rows.push([d.product_name,d.category,d.total_stock,d.reserved,d.available,d.reorder_level,d.status]));
         return rows;
       },
       file: 'inventory-report.csv',
@@ -1382,7 +1377,6 @@ async function openDistributorProfile(id) {
       const rowStyle = (i.status === 'low' || i.status === 'critical') ? 'background:var(--amber-bg)' : '';
       return `<tr style="${rowStyle}">
         <td><strong style="font-size:12px">${esc(i.product_name)}</strong></td>
-        <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text-2)">${esc(i.sku)}</td>
         <td style="text-align:center">${i.total_stock.toLocaleString('en-IN')}</td>
         <td style="text-align:center;font-weight:600">${i.available.toLocaleString('en-IN')}</td>
         <td style="text-align:center">${i.reorder_level.toLocaleString('en-IN')}</td>
@@ -1468,7 +1462,7 @@ async function openDistributorProfile(id) {
         ${inventory.length ? `
           <div class="inv-tbl-wrap">
             <table class="data">
-              <thead><tr><th>Product</th><th>SKU</th><th style="text-align:center">Total</th><th style="text-align:center">Available</th><th style="text-align:center">Reorder</th><th>Status</th></tr></thead>
+              <thead><tr><th>Product</th><th style="text-align:center">Total</th><th style="text-align:center">Available</th><th style="text-align:center">Reorder</th><th>Status</th></tr></thead>
               <tbody>${invRows}</tbody>
             </table>
           </div>` : `<div style="font-size:13px;color:var(--text-3)">No inventory linked to this distributor</div>`}
@@ -1476,7 +1470,7 @@ async function openDistributorProfile(id) {
 
       <div class="profile-footer">
         ${lowStock.length && d.email ? `
-          <button class="btn btn-pri" onclick="sendLowStockEmail(${d.id},'${d.name.replace(/'/g,"\\'")}','${d.email}',${JSON.stringify(lowStock.map(i => ({ sku: i.sku, name: i.product_name })))})">
+          <button class="btn btn-pri" onclick="sendLowStockEmail(${d.id},'${d.name.replace(/'/g,"\\'")}','${d.email}',${JSON.stringify(lowStock.map(i => ({ name: i.product_name })))})">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:5px"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,12 2,6"/></svg>
             Send Email Reminder
           </button>` : `<span></span>`}

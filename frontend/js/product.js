@@ -6,6 +6,7 @@
 
 document.addEventListener('DOMContentLoaded', async function () {
 
+<<<<<<< HEAD
     /* ---- Auth state: browsing is open to guests; only the cart needs login.
        Guests see the public MRP, signed-in users see their trade price. ---- */
     const _rawToken = localStorage.getItem('ff_token');
@@ -28,6 +29,24 @@ document.addEventListener('DOMContentLoaded', async function () {
             if (trade) return trade;
         }
         return p.mrp || 0;
+=======
+    /* ---- Login state + role (browsing is public) ---- */
+    const _rawToken = localStorage.getItem('ff_token');
+    const _rawUser  = localStorage.getItem('ff_user');
+    const IS_ANON = !_rawToken || !_rawUser;
+
+    let _user = {};
+    // NB: JSON.parse(null) returns null (doesn't throw), so guard with `|| {}`
+    // — otherwise an anonymous visitor (no ff_user) hits `_user.role` on null.
+    try { _user = JSON.parse(_rawUser) || {}; } catch(e) { _user = {}; }
+    const USER_ROLE = (_user.role || 'ret').toLowerCase();
+    const IS_DIST = !IS_ANON && USER_ROLE === 'dist';
+
+    /* price field to show based on role. Anonymous visitors see MRP only. */
+    function userPrice(p) {
+        if (IS_ANON) return p.mrp;
+        return IS_DIST ? p.distributorPrice : p.retailerPrice;
+>>>>>>> af7a5dfe9c56f6dae53e36b234e305c8c3ae6723
     }
 
     /* ---- Inject shared chrome ---- */
@@ -213,6 +232,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         // Stock chip CSS class
         const stockCls = out ? 'pl-stock-out' : low ? 'pl-stock-low' : 'pl-stock-in';
 
+<<<<<<< HEAD
         // Role-aware pricing block. Guests see the MRP with a gentle nudge to
         // sign in for trade pricing; signed-in users see their price vs MRP.
         let pricingHTML;
@@ -226,6 +246,17 @@ document.addEventListener('DOMContentLoaded', async function () {
             const save = (p.mrp && p.mrp > 0) ? Math.round(((p.mrp - price) / p.mrp) * 100) : 0;
             const priceLabel = IS_DIST ? 'Trade Margin' : 'You Save';
             pricingHTML = `<div class="pl-price-row">
+=======
+        // Role-aware pricing block. Anonymous → MRP only (no net price / discount).
+        const save = (p.mrp && p.mrp > 0) ? Math.round(((p.mrp - price) / p.mrp) * 100) : 0;
+        const priceLabel = IS_DIST ? 'Trade Margin' : 'You Save';
+        const pricingHTML = IS_ANON
+          ? `<div class="pl-price-row">
+              <span class="pl-price-main">${inr(price).replace('.00', '')}</span>
+              <span class="pl-price-label">MRP</span>
+            </div>`
+          : `<div class="pl-price-row">
+>>>>>>> af7a5dfe9c56f6dae53e36b234e305c8c3ae6723
               <span class="pl-price-main">${inr(price).replace('.00', '')}</span>
               ${p.mrp ? `<span class="pl-price-mrp">MRP ${inr(p.mrp).replace('.00', '')}</span>` : ''}
               ${save > 0 ? `<span class="pl-discount-badge">${save}% OFF</span>` : ''}
@@ -239,7 +270,9 @@ document.addEventListener('DOMContentLoaded', async function () {
             ? `<img src="${p.image}" alt="${p.name}" class="pl-img" loading="lazy" data-cat="${escHtml(p.category)}" data-fallback-class="pl-img-svg" onerror="productImgFallback(this)">`
             : `<div class="pl-img-svg">${productImageSVG(p.category)}</div>`;
 
-        const cartLabel = out
+        const cartLabel = IS_ANON
+            ? `${ICONS.cart} Login to order`
+            : out
             ? `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg> Out of Stock`
             : `${ICONS.cart} Add to Cart`;
 
@@ -262,7 +295,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         <div class="pl-rating-row">${renderStars(p.rating)} <span class="pl-rating-val">${p.rating || '—'}</span> <span class="pl-rating-cnt">(${p.reviewCount || 0})</span></div>
         <div class="pl-pricing-box">${pricingHTML}</div>
         <div class="pl-card-actions">
-          <button class="pl-btn-cart${out ? ' pl-btn-oos' : ''}" data-cart="${p.id}" ${out ? 'disabled' : ''}>${cartLabel}</button>
+          <button class="pl-btn-cart${(!IS_ANON && out) ? ' pl-btn-oos' : ''}" ${IS_ANON ? 'data-login="1"' : `data-cart="${p.id}"`} ${(!IS_ANON && out) ? 'disabled' : ''}>${cartLabel}</button>
           <button class="pl-btn-view" data-go="${p.id}" aria-label="View details">${ICONS.eye}</button>
         </div>
       </div>
@@ -375,8 +408,15 @@ document.addEventListener('DOMContentLoaded', async function () {
         const go = e.target.closest('[data-go]');
         const cart = e.target.closest('[data-cart]');
         const wish = e.target.closest('[data-wish]');
+        const login = e.target.closest('[data-login]');
         const clearBtn = e.target.closest('[data-action="clear-filters"]');
         if (clearBtn) { clearAll(); return; }
+        if (login) {
+            // Anonymous visitor tried to order — send them to log in first.
+            localStorage.setItem('ff_redirect', 'product.html');
+            window.location.href = 'login&signup.html';
+            return;
+        }
         if (wish) {
             const on = store.toggleWish(wish.getAttribute('data-wish'));
             wish.classList.toggle('active', on);

@@ -369,8 +369,6 @@ exports.getDealerDocs = async (req, res) => {
 };
 
 // ════════════════════════════ PRODUCTS ════════════════════════════════════════
-function skuOf(p) { return str(p.slug || `FF-${sid(p).slice(-6).toUpperCase()}`); }
-
 function toProduct(p) {
   const catName = (p.category && p.category.categoryName) || p.categoryName || 'General';
   const imageUrl = (p.image && p.image.url) ||
@@ -378,7 +376,6 @@ function toProduct(p) {
   return {
     id:               sid(p),
     name:             str(p.name),
-    sku:              skuOf(p),
     category:         str(catName),
     mrp:              num(p.mrp),
     retailerPrice:    num(p.retailerPrice),
@@ -428,7 +425,7 @@ exports.getProduct = async (req, res) => {
 exports.createProduct = async (req, res) => {
   try {
     const {
-      name, sku, category, mrp, retailerPrice, distributorPrice,
+      name, category, mrp, retailerPrice, distributorPrice,
       manufacturer, brand, strength, packSize, dosageForm,
       stock, description, status,
     } = req.body;
@@ -445,7 +442,6 @@ exports.createProduct = async (req, res) => {
     const categoryId = await resolveCategoryId(category);
     const productData = {
       name,
-      slug: sku || undefined,
       brand: manufacturer || brand || 'Fair Ford Pharma',
       category: categoryId,
       categoryName: category || 'General',
@@ -474,13 +470,12 @@ exports.updateProduct = async (req, res) => {
   try {
     if (!isOid(req.params.id)) return res.status(404).json({ error: 'Product not found' });
     const {
-      name, sku, category, mrp, retailerPrice, distributorPrice,
+      name, category, mrp, retailerPrice, distributorPrice,
       manufacturer, brand, strength, packSize, dosageForm,
       stock, description, status,
     } = req.body;
     const patch = {};
     if (name !== undefined) patch.name = name;
-    if (sku !== undefined) patch.slug = sku;
     if (mrp !== undefined) patch.mrp = Number(mrp);
     if (retailerPrice !== undefined)    patch.retailerPrice    = Number(retailerPrice);
     if (distributorPrice !== undefined) patch.distributorPrice = Number(distributorPrice);
@@ -587,7 +582,6 @@ exports.listInventory = async (req, res) => {
       return {
         id:           sid(p),
         product_name: str(p.name),
-        sku:          skuOf(p),
         category:     str((p.category && p.category.categoryName) || p.categoryName || 'General'),
         total_stock:  total,
         reserved:     0,

@@ -22,6 +22,9 @@ const fs = require('fs');
 const path = require('path');
 const mongoose = require('mongoose');
 const Product = require('./models/Product');
+// Product's pre-find hook populates 'category', so the Category model must be
+// registered even though we don't reference it directly.
+require('./models/Category');
 
 const ARGV   = process.argv.slice(2);
 const COMMIT = ARGV.includes('--commit');

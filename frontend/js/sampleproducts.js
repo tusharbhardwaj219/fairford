@@ -103,7 +103,7 @@ const sampleProducts = [
     },
     delivery: {
       time: '2–4 business days',
-      coverage: 'Pan India (28 states)',
+      coverage: 'Pan India (17 states)',
       shipping: 'Free shipping on orders above ₹5,000'
     }
   },

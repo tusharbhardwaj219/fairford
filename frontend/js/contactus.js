@@ -747,7 +747,7 @@ function _renderCart() {
         const gst = subtotal * 0.12;
         foot.style.display = 'block';
         foot.innerHTML = '<div class="totals">' +
-            '<div class="totals-row"><span>Subtotal (' + entries.length + ' SKU' + (entries.length === 1 ? '' : 's') + ')</span><b>' + _inr(subtotal) + '</b></div>' +
+            '<div class="totals-row"><span>Subtotal (' + entries.length + ' item' + (entries.length === 1 ? '' : 's') + ')</span><b>' + _inr(subtotal) + '</b></div>' +
             '<div class="totals-row"><span>GST (12%, estimate)</span><b>' + _inr(gst) + '</b></div>' +
             '<div class="totals-row grand"><span>Order Total</span><b>' + _inr(subtotal + gst) + '</b></div></div>' +
             '<button class="btn-checkout" ' + (moqViolations > 0 ? 'disabled' : '') + ' onclick="window.location.href=\'search.html\'">' +
