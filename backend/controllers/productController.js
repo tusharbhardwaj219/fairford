@@ -209,11 +209,15 @@ exports.getProduct = async (req, res, next) => {
       return res.status(404).json({ success: false, message: 'Product not found' });
     }
 
-    const relatedProducts = await Product.find({
-      category: product.category._id,
-      _id: { $ne: product._id },
-      status: 'active'
-    }).limit(8);
+    // Guard against a product whose category ref was deleted (populate → null):
+    // without this, `product.category._id` throws and the whole detail API 500s.
+    const relatedProducts = product.category
+      ? await Product.find({
+          category: product.category._id,
+          _id: { $ne: product._id },
+          status: 'active'
+        }).limit(8)
+      : [];
 
     const role = req.user ? req.user.role : undefined;
 
@@ -235,11 +239,15 @@ exports.getProductBySlug = async (req, res, next) => {
       return res.status(404).json({ success: false, message: 'Product not found' });
     }
 
-    const relatedProducts = await Product.find({
-      category: product.category._id,
-      _id: { $ne: product._id },
-      status: 'active'
-    }).limit(8);
+    // Guard against a product whose category ref was deleted (populate → null):
+    // without this, `product.category._id` throws and the whole detail API 500s.
+    const relatedProducts = product.category
+      ? await Product.find({
+          category: product.category._id,
+          _id: { $ne: product._id },
+          status: 'active'
+        }).limit(8)
+      : [];
 
     const role = req.user ? req.user.role : undefined;
 
