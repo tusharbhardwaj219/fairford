@@ -627,6 +627,34 @@
   color: #374151;
   line-height: 1.75;
 }
+/* Structured product description: intro / uses list / directions */
+.pd-desc-block { margin-bottom: 22px; }
+.pd-desc-block:last-child { margin-bottom: 0; }
+.pd-desc-block .pd-tab-p + .pd-tab-p { margin-top: 10px; }
+.pd-desc-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 9px;
+}
+.pd-desc-list li {
+  position: relative;
+  padding-left: 26px;
+  font-size: .92rem;
+  color: #374151;
+  line-height: 1.6;
+}
+.pd-desc-list li::before {
+  content: "";
+  position: absolute;
+  left: 4px;
+  top: .55em;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--pd-blue, #0F4C81);
+}
 
 .pd-empty-tab {
   display: flex;

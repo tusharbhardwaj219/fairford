@@ -20,15 +20,16 @@ function filterProductPricing(product, role) {
     delete p.retailerPrice;
     delete p.distributorPrice;
     delete p.gst;
+    
     p.pricingMessage = 'Sign in to view your trade price.';
+    return p;
 
     // Anonymous visitors may browse and see MRP only. Net (retailer /
     // distributor) prices stay hidden until they log in.
-    delete p.retailerPrice;
-    delete p.distributorPrice;
-    delete p.gst;
- 
-    return p;
+    // delete p.retailerPrice;
+    // delete p.distributorPrice;
+    // delete p.gst;
+    // return p;
   }
 
   if (role === 'dist') {

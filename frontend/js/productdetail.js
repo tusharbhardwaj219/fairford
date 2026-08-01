@@ -17,27 +17,17 @@ document.addEventListener('DOMContentLoaded', function () {
   const token   = localStorage.getItem('ff_token');
   const userRaw = localStorage.getItem('ff_user');
 
-<<<<<<< HEAD
   // Viewing a product is open to guests — only adding to the cart requires
   // login (gated centrally in common.js). Signed-in users get role-based trade
-  // pricing; guests see the public MRP.
-  let currentUser = null;
-  if (userRaw) {
-=======
-  // Browsing is public. Anonymous visitors see MRP only and are asked to log in
-  // to order (handled in render()). currentUser stays null when logged out.
+  // pricing; guests see the public MRP. currentUser stays null when logged out.
   let currentUser = null;
   if (token && userRaw) {
->>>>>>> af7a5dfe9c56f6dae53e36b234e305c8c3ae6723
     try {
       currentUser = JSON.parse(userRaw);
     } catch (_) {
       localStorage.removeItem('ff_token');
       localStorage.removeItem('ff_user');
-<<<<<<< HEAD
-=======
       currentUser = null;
->>>>>>> af7a5dfe9c56f6dae53e36b234e305c8c3ae6723
     }
   }
 
@@ -153,17 +143,11 @@ document.addEventListener('DOMContentLoaded', function () {
   function render(p, user) {
     hideSkeleton();
 
-<<<<<<< HEAD
     const role     = (user && user.role) || null;
     const IS_DIST  = role === 'dist';
     const IS_RET   = role === 'ret';
     const IS_GUEST = !role;
-=======
-    const IS_ANON = !user;
-    const role    = (user && user.role) || '';
-    const IS_DIST = role === 'dist';
-    const IS_RET  = role === 'ret';
->>>>>>> af7a5dfe9c56f6dae53e36b234e305c8c3ae6723
+    const IS_ANON  = !user;
 
     // p.category may be a populated Mongoose object — extract the display name
     const catName = p.categoryName
@@ -516,19 +500,45 @@ document.addEventListener('DOMContentLoaded', function () {
     </section>`;
   }
 
+  // Turn the catalogue description — "Product introduction … / Uses of X … /
+  // How to use X …" — into clean sections: intro paragraphs, a bulleted Uses
+  // list, and a Directions paragraph. Falls back to a single paragraph for any
+  // product whose description isn't in this structured format.
+  function renderStructuredDescription(desc) {
+    const lines = String(desc).split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+    const isStructured = lines.some(l => /^(product introduction|uses of |how to use |directions)/i.test(l));
+    if (!isStructured) return `<p class="pd-tab-p">${esc(String(desc).trim())}</p>`;
+
+    const sections = [];
+    let cur = { type: 'intro', title: 'Product Description', items: [] };
+    const flush = () => { if (cur.items.length) sections.push(cur); };
+    lines.forEach(line => {
+      if (/^product introduction$/i.test(line)) { flush(); cur = { type: 'intro', title: 'Product Description', items: [] }; }
+      else if (/^uses of\b/i.test(line))        { flush(); cur = { type: 'uses', title: 'Uses & Benefits', items: [] }; }
+      else if (/^(how to use|directions for use|how to take|directions)\b/i.test(line)) { flush(); cur = { type: 'howto', title: 'Directions for Use', items: [] }; }
+      else cur.items.push(line);
+    });
+    flush();
+
+    return sections.map(s => {
+      if (s.type === 'uses') {
+        return `<div class="pd-desc-block"><h3 class="pd-tab-h">${s.title}</h3>` +
+               `<ul class="pd-desc-list">${s.items.map(i => `<li>${esc(i)}</li>`).join('')}</ul></div>`;
+      }
+      return `<div class="pd-desc-block"><h3 class="pd-tab-h">${s.title}</h3>` +
+             s.items.map(i => `<p class="pd-tab-p">${esc(i)}</p>`).join('') + `</div>`;
+    }).join('');
+  }
+
   function buildTabOverview(p) {
     if (!p.description && !p.uses) {
       return `<div class="pd-empty-tab"><svg viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.5" stroke-linecap="round" width="36" height="36"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>No overview available for this product.</div>`;
     }
     return `
     <div class="pd-tab-inner">
-      ${p.description ? `
-      <div style="margin-bottom:20px">
-        <h3 class="pd-tab-h">Product Description</h3>
-        <p class="pd-tab-p">${esc(p.description)}</p>
-      </div>` : ''}
+      ${p.description ? renderStructuredDescription(p.description) : ''}
       ${p.uses ? `
-      <div>
+      <div class="pd-desc-block">
         <h3 class="pd-tab-h">Uses &amp; Indications</h3>
         <p class="pd-tab-p">${esc(p.uses)}</p>
       </div>` : ''}
@@ -741,7 +751,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const existing = document.getElementById('pd-sticky-widget');
     if (existing) existing.remove();
 
-<<<<<<< HEAD
     // Show the real product photo in the sticky bar (same image as the hero
     // gallery). Fall back to the category placeholder only if the product
     // genuinely has no image on file.
@@ -759,9 +768,7 @@ document.addEventListener('DOMContentLoaded', function () {
       ? `<img src="${esc(swThumbUrl)}" alt="${esc(p.name)}" data-cat="${esc(catName || '')}" data-fallback-class="pd-sw-thumb-svg" onerror="productImgFallback(this)">`
       : categoryIcon(catName);
 
-=======
     const swPrice = IS_ANON ? (p.mrp || 0) : userPrice;
->>>>>>> af7a5dfe9c56f6dae53e36b234e305c8c3ae6723
     const widget = document.createElement('div');
     widget.className = 'pd-sticky-widget';
     widget.id = 'pd-sticky-widget';
