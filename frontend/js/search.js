@@ -64,8 +64,13 @@
       console.error('[search] product fetch failed', e);
       products = [];
     }
-    ALL_PRODUCTS = products;
-    renderGrid(products);
+    // List products A–Z, matching the products page default. Sorting a copy
+    // once here keeps every later view alphabetical too, since filterGrid()
+    // preserves order when it narrows the list.
+    ALL_PRODUCTS = products.slice().sort(function (a, b) {
+      return String(a.name || '').localeCompare(String(b.name || ''));
+    });
+    renderGrid(ALL_PRODUCTS);
   }
 
   function cardHTML(p) {

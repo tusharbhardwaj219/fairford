@@ -59,8 +59,8 @@ const sendWelcomeEmail = async (email, name) => {
               
               <p style="color: #888; font-size: 12px;">
                 Fair Ford Pharmaceuticals PVT. LTD.<br>
-                KHEWAT NO-755, KHATON NO-782<br>
-                Faridabad, Haryana 121003<br>
+                Fair Ford Tower, Gali No-07, Main Road, Anangpur Village,<br>
+                Opposite Mount Kailash Factory, Faridabad- 121003 (Haryana)<br>
                 Phone: +91-9958584020
               </p>
             </div>

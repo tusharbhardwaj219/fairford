@@ -43,7 +43,11 @@ function filterProductPricing(product, role) {
 
   if (role === 'ret') {
     delete p.distributorPrice;
-    delete p.gst;
+    // `gst` is deliberately KEPT. Rates vary per product (5/12/18%) and the
+    // storefront cart needs the real rate to show the same total the server
+    // will charge — stripping it made the cart fall back to a flat 12% and
+    // quote a higher figure than the retailer dashboard. A GST rate is public
+    // tax information (it is printed on every invoice), not trade pricing.
     if (p.mrp && p.retailerPrice) {
       p.discount = Number(((p.mrp - p.retailerPrice) / p.mrp * 100).toFixed(1));
     }

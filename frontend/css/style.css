@@ -4137,10 +4137,32 @@ img {
 }
 
 .footer-credit p {
-    display: inline-flex;
+    display: flex;
     align-items: center;
     flex-wrap: wrap;
-    gap: 4px;
+    justify-content: flex-end;
+    gap: 2px 8px;
+    margin: 0;
+    line-height: 1.7;
+}
+
+/* Each half stays glued together, so a narrow screen breaks BETWEEN the two
+   phrases rather than mid-sentence (which is what made this look ragged). */
+.footer-credit .fc-part {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.footer-credit .fc-sep {
+    opacity: 0.4;
+    user-select: none;
+}
+
+/* On small screens the halves stack, and a leading "|" would look stranded. */
+@media (max-width: 640px) {
+    .footer-credit p { justify-content: center; }
+    .footer-credit .fc-sep { display: none; }
 }
 
 .footer-heart-svg {

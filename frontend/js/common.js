@@ -204,7 +204,9 @@ const store = {
     else { cart.push({ id: String(id), qty: qty || 1 }); }
     this._setCart(cart);
     this.syncCounts();
-    if (this._openPanel) this._openPanel('ff-cart-panel');
+    // Deliberately does NOT open the cart panel — interrupting the user on every
+    // add made browsing painful. The badge count updates instead, and the panel
+    // is refreshed so it's correct whenever they choose to open it themselves.
     this._refreshCartPanel();
     return true;
   },
@@ -321,7 +323,9 @@ const store = {
       if (!p) return;
       var lineTotal = p.retailerPrice * item.qty;
       subtotal += lineTotal;
-      gstTotal += (lineTotal * (p.gst || 12)) / 100;
+      // Per-item GST rate (5/12/18) — same formula the server uses to price the
+      // order, so the figure shown here is what actually gets charged.
+      gstTotal += (lineTotal * (p.gst == null ? 12 : p.gst)) / 100;
       var thumb = p.image
         ? '<img src="' + escHtml(p.image) + '" alt="' + escHtml(p.name) + '" class="fline-img" data-cat="' + escHtml(p.category) + '" data-fallback-class="fline-svg" onerror="productImgFallback(this)">'
         : '<div class="fline-svg">' + (typeof productImageSVG === 'function' ? productImageSVG(p.category) : escHtml(p.name.charAt(0))) + '</div>';
@@ -346,11 +350,14 @@ const store = {
     });
     body.innerHTML = html;
 
+    // The server rounds GST to whole rupees (orderService) — round the same way
+    // here so the cart total matches the amount actually charged to the paisa.
+    gstTotal = Math.round(gstTotal);
     var grand = subtotal + gstTotal;
     foot.innerHTML =
       '<div class="ftotals">' +
         '<div class="ftotals-row"><span>Subtotal</span><span>' + inr(subtotal).replace('.00','') + '</span></div>' +
-        '<div class="ftotals-row"><span>Estimated GST</span><span>' + inr(gstTotal).replace('.00','') + '</span></div>' +
+        '<div class="ftotals-row"><span>GST</span><span>' + inr(gstTotal).replace('.00','') + '</span></div>' +
         '<div class="ftotals-row grand"><span>Grand Total</span><span>' + inr(grand).replace('.00','') + '</span></div>' +
       '</div>' +
       // Two explicit actions instead of one ambiguous "Proceed to Checkout":
@@ -1021,7 +1028,7 @@ function renderFooter() {
             ${svgMapPin}
             <div>
               <p class="contact-label">Address</p>
-              <p class="contact-value" style="text-transform:lowercase;">1st,2nd,3rd and 4th floors, Fair Ford Tower,Gali No-07, Main Road, Anangpur Village, Opposite Mount Kailash Factory, Faridabad- 121003 (Haryana)</p>
+              <p class="contact-value">Fair Ford Tower, Gali No-07, Main Road, Anangpur Village, Opposite Mount Kailash Factory, Faridabad- 121003 (Haryana)</p>
             </div>
           </div>
           <div class="contact-item">
@@ -1068,7 +1075,13 @@ function renderFooter() {
           <p>&copy; ${year} FAIRFORD Pharmaceuticals PVT. LTD. All rights reserved.</p>
         </div>
         <div class="footer-credit">
-          <p>Designed and Created by <a href="https://www.linkedin.com/in/himanshu-prajapati-469737327?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" target="_blank">Himanshu</a>, <a href="https://www.linkedin.com/in/bhardwaj-tushar-147711309?utm_source=share_via&utm_content=profile&utm_medium=member_android" target="_blank">Tushar</a> and <a href="https://www.linkedin.com/company/fair-ford-pharmaceuticals/" target="_blank">Dilip</a> ${svgHeart} | Powered by Fair Ford Pharmaceuticals PVT. LTD.</p>
+          <!-- Each half is one unbreakable unit so the line wraps between them
+               instead of orphaning the "|" or splitting the company name. -->
+          <p>
+            <span class="fc-part">Designed and Created by <a href="https://www.linkedin.com/company/fair-ford-pharmaceuticals/" target="_blank" rel="noopener">Fair Ford and Team</a> ${svgHeart}</span>
+            <span class="fc-sep" aria-hidden="true">|</span>
+            <span class="fc-part">Powered by Fair Ford Pharmaceuticals PVT. LTD.</span>
+          </p>
         </div>
       </div>
     </div>

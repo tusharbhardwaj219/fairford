@@ -134,7 +134,8 @@ const sendUserAutoReply = async (name, email) => {
                 </p>
                 <div style="margin-top:30px;padding-top:20px;border-top:1px solid #eee;font-size:12px;color:#aaa;text-align:center;">
                   © ${new Date().getFullYear()} Fair Ford Pharmaceuticals Pvt. Ltd. All rights reserved.<br>
-                  Village Anangpur, Faridabad, Haryana 121003
+                  Fair Ford Tower, Gali No-07, Main Road, Anangpur Village,<br>
+                  Opposite Mount Kailash Factory, Faridabad- 121003 (Haryana)
                 </div>
               </div>
             </div>
