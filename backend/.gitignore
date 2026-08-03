@@ -77,3 +77,7 @@ env/
 *.pem
 *.key
 *.p12
+
+
+#  razorpay .env file
+.env.bak.razorpay
