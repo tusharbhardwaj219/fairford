@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex" />
+  <title>Payment Failed — Fair Ford Pharmaceuticals</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root { --brand:#0F4C81; --red:#DC2626; --ink:#111827; --muted:#6B7280; --line:#E5E7EB; }
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body {
+      font-family:'Inter',system-ui,sans-serif; background:#F3F6FA; color:var(--ink);
+      min-height:100vh; display:grid; place-items:center; padding:24px;
+    }
+    .card {
+      width:100%; max-width:520px; background:#fff; border:1px solid var(--line);
+      border-radius:18px; padding:40px 32px; text-align:center;
+      box-shadow:0 12px 40px rgba(15,76,129,.10);
+    }
+    .mark {
+      width:82px; height:82px; margin:0 auto 22px; border-radius:50%;
+      background:rgba(220,38,38,.09); display:grid; place-items:center;
+      animation:pop .45s cubic-bezier(.2,.9,.3,1.4) both;
+    }
+    @keyframes pop { from { transform:scale(.5); opacity:0 } to { transform:scale(1); opacity:1 } }
+    h1 { font-size:1.5rem; font-weight:700; letter-spacing:-.02em; margin-bottom:8px; }
+    .sub { color:var(--muted); font-size:.94rem; line-height:1.65; margin-bottom:22px; }
+    .reason {
+      background:#FEF2F2; border:1px solid #FECACA; color:#991B1B;
+      border-radius:11px; padding:12px 15px; font-size:.87rem; line-height:1.55;
+      margin-bottom:22px; text-align:left; word-break:break-word;
+    }
+    .rows { border:1px solid var(--line); border-radius:12px; overflow:hidden; margin-bottom:26px; text-align:left; }
+    .row { display:flex; justify-content:space-between; gap:12px; padding:13px 16px; font-size:.9rem; }
+    .row span:first-child { color:var(--muted); }
+    .row span:last-child { font-weight:600; word-break:break-all; text-align:right; }
+    .actions { display:flex; gap:10px; flex-wrap:wrap; }
+    .btn {
+      flex:1 1 180px; display:inline-flex; align-items:center; justify-content:center; gap:8px;
+      padding:13px 20px; border-radius:11px; font-size:.9rem; font-weight:600;
+      text-decoration:none; border:1px solid transparent; cursor:pointer; transition:.18s;
+    }
+    .btn-primary { background:var(--brand); color:#fff; }
+    .btn-primary:hover { background:#0c3f6c; }
+    .btn-ghost { background:#EEF2F7; color:var(--brand); }
+    .btn-ghost:hover { background:#e2e9f2; }
+    .note { margin-top:20px; font-size:.78rem; color:var(--muted); line-height:1.6; }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <div class="mark" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="#DC2626"
+           stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10" /><line x1="15" y1="9" x2="9" y2="15" /><line x1="9" y1="9" x2="15" y2="15" />
+      </svg>
+    </div>
+
+    <h1>Payment not completed</h1>
+    <p class="sub">
+      Your order has been saved but is <strong>not paid</strong> yet.
+      You can retry the payment, or switch to cash on delivery.
+    </p>
+
+    <div class="reason" id="pReasonBox" style="display:none;">
+      <strong>Reason:</strong> <span id="pReason"></span>
+    </div>
+
+    <div class="rows">
+      <div class="row"><span>Order number</span><span id="pOrder">—</span></div>
+      <div class="row"><span>Status</span><span style="color:#DC2626">Unpaid</span></div>
+    </div>
+
+    <div class="actions">
+      <a class="btn btn-primary" href="retailer.html">Back to cart &amp; retry</a>
+      <a class="btn btn-ghost" href="contactus.html">Contact support</a>
+    </div>
+
+    <p class="note">
+      If money was deducted from your account, it is refunded automatically by the
+      bank — usually within 5–7 working days. Contact support with your order
+      number if it doesn't arrive.
+    </p>
+  </main>
+
+  <script>
+    // textContent (not innerHTML) so nothing in the query string can inject markup.
+    (function () {
+      var q = new URLSearchParams(window.location.search);
+      var order = q.get('order');
+      var reason = q.get('reason');
+      if (order) document.getElementById('pOrder').textContent = order;
+      if (reason) {
+        document.getElementById('pReason').textContent = reason;
+        document.getElementById('pReasonBox').style.display = 'block';
+      }
+    })();
+  </script>
+</body>
+</html>

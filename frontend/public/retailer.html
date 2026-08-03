@@ -92,10 +92,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           <div><span>GST (12%)</span><span id="ttGst">₹0</span></div>
           <div class="grand"><span>Total</span><span id="ttGrand">₹0</span></div>
         </div>
-        <button class="btn btn-primary" id="rtPlace" style="width:100%; margin-top:14px; display:none;">
+        <button class="btn btn-primary" id="rtPayOnline" style="width:100%; margin-top:14px; display:none;">
+          Pay online · UPI / Card / Netbanking
+        </button>
+        <button class="btn btn-ghost" id="rtPlace" style="width:100%; margin-top:10px; display:none;">
           Place order · Cash on delivery
         </button>
-        <p class="cod-note" id="rtCodNote" style="display:none;">No online payment — pay the distributor on delivery.</p>
+        <p class="cod-note" id="rtCodNote" style="display:none;">Pay securely online, or choose cash on delivery.</p>
       </section>
     </div>
 
@@ -110,7 +113,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
   <div class="rt-toast" id="rtToast"></div>
 
+  <!-- Razorpay Standard Checkout SDK (must load before payment.js) -->
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
   <script src="/frontend/js/logout-confirm.js"></script>
+  <script src="/frontend/js/payment.js"></script>
   <script src="/frontend/js/retailer.js"></script>
 </body>
 </html>

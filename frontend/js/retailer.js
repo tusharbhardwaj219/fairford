@@ -23,6 +23,7 @@ let PROFILE = null;
 let CART = readCart();          // [{ id, qty }]
 let ORDERS = {};                // id → order (for Buy Again / View Details)
 let searchTimer;
+let ONLINE_PAY_ON = false;      // set on load from GET /api/payments/config
 
 function readCart() { try { return JSON.parse(localStorage.getItem('ff_cart') || '[]'); } catch (e) { return []; } }
 function writeCart() { localStorage.setItem('ff_cart', JSON.stringify(CART)); }
@@ -112,6 +113,11 @@ async function loadProducts(search) {
     const data = await apiFetch('/retailer/products?' + q.toString());
     PRODUCTS = (data.data && data.data.products) || [];
     renderProducts();
+    // The cart panel resolves its rows against PRODUCTS, so it can only render
+    // once the catalogue has arrived. Without this repaint a retailer who lands
+    // here with items already in the cart (added from the storefront) sees an
+    // empty cart until they touch something.
+    updateCartUI();
   } catch (e) {
     $('rtProducts').innerHTML = '<p class="rt-empty">' + esc(e.message) + '</p>';
   }
@@ -156,11 +162,13 @@ const cartDetailed = () => CART.map((c) => ({ c, p: productById(c.id) })).filter
 
 function updateCartUI() {
   const body = $('rtCartBody'), totals = $('rtTotals'), placeBtn = $('rtPlace'), codNote = $('rtCodNote');
+  const payBtn = $('rtPayOnline');
   const rows = cartDetailed();
 
   if (!rows.length) {
     body.innerHTML = '<p class="rt-empty">Your cart is empty.</p>';
     totals.style.display = 'none'; placeBtn.style.display = 'none'; codNote.style.display = 'none';
+    if (payBtn) payBtn.style.display = 'none';
     return;
   }
 
@@ -196,6 +204,13 @@ function updateCartUI() {
   placeBtn.disabled = !active;
   placeBtn.textContent = active ? 'Place order · Cash on delivery' : 'Awaiting account approval';
   codNote.style.display = active ? 'block' : 'none';
+
+  // Online payment is only offered when the account is approved AND the server
+  // has Razorpay configured (ONLINE_PAY_ON is resolved once on page load).
+  if (payBtn) {
+    payBtn.style.display = active && ONLINE_PAY_ON ? 'block' : 'none';
+    payBtn.disabled = !active;
+  }
 }
 
 async function placeOrder() {
@@ -221,6 +236,42 @@ async function placeOrder() {
     if (ordersSection) ordersSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
   } catch (e) {
     toast('⚠ ' + e.message);
+  } finally {
+    btn.disabled = false; btn.textContent = orig;
+    updateCartUI();
+  }
+}
+
+/* ── Online payment (Razorpay) ──
+   The cart is sent as product ids + quantities only; the server prices the
+   order and tells Razorpay what to charge, so the amount can't be tampered
+   with here. On success the cart is cleared and we land on payment-success. */
+async function payOnline() {
+  const rows = cartDetailed();
+  if (!rows.length) { toast('Your cart is empty'); return; }
+  if (!window.FFPayment) { toast('⚠ Payment module not loaded — please refresh'); return; }
+
+  const btn = $('rtPayOnline'); const orig = btn.textContent;
+  btn.disabled = true;
+
+  const items = rows.map(({ c }) => ({ product: c.id, quantity: c.qty }));
+  const ordered = new Set(rows.map((x) => String(x.c.id)));
+
+  try {
+    await window.FFPayment.payForCart(items, {
+      deliveryPriority: 'standard',
+      onStatus: (msg) => { btn.textContent = msg; },
+      onSuccess: () => {
+        // Clear only what was actually paid for, then let payment.js redirect.
+        CART = CART.filter((c) => !ordered.has(String(c.id)));
+        writeCart();
+      },
+    });
+  } catch (e) {
+    // Cancelled / failed — payment.js has already told the server. The order
+    // stays in My Orders as unpaid so it can be retried.
+    toast((e && e.cancelled ? '⚠ ' : '✕ ') + (e.message || 'Payment failed'));
+    await loadOrders();
   } finally {
     btn.disabled = false; btn.textContent = orig;
     updateCartUI();
@@ -331,9 +382,21 @@ $('rtSearch').addEventListener('input', (e) => {
 });
 $('afSave').addEventListener('click', saveAddress);
 $('rtPlace').addEventListener('click', placeOrder);
+if ($('rtPayOnline')) $('rtPayOnline').addEventListener('click', payOnline);
 $('rtLogout').addEventListener('click', logout);
 
 /* ── Init ── */
+// Ask the server whether online payment is switched on, then repaint the cart
+// so the "Pay online" button appears (or stays hidden on a COD-only deploy).
+(async function initOnlinePayment() {
+  try {
+    ONLINE_PAY_ON = window.FFPayment ? await window.FFPayment.isEnabled() : false;
+  } catch (e) {
+    ONLINE_PAY_ON = false;
+  }
+  updateCartUI();
+})();
+
 loadProfile();
 loadProducts();
 loadOrders();

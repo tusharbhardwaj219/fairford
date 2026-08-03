@@ -37,6 +37,18 @@ const paymentSchema = new mongoose.Schema({
   dueDate:    Date,
   paidAt:     Date,
   notes:      String,
+
+  // ── Razorpay (online payments) ──────────────────────────────────────────────
+  // Populated only for method: 'online'. razorpayPaymentId is unique+sparse so
+  // the same payment can never be recorded twice (idempotent verification), while
+  // the many non-Razorpay payment rows (cash/wallet) are ignored by the index.
+  currency:          { type: String, default: 'INR' },
+  razorpayOrderId:   { type: String, default: null, index: true, sparse: true },
+  razorpayPaymentId: { type: String, default: null, unique: true, sparse: true },
+  razorpaySignature: { type: String, default: null, select: false },
+  // Instrument reported by Razorpay: card / upi / netbanking / wallet / emi.
+  methodDetail:      { type: String, default: null },
+  failureReason:     { type: String, default: null },
 }, { timestamps: true });
 
 paymentSchema.index({ retailer: 1, createdAt: -1 });

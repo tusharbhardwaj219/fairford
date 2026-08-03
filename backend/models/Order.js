@@ -56,8 +56,10 @@ const orderSchema = new mongoose.Schema({
   expectedDelivery: Date,
   actualDelivery:   Date,
   paymentStatus: {
+    // 'failed' = an online payment attempt was made and did not succeed. The
+    // order stays visible so the retailer can retry or cancel it.
     type:    String,
-    enum:    ['unpaid', 'partial', 'paid'],
+    enum:    ['unpaid', 'partial', 'paid', 'failed'],
     default: 'unpaid',
     index:   true,
   },
@@ -65,6 +67,12 @@ const orderSchema = new mongoose.Schema({
     type: String,
     enum: ['wallet', 'credit', 'online', 'cash'],
   },
+  // ── Razorpay (online payment) ───────────────────────────────────────────────
+  // Set when the order is paid online. `sparse` so the unique index ignores the
+  // many COD orders that never get a Razorpay order.
+  razorpayOrderId:   { type: String, default: null, index: true, sparse: true },
+  razorpayPaymentId: { type: String, default: null },
+  paidAt:            { type: Date,   default: null },
   timeline: [timelineSchema],
   notes: String,
 }, { timestamps: true });

@@ -82,7 +82,9 @@ document.addEventListener('DOMContentLoaded', async function () {
         rating: 0,
         min: PRICE_FLOOR,
         max: PRICE_CEIL,
-        sort: "featured"
+        // Products are listed A–Z by default (matches the pre-selected option
+        // in the sort dropdown, which readState() reads on every apply).
+        sort: "name"
     };
 
     /* =========  BUILD FILTER CONTROLS  ========= */
@@ -367,7 +369,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             if (el.type === 'checkbox' || el.type === 'radio') el.checked = false;
         });
         resetPrice();
-        document.getElementById('sort-select').value = 'featured';
+        document.getElementById('sort-select').value = 'name';   // back to the A–Z default
         applyLive();
     }
     document.getElementById('clear-filters').addEventListener('click', function () { clearAll(); toast('Filters cleared'); });

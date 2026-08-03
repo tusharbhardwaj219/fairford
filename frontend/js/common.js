@@ -168,6 +168,24 @@ function ffCanUseCart() {
   return false;
 }
 
+// Reveal the cart panel's "Pay Online" button only when the gateway is actually
+// configured on the server AND the Razorpay SDK loaded. On a COD-only deploy
+// (or if the SDK is blocked) the button stays hidden and cash-on-delivery is
+// the single, clearly-labelled action.
+var _ffOnlinePayOn = null;   // null = not checked yet
+function refreshPayOnlineButton() {
+  var btn = document.querySelector('.fbtn-pay-online');
+  if (!btn) return;
+  var show = function (on) { btn.style.display = on ? '' : 'none'; };
+
+  if (_ffOnlinePayOn !== null) { show(_ffOnlinePayOn); return; }
+  if (typeof window.FFPayment === 'undefined') { show(false); return; }
+
+  window.FFPayment.isEnabled()
+    .then(function (on) { _ffOnlinePayOn = on; show(on); })
+    .catch(function () { _ffOnlinePayOn = false; show(false); });
+}
+
 const store = {
   get cart() {
     try { return JSON.parse(localStorage.getItem('ff_cart') || '[]'); } catch(e) { return []; }
@@ -278,6 +296,7 @@ const store = {
     var SVG_MINUS = '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14"/></svg>';
     var SVG_PLUS  = '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>';
     var SVG_CART  = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"/></svg>';
+    var SVG_CARD  = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2.5"/><path d="M2 10h20"/></svg>';
 
     if (!cart.length) {
       body.innerHTML =
@@ -334,8 +353,15 @@ const store = {
         '<div class="ftotals-row"><span>Estimated GST</span><span>' + inr(gstTotal).replace('.00','') + '</span></div>' +
         '<div class="ftotals-row grand"><span>Grand Total</span><span>' + inr(grand).replace('.00','') + '</span></div>' +
       '</div>' +
-      '<button class="fbtn-checkout">' + SVG_CART + ' Proceed to Checkout</button>' +
+      // Two explicit actions instead of one ambiguous "Proceed to Checkout":
+      // the old single button silently placed a COD order and only flashed a
+      // toast, which read as "nothing happened". Online pay is added at runtime
+      // once we know the gateway is configured (see refreshPayOnlineButton).
+      '<button class="fbtn-checkout fbtn-pay-online" style="display:none">' + SVG_CARD + ' Pay Online · UPI / Card</button>' +
+      '<button class="fbtn-checkout fbtn-cod">' + SVG_CART + ' Place Order · Cash on Delivery</button>' +
       '<p class="ffoot-note">Min. order quantities apply · Prices in INR</p>';
+
+    refreshPayOnlineButton();
   },
 
   _refreshWishPanel: async function() {
@@ -824,6 +850,33 @@ function initPanels() {
     var cart = store.cart;
     if (!cart.length) { toast('Your cart is empty'); return; }
 
+    // ── Pay online (Razorpay) ────────────────────────────────────────────────
+    // Opens the Checkout modal — an unmistakable response to the click. The
+    // amount is priced by the server; we only send product ids + quantities.
+    if (btn.classList.contains('fbtn-pay-online')) {
+      if (!window.FFPayment) { toast('Payment module not loaded — please refresh.'); return; }
+      var payOrig = btn.innerHTML;
+      btn.disabled = true;
+      try {
+        await window.FFPayment.payForCart(
+          cart.map(function (c) { return { product: c.id, quantity: c.qty }; }),
+          {
+            deliveryPriority: 'standard',
+            onStatus: function (m) { btn.innerHTML = m; },
+            onSuccess: function () { store._setCart([]); store.syncCounts(); },
+          }
+        );
+      } catch (err) {
+        toast((err && err.cancelled ? '⚠ ' : '✕ ') + (err.message || 'Payment failed'));
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = payOrig;
+        store._refreshCartPanel();
+      }
+      return;
+    }
+
+    // ── Cash on delivery (existing flow, unchanged) ──────────────────────────
     var orig = btn.innerHTML;
     btn.disabled = true;
     btn.innerHTML = 'Placing…';

@@ -370,11 +370,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             Filters
                         </button>
                         <select class="sort-select" id="sort-select" aria-label="Sort products">
+                            <!-- A–Z is the default listing order (first + selected). -->
+                            <option value="name" selected>Name: A–Z</option>
                             <option value="featured">Sort: Featured</option>
                             <option value="price-asc">Price: Low to High</option>
                             <option value="price-desc">Price: High to Low</option>
                             <option value="rating">Top Rated</option>
-                            <option value="name">Name: A–Z</option>
                         </select>
                     </div>
                 </div>
@@ -393,6 +394,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <script src="/frontend/js/api.js"></script>
     <script src="/frontend/js/data.js"></script>
     <script src="/frontend/js/common.js"></script>
+    <!-- Razorpay Standard Checkout (powers "Pay Online" in the cart panel) -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="/frontend/js/payment.js"></script>
     <script src="/frontend/js/product.js"></script>
 </body>
 </html>

@@ -32,17 +32,22 @@ app.use(helmet({
     useDefaults: false,
     directives: {
       defaultSrc:     ["'self'"],
-      scriptSrc:      ["'self'", "'unsafe-inline'", 'https://cdnjs.cloudflare.com', 'https://cdn.jsdelivr.net'],
+      // checkout.razorpay.com serves the Checkout SDK; without it the payment
+      // modal is blocked by CSP and never opens.
+      scriptSrc:      ["'self'", "'unsafe-inline'", 'https://cdnjs.cloudflare.com', 'https://cdn.jsdelivr.net', 'https://checkout.razorpay.com'],
       scriptSrcAttr:  ["'unsafe-inline'"], // inline onclick handlers used across the pages
       styleSrc:       ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com', 'https://cdnjs.cloudflare.com', 'https://cdn.jsdelivr.net'],
       fontSrc:        ["'self'", 'data:', 'https://fonts.gstatic.com', 'https://cdnjs.cloudflare.com', 'https://cdn.jsdelivr.net'],
       imgSrc:         ["'self'", 'data:', 'https:'],
-      connectSrc:     ["'self'"],
-      frameSrc:       ["'self'", 'https://www.google.com'], // contact-page Google Maps embed
+      // Checkout posts telemetry to lumberjack.* and talks to api.razorpay.com.
+      connectSrc:     ["'self'", 'https://api.razorpay.com', 'https://lumberjack.razorpay.com', 'https://lumberjack-metrics.razorpay.com'],
+      // Razorpay renders its modal (and bank/UPI redirects) inside iframes.
+      frameSrc:       ["'self'", 'https://www.google.com', 'https://api.razorpay.com', 'https://checkout.razorpay.com'],
       objectSrc:      ["'none'"],
       baseUri:        ["'self'"],
       frameAncestors: ["'self'"],
-      formAction:     ["'self'"],
+      // Bank / 3-D Secure pages are reached by form POST during checkout.
+      formAction:     ["'self'", 'https://api.razorpay.com'],
     },
   },
 }));
@@ -106,6 +111,12 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 // ── BODY PARSING ──────────────────────────────────────────────────────────────
+// The Razorpay webhook signature is an HMAC over the EXACT bytes Razorpay sent,
+// so that one route needs the raw buffer. It must be registered before
+// express.json() — body-parser marks the request as read (req._body), so the
+// JSON parser below skips it and req.body stays a Buffer.
+app.use('/api/payments/webhook', express.raw({ type: '*/*', limit: '1mb' }));
+
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 app.use(cookieParser());
