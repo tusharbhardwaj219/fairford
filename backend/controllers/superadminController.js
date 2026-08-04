@@ -18,6 +18,7 @@ const Product     = require('../models/Product');
 const Order       = require('../models/Order');
 const Scheme      = require('../models/Scheme');
 const Category    = require('../models/Category');
+const Admin       = require('../models/Admin');
 
 // ── Dashboard-only collections (no real equivalent in the storefront) ─────────
 const PriceRule = mongoose.models.SaPriceRule || mongoose.model('SaPriceRule',
@@ -748,6 +749,37 @@ exports.deleteDistMapping = async (req, res) => {
     const r = await DistMapping.deleteOne({ _id: req.params.id });
     if (!r.deletedCount) return res.status(404).json({ error: 'Not found' });
     ok(res);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+};
+
+// ════════════════════════════ ADMIN ACCOUNTS ══════════════════════════════════
+// Create or reset a superadmin login. Restricted to existing superadmins (not
+// plain 'admin') — this is more privileged than the retailer/distributor CRUD
+// above, since it can create another fully-privileged account.
+exports.upsertAdmin = async (req, res) => {
+  try {
+    if (req.user.role !== 'superadmin') {
+      return res.status(403).json({ error: 'Only a superadmin can manage admin accounts' });
+    }
+    const email = String(req.body.email || '').toLowerCase().trim();
+    const password = req.body.password;
+    const name = req.body.name || 'Super Admin';
+    if (!email || !password) return res.status(400).json({ error: 'email and password are required' });
+    if (password.length < 12) return res.status(400).json({ error: 'Password must be at least 12 characters' });
+
+    let admin = await Admin.findOne({ email }).select('+password');
+    let created = false;
+    if (admin) {
+      admin.password = password;   // pre-save hook hashes it
+      admin.isActive = true;
+      admin.loginAttempts = 0;
+      admin.lockUntil = null;
+      await admin.save();
+    } else {
+      admin = await Admin.create({ name, email, password, role: 'superadmin', isActive: true });
+      created = true;
+    }
+    res.status(created ? 201 : 200).json({ success: true, created, email: admin.email, role: admin.role });
   } catch (e) { res.status(500).json({ error: e.message }); }
 };
 

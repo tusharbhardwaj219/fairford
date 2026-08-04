@@ -64,6 +64,10 @@ router.post('/dist-mapping', c.createDistMapping);
 router.put('/dist-mapping/:id', c.updateDistMapping);
 router.delete('/dist-mapping/:id', c.deleteDistMapping);
 
+// Admin accounts (create/reset a superadmin login) — controller enforces that
+// only an existing superadmin, not a plain admin, may call this.
+router.post('/admins', c.upsertAdmin);
+
 // Notifications
 router.post('/notify/low-stock', c.notifyLowStock);
 
