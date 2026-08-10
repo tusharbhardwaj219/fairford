@@ -393,13 +393,19 @@ exports.updateProduct = async (req, res, next) => {
       update.categoryName = category.categoryName;
     }
 
-    // Replace main image: delete old from Cloudinary, save new
+    // Replace main image: delete old from Cloudinary, save new. Also clear the
+    // `images[]` gallery — the product-detail page prefers images[0] over the
+    // primary `image` whenever the gallery is non-empty, so a leftover gallery
+    // entry from before this edit would silently keep showing the OLD photo on
+    // the detail page even though the listing page (which only reads `image`)
+    // correctly shows the new one. Bit us in production 2026-08-10.
     if (req.file) {
       await destroyCloudinaryImage(product.image && product.image.public_id);
       update.image = {
         url:       req.file.path,
         public_id: req.file.filename
       };
+      update.images = [];
     }
 
     product = await Product.findByIdAndUpdate(req.params.id, update, {

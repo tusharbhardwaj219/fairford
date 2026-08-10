@@ -217,11 +217,15 @@ document.addEventListener('DOMContentLoaded', function () {
       if (typeof x === 'string') return x;
       return x.url || '';
     }).filter(Boolean);
-    if (!imgs.length && p.image) {
-      const primary = typeof p.image === 'string' ? p.image : (p.image.url || '');
-      if (primary) imgs = [primary];
+    const primaryImgUrl = p.image ? (typeof p.image === 'string' ? p.image : (p.image.url || '')) : '';
+    if (!imgs.length && primaryImgUrl) {
+      imgs = [primaryImgUrl];
     }
     const hasImg  = imgs.length > 0;
+    // If the hero is showing a gallery photo that differs from the primary
+    // `image`, give the fallback a second URL to try before it gives up to a
+    // generic placeholder (see productImgFallback in common.js).
+    const heroAltSrc = (hasImg && primaryImgUrl && imgs[0] !== primaryImgUrl) ? primaryImgUrl : '';
     const cat     = esc(catName || '');
     const brand   = esc(p.manufacturer || p.brand || 'Pharma');
     const ratingVal = p.rating || p.ratings || null;
@@ -245,7 +249,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
       <div class="pd-main-img" id="pd-main-img" role="button" tabindex="0" aria-label="Zoom product image">
         ${hasImg
-          ? `<img class="pd-main-img-el" id="pd-main-img-el" src="${esc(imgs[0])}" alt="${esc(p.name)}" data-cat="${cat}" data-fallback-class="pd-img-ph" onerror="productImgFallback(this)" />`
+          ? `<img class="pd-main-img-el" id="pd-main-img-el" src="${esc(imgs[0])}" alt="${esc(p.name)}" data-cat="${cat}" data-fallback-class="pd-img-ph"${heroAltSrc ? ` data-alt-src="${esc(heroAltSrc)}"` : ''} onerror="productImgFallback(this)" />`
           : `<div class="pd-img-ph">
                <div class="pd-img-ph-icon">${categoryIcon(catName)}</div>
                <div class="pd-img-ph-txt">${esc(p.name)}</div>

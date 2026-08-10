@@ -493,6 +493,14 @@ exports.updateProduct = async (req, res) => {
     // Replace the product image: delete the old Cloudinary asset (fire and
     // forget — failure to clean up shouldn't block the update), then store
     // the new one. If no file came in, leave the existing image intact.
+    //
+    // Also clear the `images[]` gallery: productdetail.js prefers images[0]
+    // over this primary `image` whenever the gallery is non-empty, so a
+    // leftover gallery entry from before this edit would silently keep the
+    // detail page showing the OLD photo even though everywhere else (product
+    // listing, this dashboard) correctly shows the new one — bit us in
+    // production 2026-08-10 (ACLOFAIR COLD & FLU kept its old "Red" gallery
+    // photo after the primary was changed to the plain teal pack).
     if (req.file) {
       const existing = await Product.findById(req.params.id).select('image').lean();
       if (existing && existing.image && existing.image.public_id) {
@@ -502,6 +510,7 @@ exports.updateProduct = async (req, res) => {
         } catch (_) {}
       }
       patch.image = { url: req.file.path, public_id: req.file.filename };
+      patch.images = [];
     }
 
     const p = await Product.findByIdAndUpdate(req.params.id, { $set: patch }, { returnDocument: 'after' });
