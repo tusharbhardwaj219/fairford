@@ -1,0 +1,25 @@
+HTTP/1.1 200 OK
+Content-Security-Policy: default-src 'self';script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://checkout.razorpay.com https://cdn.razorpay.com https://www.googletagmanager.com;script-src-attr 'unsafe-inline';style-src 'self' 'unsafe-inline' https://api.fontshare.com https://fonts.googleapis.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;font-src 'self' data: https://cdn.fontshare.com https://fonts.gstatic.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;img-src 'self' data: https:;connect-src 'self' https://api.razorpay.com https://lumberjack.razorpay.com https://lumberjack-metrics.razorpay.com https://www.google-analytics.com https://analytics.google.com https://stats.g.doubleclick.net https://www.googletagmanager.com;frame-src 'self' https://www.google.com https://api.razorpay.com https://checkout.razorpay.com https://www.googletagmanager.com;object-src 'none';base-uri 'self';frame-ancestors 'self';form-action 'self' https://api.razorpay.com
+Cross-Origin-Opener-Policy: same-origin
+Cross-Origin-Resource-Policy: same-origin
+Origin-Agent-Cluster: ?1
+Referrer-Policy: no-referrer
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+X-Content-Type-Options: nosniff
+X-DNS-Prefetch-Control: off
+X-Download-Options: noopen
+X-Frame-Options: SAMEORIGIN
+X-Permitted-Cross-Domain-Policies: none
+X-XSS-Protection: 0
+Vary: Origin
+Access-Control-Allow-Credentials: true
+Accept-Ranges: bytes
+Cache-Control: public, max-age=0
+Last-Modified: Fri, 21 Aug 2026 05:11:31 GMT
+ETag: W/"1347b-1a022bb3d7d"
+Content-Type: text/html; charset=UTF-8
+Content-Length: 78971
+Date: Fri, 21 Aug 2026 05:13:16 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+

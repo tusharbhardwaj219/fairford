@@ -1,0 +1,206 @@
+/* ==============================================================
+   FAIR FORD PHARMACEUTICALS — page loader
+   loader.css  ·  pairs with js/loader.js
+   --------------------------------------------------------------
+   A light, clinical curtain rather than a dark splash: the brand
+   mark resolves inside a drawing ring, the wordmark settles, a hair
+   progress rail fills, then the whole thing lifts away as two
+   panels so the page underneath is revealed rather than faded to.
+
+   Everything animates on transform/opacity only, so the loader can
+   never cause layout shift in the page beneath it.
+   ============================================================== */
+
+/* Locks scroll while the loader is up. Removed by loader.js in every
+   exit path, including the failsafe timeout. */
+html.ff-l-active,
+html.ff-l-active body {
+    overflow: hidden !important;
+}
+
+#ff-loader {
+    position: fixed;
+    inset: 0;
+    z-index: 2147483000;
+    display: grid;
+    place-items: center;
+    pointer-events: all;
+    touch-action: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Two panels that split apart on exit. */
+#ff-loader .ff-l-panel {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 50.5%;              /* .5 overlap kills the hairline seam */
+    background:
+        radial-gradient(120% 140% at 50% 0%, #ffffff 0%, var(--ff-l-bg, #F7FAFC) 60%),
+        var(--ff-l-bg, #F7FAFC);
+    transition: transform 820ms cubic-bezier(0.76, 0, 0.24, 1);
+    will-change: transform;
+}
+#ff-loader .ff-l-panel--top { top: 0; }
+#ff-loader .ff-l-panel--bottom { bottom: 0; }
+
+#ff-loader.is-out .ff-l-panel--top { transform: translateY(-101%); }
+#ff-loader.is-out .ff-l-panel--bottom { transform: translateY(101%); }
+
+/* Soft brand wash so the field reads as lit, not flat paper. */
+#ff-loader .ff-l-wash {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+        radial-gradient(38% 42% at 50% 44%, rgba(54, 183, 165, .13), transparent 70%),
+        radial-gradient(60% 55% at 50% 108%, rgba(15, 76, 129, .16), transparent 72%);
+    transition: opacity 420ms ease;
+}
+#ff-loader.is-out .ff-l-wash { opacity: 0; }
+
+/* ---- Stage ---------------------------------------------------- */
+#ff-loader .ff-l-stage {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    transition: opacity 320ms ease, transform 520ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+#ff-loader.is-out .ff-l-stage {
+    opacity: 0;
+    transform: translateY(-10px) scale(.985);
+}
+
+/* ---- Mark + drawing ring -------------------------------------- */
+#ff-loader .ff-l-mark {
+    position: relative;
+    width: 104px;
+    height: 104px;
+    display: grid;
+    place-items: center;
+}
+
+#ff-loader .ff-l-ring {
+    position: absolute;
+    inset: 0;
+    transform: rotate(-90deg);   /* start the stroke at 12 o'clock */
+}
+#ff-loader .ff-l-ring circle {
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+}
+#ff-loader .ff-l-ring .trk { stroke: rgba(15, 76, 129, .12); }
+#ff-loader .ff-l-ring .arc {
+    stroke: url(#ffLGrad);
+    stroke-dasharray: 302;       /* 2·π·48 */
+    stroke-dashoffset: 302;
+    transition: stroke-dashoffset 260ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#ff-loader .ff-l-logo {
+    width: 62px;
+    height: 62px;
+    object-fit: contain;
+    opacity: 0;
+    transform: scale(.86);
+    animation: ffLMark 720ms cubic-bezier(0.16, 1, 0.3, 1) 60ms forwards;
+}
+
+@keyframes ffLMark {
+    to { opacity: 1; transform: scale(1); }
+}
+
+/* A slow breath keeps the mark alive while the page finishes loading. */
+#ff-loader .ff-l-mark::after {
+    content: "";
+    position: absolute;
+    inset: -14px;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, rgba(54, 183, 165, .20), transparent 70%);
+    animation: ffLBreathe 2.6s ease-in-out infinite;
+    pointer-events: none;
+}
+@keyframes ffLBreathe {
+    0%, 100% { opacity: .45; transform: scale(.94); }
+    50%      { opacity: .95; transform: scale(1.06); }
+}
+
+/* ---- Wordmark -------------------------------------------------- */
+#ff-loader .ff-l-text {
+    margin-top: 26px;
+    font-family: var(--ff-font-heading, 'Manrope', system-ui, sans-serif);
+    font-weight: 700;
+    font-size: clamp(15px, 3.4vw, 19px);
+    letter-spacing: .30em;
+    text-indent: .30em;             /* optical centring vs the tracking */
+    line-height: 1;
+    color: #0F4C81;
+    opacity: 0;
+    transform: translateY(9px);
+    animation: ffLRise 640ms cubic-bezier(0.16, 1, 0.3, 1) 260ms forwards;
+}
+
+#ff-loader .ff-l-sub {
+    margin-top: 11px;
+    font-family: var(--ff-font-body, 'Inter', system-ui, sans-serif);
+    font-weight: 500;
+    font-size: clamp(9px, 2.2vw, 10.5px);
+    letter-spacing: .24em;
+    text-indent: .24em;
+    text-transform: uppercase;
+    color: #6B8199;
+    opacity: 0;
+    transform: translateY(8px);
+    animation: ffLRise 620ms cubic-bezier(0.16, 1, 0.3, 1) 380ms forwards;
+}
+
+@keyframes ffLRise {
+    to { opacity: 1; transform: none; }
+}
+
+/* ---- Progress rail --------------------------------------------- */
+#ff-loader .ff-l-rail {
+    position: relative;
+    margin-top: 26px;
+    width: clamp(150px, 42vw, 210px);
+    height: 2px;
+    border-radius: 2px;
+    overflow: hidden;
+    background: rgba(15, 76, 129, .11);
+    opacity: 0;
+    animation: ffLRise 520ms ease 460ms forwards;
+}
+
+#ff-loader .ff-l-bar {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 0;
+    border-radius: 2px;
+    background: linear-gradient(90deg, #0F4C81, #1E6FA8 55%, #36B7A5);
+    transition: width 260ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ---- Reduced motion: hold everything still, still show progress -- */
+@media (prefers-reduced-motion: reduce) {
+    #ff-loader .ff-l-logo,
+    #ff-loader .ff-l-text,
+    #ff-loader .ff-l-sub,
+    #ff-loader .ff-l-rail {
+        animation: none;
+        opacity: 1;
+        transform: none;
+    }
+    #ff-loader .ff-l-mark::after { animation: none; }
+    #ff-loader .ff-l-panel { transition-duration: 260ms; }
+}
+
+/* ---- Small screens --------------------------------------------- */
+@media (max-width: 480px) {
+    #ff-loader .ff-l-mark { width: 88px; height: 88px; }
+    #ff-loader .ff-l-logo { width: 52px; height: 52px; }
+    #ff-loader .ff-l-text { margin-top: 22px; }
+}

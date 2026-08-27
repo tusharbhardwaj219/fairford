@@ -22,7 +22,7 @@
 * { box-sizing: border-box; }
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-family: var(--ff-font-body, 'Inter', system-ui, sans-serif);
   background: var(--bg);
   color: var(--text);
 }
@@ -45,6 +45,16 @@ body {
 
 /* ── Layout ── */
 .rt-wrap { max-width: 1180px; margin: 0 auto; padding: 22px 18px 60px; }
+
+/* Page-level heading. The page previously started at <h2>, leaving the
+   document with no top-level heading. */
+.rt-page-title {
+  margin: 0 0 18px;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--primary);
+}
 .rt-grid { display: grid; grid-template-columns: 1fr 360px; gap: 20px; align-items: start; }
 @media (max-width: 900px) { .rt-grid { grid-template-columns: 1fr; } }
 

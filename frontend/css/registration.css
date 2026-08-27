@@ -22,7 +22,7 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-family: var(--ff-font-body, 'Inter', system-ui, sans-serif);
     background: #fff;
     color: #000;
     min-height: 100vh;
@@ -86,12 +86,12 @@ body {
     /* background: linear-gradient(135deg, var(--indigo) 0%, var(--cyan) 100%); */
     border-radius: 13px;
     display: flex; align-items: center; justify-content: center;
-    font-weight: 800; font-size: 16px; color: #fff;
+    font-weight: 700; font-size: 16px; color: #fff;
     /* box-shadow: 0 0 24px var(--glow-indigo); */
 }
 
 .brand-name {
-    font-size: 18px; font-weight: 800; letter-spacing: -0.4px;
+    font-size: 18px; font-weight: 700; letter-spacing: -0.4px;
     color: #0d1e3c;
 }
 .brand-sub {
@@ -207,7 +207,7 @@ body {
 .badge-dot { width:6px; height:6px; border-radius:50%; background:var(--cyan); animation:blink 1.6s infinite; }
 @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
 .page-title {
-    font-size: clamp(20px, 2.2vw, 26px); font-weight: 800; letter-spacing: -0.8px; color: #0d1e3c;
+    font-size: clamp(20px, 2.2vw, 26px); font-weight: 700; letter-spacing: -0.8px; color: #0d1e3c;
 }
 .page-subtitle {
     font-size: 13.5px; font-weight: 400; color: var(--text-dim); margin-top: 4px;
@@ -240,7 +240,7 @@ body {
 
 /* Section heading */
 .section-heading {
-    font-size: 13px; font-weight: 800;
+    font-size: 13px; font-weight: 700;
     letter-spacing: 1.4px; text-transform: uppercase;
     color: #0d1e3c;
     margin-bottom: 20px; padding-bottom: 10px;
@@ -342,7 +342,7 @@ textarea {
     border-radius: 11px;
     padding: 12.5px 14px 12.5px 42px;
     color: #0d1e3c;
-    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-family: var(--ff-font-body, 'Inter', system-ui, sans-serif);
     font-size: 13.5px; font-weight: 400;
     outline: none; transition: all 0.22s;
     -webkit-appearance: none;
@@ -397,6 +397,47 @@ input.error, select.error { border-color: var(--red) !important; }
 .pw-label.good-t   { color: var(--blue); }
 .pw-label.strong-t { color: var(--emerald); }
 
+/* Password requirement checklist — states the rules upfront and ticks them off
+   live, rather than revealing them one server rejection at a time. */
+.pw-rules {
+    list-style: none;
+    margin: 8px 0 0;
+    padding: 0;
+    display: grid;
+    gap: 3px;
+}
+.pw-rules li {
+    position: relative;
+    padding-left: 18px;
+    font-size: 10.5px;
+    line-height: 1.5;
+    color: var(--text-dim);
+    transition: color .18s ease;
+}
+.pw-rules li::before {
+    content: "○";
+    position: absolute;
+    left: 2px;
+    top: 0;
+    font-size: 10px;
+    line-height: 1.5;
+}
+.pw-rules li.ok {
+    color: var(--emerald);
+}
+.pw-rules li.ok::before {
+    content: "✓";
+    font-weight: 700;
+}
+.pw-rules code {
+    font-family: var(--ff-font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+    font-size: 10px;
+    letter-spacing: .04em;
+}
+.pw-rules.has-error li[data-rule="special"] {
+    color: var(--red);
+}
+
 /* OTP box */
 .otp-row { display: flex; gap: 10px; align-items: flex-end; }
 .otp-row input { flex: 1; }
@@ -405,7 +446,7 @@ input.error, select.error { border-color: var(--red) !important; }
     background: rgba(59,91,219,0.10);
     border: 1.5px solid rgba(59,91,219,0.25);
     border-radius: 11px; color: var(--indigo-light);
-    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-family: var(--ff-font-body, 'Inter', system-ui, sans-serif);
     font-size: 13px; font-weight: 700; cursor: pointer;
     transition: all 0.25s; white-space: nowrap;
 }
@@ -419,7 +460,7 @@ input.error, select.error { border-color: var(--red) !important; }
     background: rgba(255,255,255,0.95);
     border: 2px solid var(--border);
     border-radius: 12px; color: #0d1e3c;
-    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-family: var(--ff-font-body, 'Inter', system-ui, sans-serif);
     font-size: 22px; font-weight: 700;
     outline: none; transition: all 0.2s;
     padding: 0;
@@ -509,7 +550,7 @@ input.error, select.error { border-color: var(--red) !important; }
     padding: 13px 22px;
     background: transparent; border: 1.5px solid var(--border);
     border-radius: 12px; color: var(--text-mid);
-    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-family: var(--ff-font-body, 'Inter', system-ui, sans-serif);
     font-size: 14px; font-weight: 600; cursor: pointer;
     transition: all 0.25s;
 }
@@ -519,7 +560,7 @@ input.error, select.error { border-color: var(--red) !important; }
     padding: 13px 28px;
     background: linear-gradient(135deg, var(--indigo) 0%, var(--blue) 55%, var(--cyan) 100%);
     border: none; border-radius: 12px; color: #fff;
-    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-family: var(--ff-font-body, 'Inter', system-ui, sans-serif);
     font-size: 14px; font-weight: 700; cursor: pointer;
     transition: all 0.3s;
     box-shadow: 0 4px 20px rgba(59,91,219,0.40);
@@ -550,7 +591,7 @@ input.error, select.error { border-color: var(--red) !important; }
 }
 @keyframes popIn { from{transform:scale(0);opacity:0} to{transform:scale(1);opacity:1} }
 .success-title {
-    font-size: clamp(24px, 3vw, 32px); font-weight: 800; letter-spacing: -1px;
+    font-size: clamp(24px, 3vw, 32px); font-weight: 700; letter-spacing: -1px;
     margin-bottom: 12px; color: #0d1e3c;
 }
 .success-sub {
@@ -569,7 +610,7 @@ input.error, select.error { border-color: var(--red) !important; }
     padding: 13px 28px;
     background: linear-gradient(135deg, var(--indigo), var(--cyan));
     border: none; border-radius: 12px; color: #fff;
-    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-family: var(--ff-font-body, 'Inter', system-ui, sans-serif);
     font-size: 14px; font-weight: 700; cursor: pointer;
     transition: all 0.3s; box-shadow: 0 4px 20px rgba(59,91,219,0.4);
 }
@@ -578,7 +619,7 @@ input.error, select.error { border-color: var(--red) !important; }
     padding: 13px 28px;
     background: transparent; border: 1.5px solid var(--border);
     border-radius: 12px; color: var(--text-mid);
-    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-family: var(--ff-font-body, 'Inter', system-ui, sans-serif);
     font-size: 14px; font-weight: 600; cursor: pointer;
     transition: all 0.25s;
 }

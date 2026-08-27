@@ -617,9 +617,17 @@ function _normaliseApiProduct(p) {
     distributorPrice: Number(p.distributorPrice || 0),
     gst:              Number(p.gst || 12),
     moq:              Number(p.minimumOrderQuantity || 1),
+    // Same value under the API's own name. Callers reach for either spelling
+    // (product.js read `minimumOrderQuantity` and always got undefined, so the
+    // MOQ line never rendered); keeping both means neither is wrong.
+    minimumOrderQuantity: Number(p.minimumOrderQuantity || 1),
     stock:            Number(p.stock || 0),
     stockStatus:      stockStatus,
-    rating:           Number(p.rating || 4.5),
+    // NO review system exists: every product carries rating 0 / reviewCount 0.
+    // This used to read `p.rating || 4.5`, which turned that 0 into a
+    // fabricated 4.5-star score shown on the listing and the detail hero.
+    // Pass the real value through; callers already hide a falsy rating.
+    rating:           Number(p.rating || 0),
     reviewCount:      Number(p.reviewCount || 0),
     dosageForm:       p.dosageForm || '-',
     composition:      p.composition || [],
@@ -628,9 +636,36 @@ function _normaliseApiProduct(p) {
     sideEffects:      p.sideEffects || [],
     storage:          p.storage || [],
     description:      p.description || '',
-    image:            (p.image && p.image.url) || (p.images && p.images[0] && p.images[0].url) || ''
+    image:            (p.image && p.image.url) || (p.images && p.images[0] && p.images[0].url) || '',
+    // Extra fields the marketplace listing needs. All are real values from the
+    // API — nothing here is derived or invented.
+    slug:             p.slug || '',
+    gstRate:          Number(p.gst || 0),
+    createdAt:        p.createdAt || '',
+    tags:             Array.isArray(p.tags) ? p.tags : [],
+    // Catalogue code lives in `tags` as "code:I00853" on the products that
+    // have one. Surfaced so buyers can search by the code on their order form.
+    code:             _extractProductCode(p.tags),
+    isFeatured:       !!p.isFeatured,
+    isBestseller:     !!p.isBestseller,
+    isNewArrival:     !!p.isNewArrival
   };
 }
+
+function _extractProductCode(tags) {
+  if (!Array.isArray(tags)) return '';
+  for (var i = 0; i < tags.length; i++) {
+    var t = String(tags[i] || '');
+    if (t.toLowerCase().indexOf('code:') === 0) return t.slice(5).trim();
+  }
+  return '';
+}
+
+/* True when the last getAllProducts() call could not reach the API. Lets a
+   caller tell "the request failed" apart from "the catalogue is genuinely
+   empty" — two states that must not show the same message. */
+var _productsLoadFailed = false;
+function productsLoadFailed() { return _productsLoadFailed; }
 
 async function getAllProducts() {
   if (_cachedProducts) return _cachedProducts;
@@ -638,15 +673,19 @@ async function getAllProducts() {
     var token = localStorage.getItem('ff_token');
     var headers = { 'Content-Type': 'application/json' };
     if (token) headers.Authorization = 'Bearer ' + token;
-    var res = await fetch('/api/products?limit=200', { headers: headers });
+    var res = await fetch('/api/products?limit=500', { headers: headers });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
     var data = await res.json();
     var list = (data && data.products) || [];
+    _productsLoadFailed = false;
     _cachedProducts = list.map(_normaliseApiProduct);
     return _cachedProducts;
   } catch (e) {
     console.error('[data] getAllProducts failed:', e);
-    _cachedProducts = [];
-    return _cachedProducts;
+    // Deliberately NOT cached. Caching [] on a network blip made the failure
+    // permanent for the session — a "Retry" button could never recover.
+    _productsLoadFailed = true;
+    return [];
   }
 }
 

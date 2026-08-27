@@ -33,9 +33,13 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     } catch (e) { window.location.replace('/admin.html'); }
   })();
 </script>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+    <link rel="stylesheet" href="/frontend/css/typography.css">
 <link rel="stylesheet" href="/frontend/css/superadmin.css">
+  <!-- Page loader (see css/loader.css + js/loader.js). Not deferred:
+       the overlay must exist before first paint. -->
+  <link rel="stylesheet" href="/frontend/css/loader.css" />
+  <script src="/frontend/js/loader.js"></script>
 </head>
 <body><!-- Google Tag Manager (noscript) -->
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5B2HT6FW"
@@ -258,9 +262,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           <div style="display:flex;align-items:center;gap:24px">
             <div style="position:relative;width:100px;height:100px;flex-shrink:0"><canvas id="walletDonut"></canvas></div>
             <div style="flex:1">
-              <div class="legend-row"><span class="legend-dot" style="background:#0FA86A"></span><span style="flex:1;color:var(--text-2)">Settled</span><strong>74%</strong></div>
-              <div class="legend-row"><span class="legend-dot" style="background:#5B3EE8"></span><span style="flex:1;color:var(--text-2)">Escrow</span><strong>16%</strong></div>
-              <div class="legend-row"><span class="legend-dot" style="background:#E24B4A"></span><span style="flex:1;color:var(--text-2)">Pending</span><strong>10%</strong></div>
+              <div class="legend-row"><span class="legend-dot" style="background:#0FA86A"></span><span style="flex:1;color:var(--text-2)">Settled</span><strong id="wdSettled">—</strong></div>
+              <div class="legend-row"><span class="legend-dot" style="background:#5B3EE8"></span><span style="flex:1;color:var(--text-2)">In transit</span><strong id="wdTransit">—</strong></div>
+              <div class="legend-row"><span class="legend-dot" style="background:#E24B4A"></span><span style="flex:1;color:var(--text-2)">Pending</span><strong id="wdPending">—</strong></div>
               <div class="settle-bar" onclick="showPage('wallet')">Initiate Settlement</div>
             </div>
           </div>
@@ -819,23 +823,20 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <div class="form-group"><!-- spacer --></div>
       </div>
 
-      <!-- Product image: optional on edit, shown on the storefront product card -->
-      <div class="form-group">
-        <label class="form-label">Product Image</label>
-        <div class="prod-image-picker">
-          <div class="prod-image-preview" id="prodImagePreview">
-            <span class="prod-image-placeholder">No image selected</span>
-          </div>
-          <div class="prod-image-controls">
-            <label class="btn btn-ghost btn-sm" for="productImageInput" style="cursor:pointer;">
-              Choose image…
-            </label>
-            <input type="file" id="productImageInput" name="product-image"
-                   accept="image/png,image/jpeg,image/webp" style="display:none;">
-            <button type="button" id="productImageClear" class="btn btn-danger btn-sm" style="display:none;">Remove</button>
-            <span class="prod-image-hint">PNG / JPG / WEBP up to 5 MB</span>
-          </div>
+      <!-- ══ Product Images — 4-slot gallery manager (rendered by superadmin.js) ══
+           Feeds the customer-facing 4-image product gallery. Slot 1 is the
+           primary image used across listings/search/cart; slots 2–4 are the
+           additional detail-page views. -->
+      <div class="form-group pig">
+        <div class="pig-head">
+          <label class="form-label" style="margin:0">Product Images</label>
+          <span class="pig-count" id="pigCount">0 / 4</span>
         </div>
+        <p class="pig-help">Upload up to 4 official images for this product. Use high-quality photos with a consistent background and product scale.</p>
+        <div class="pig-product" id="pigProduct" hidden>Product: <b id="pigProductName"></b></div>
+        <div class="pig-grid" id="pigGrid" aria-label="Product image slots"></div>
+        <!-- single hidden input reused for every slot's file picker -->
+        <input type="file" id="pigFileInput" accept="image/png,image/jpeg,image/jpg,image/webp" hidden>
       </div>
 
       <div class="form-group"><label class="form-label">Description</label><textarea class="form-input" name="product-desc" placeholder="Product description" style="resize:vertical;min-height:80px"></textarea></div>

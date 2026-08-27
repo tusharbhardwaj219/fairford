@@ -101,4 +101,26 @@ orderSchema.pre('save', async function () {
 orderSchema.index({ retailer: 1, createdAt: -1 });
 orderSchema.index({ distributor: 1, createdAt: -1 });
 
+// ── Uphaar rewards hook ──────────────────────────────────────────────────────
+// Flag the transition into 'delivered' while modified-paths are still known
+// (isModified is only meaningful pre-save). Plain sync hook WITH next — safe
+// per the async-hook gotcha; only async hooks must omit next.
+orderSchema.pre('save', function (next) {
+  this._becameDelivered = this.isModified('status') && this.status === 'delivered';
+  next();
+});
+
+// After a delivered order is persisted, credit Uphaar cashback + refresh the
+// retailer's box/tier snapshot. Best-effort + idempotent (see rewardsService),
+// so it never fails the save. Required lazily to avoid a circular require
+// (rewardsService pulls in this model). Fires for EVERY deliver path because
+// they all go through order.save() (orderController, adminController,
+// distributorInventoryController).
+orderSchema.post('save', function (doc) {
+  if (!doc || !doc._becameDelivered) return;
+  doc._becameDelivered = false;
+  const { creditOrderRewards } = require('../services/rewardsService');
+  Promise.resolve().then(function () { return creditOrderRewards(doc._id); }).catch(function () {});
+});
+
 module.exports = mongoose.model('Order', orderSchema);

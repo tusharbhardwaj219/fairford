@@ -46,7 +46,7 @@
     background: linear-gradient(135deg, #f8faff 0%, #fff 100%);
 }
 .fpanel-title {
-    font-family: var(--font-display, 'Bricolage Grotesque', sans-serif);
+    font-family: var(--ff-font-heading, 'Manrope', system-ui, sans-serif);
     font-weight: 700;
     font-size: 17px;
     color: #0d1b2a;
@@ -122,7 +122,7 @@
     color: #F43F5E;
 }
 .fpanel-empty-big {
-    font-family: var(--font-display, 'Bricolage Grotesque', sans-serif);
+    font-family: var(--ff-font-heading, 'Manrope', system-ui, sans-serif);
     font-weight: 700;
     font-size: 15.5px;
     color: #111827;
@@ -191,7 +191,7 @@
 
 .fline-info { min-width: 0; }
 .fline-name {
-    font-family: var(--font-display, 'Bricolage Grotesque', sans-serif);
+    font-family: var(--ff-font-heading, 'Manrope', system-ui, sans-serif);
     font-weight: 700;
     font-size: 13px;
     color: #111827;
@@ -227,8 +227,8 @@
     padding-top: 2px;
 }
 .fline-total {
-    font-family: var(--font-display, 'Bricolage Grotesque', sans-serif);
-    font-weight: 800;
+    font-family: var(--ff-font-heading, 'Manrope', system-ui, sans-serif);
+    font-weight: 700;
     font-size: 13.5px;
     color: #111827;
 }
@@ -295,11 +295,11 @@
 .ftotals-row.grand {
     font-size: 14.5px;
     color: #111827;
-    font-weight: 800;
+    font-weight: 700;
     border-top: 1.5px solid #E5E7EB;
     margin-top: 8px;
     padding-top: 10px;
-    font-family: var(--font-display, 'Bricolage Grotesque', sans-serif);
+    font-family: var(--ff-font-heading, 'Manrope', system-ui, sans-serif);
 }
 
 /* ── Checkout / Add-All button ── */
@@ -310,7 +310,7 @@
     color: #fff;
     font-weight: 700;
     font-size: 13.5px;
-    font-family: var(--font-display, 'Bricolage Grotesque', sans-serif);
+    font-family: var(--ff-font-heading, 'Manrope', system-ui, sans-serif);
     border-radius: 11px;
     cursor: pointer;
     border: none;

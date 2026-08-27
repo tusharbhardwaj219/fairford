@@ -22,17 +22,13 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     <meta name="description"
         content="Premium pharmaceutical B2B platform — trusted by stockists & retailers across India." />
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.8/js/bootstrap.min.js"
-        integrity="sha512-nKXmKvJyiGQy343jatQlzDprflyB5c+tKCzGP3Uq67v+lmzfnZUi/ZT+fc6ITZfSC5HhaBKUIvr/nTLCV+7F+Q=="
-        crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
-
-    <link rel="icon" type="image/png" href=https://res.cloudinary.com/dp4yririh/image/upload/v1782967649/fairford/site/m5d8pmtzdjr4dcgctvuc.png>
+    <link rel="icon" type="image/png" href="https://res.cloudinary.com/dp4yririh/image/upload/v1782967649/fairford/site/m5d8pmtzdjr4dcgctvuc.png">
 
     <!-- External stylesheet -->
+    <link rel="stylesheet" href="/frontend/css/typography.css">
     <link rel="stylesheet" href="/frontend/css/style.css">
+    <link rel="stylesheet" href="/frontend/css/home.css">
     <link rel="stylesheet" href="/frontend/css/panels.css">
-
-    <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
 
     <!-- SEO Meta -->
     <title>Fair Ford Pharmaceuticals — B2B Pharma Marketplace</title>
@@ -53,25 +49,62 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     <meta name="twitter:description" content="WHO-GMP certified medicines for B2B distributors &amp; retailers across India." />
     <meta name="twitter:image" content="https://res.cloudinary.com/dp4yririh/image/upload/v1782967649/fairford/site/m5d8pmtzdjr4dcgctvuc.png" />
 
-    <!-- Preconnect for performance -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="preconnect" href="https://images.unsplash.com" />
+    <!-- Preconnect for performance — res.cloudinary.com hosts every product/hero image -->
+    <link rel="preconnect" href="https://res.cloudinary.com" crossorigin />
+    <!-- Slide 1 is the LCP element — start it with the document. -->
+    <link rel="preload" as="image" fetchpriority="high"
+        href="https://res.cloudinary.com/dp4yririh/image/upload/v1787296226/ChatGPT_Image_Aug_21_2026_12_21_47_PM_pahs11.png" />
     <link rel="preconnect" href="https://cdn.jsdelivr.net" />
 
     <!-- Premium Typography: Plus Jakarta Sans + Inter -->
-    <link
-        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
-
     <!-- Font Awesome — professional medical icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 
-    <!-- Lucide Icons — modern SVG icons -->
-    <script src="https://cdn.jsdelivr.net/npm/lucide@latest"></script>
 
-    <!-- Swiper.js CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <!-- Structured data — Organization + WebSite. Only verified, on-page facts. -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Organization",
+          "@id": "https://www.fairfordpharma.com/#organization",
+          "name": "Fair Ford Pharmaceuticals Pvt. Ltd.",
+          "url": "https://www.fairfordpharma.com/",
+          "logo": "https://res.cloudinary.com/dp4yririh/image/upload/v1782967649/fairford/site/m5d8pmtzdjr4dcgctvuc.png",
+          "email": "info@fairfordpharma.com",
+          "telephone": "+91-9958584228",
+          "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "Fair Ford Tower, Gali No-07, Main Road, Anangpur Village, Opposite Mount Kailash Factory",
+            "addressLocality": "Faridabad",
+            "addressRegion": "Haryana",
+            "postalCode": "121003",
+            "addressCountry": "IN"
+          },
+          "sameAs": [
+            "https://www.facebook.com/profile.php?id=61550892159031",
+            "https://www.linkedin.com/company/fairfordpharma",
+            "https://www.instagram.com/fairfordpharma/",
+            "https://www.youtube.com/@user-jm4zy6du8f"
+          ]
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://www.fairfordpharma.com/#website",
+          "url": "https://www.fairfordpharma.com/",
+          "name": "Fair Ford Pharmaceuticals",
+          "publisher": { "@id": "https://www.fairfordpharma.com/#organization" }
+        }
+      ]
+    }
+    </script>
 
+  <!-- Page loader (see css/loader.css + js/loader.js). Not deferred:
+       the overlay must exist before first paint. -->
+  <link rel="stylesheet" href="/frontend/css/loader.css" />
+  <link rel="stylesheet" href="/frontend/css/footer.css">
+  <script src="/frontend/js/loader.js"></script>
 </head>
 <body><!-- Google Tag Manager (noscript) -->
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5B2HT6FW"
@@ -86,14 +119,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <ul class="topbar__contact" aria-label="Contact information">
 
                 <li class="topbar__item">
-                    <a href="tel:+918595939723" class="topbar__link" aria-label="Call us">
+                    <a href="tel:+919958584228" class="topbar__link" aria-label="Call us">
                         <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                             class="lucide lucide-phone-icon lucide-phone">
                             <path
                                 d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384" />
                         </svg>
-                        <span>+91 8595939723</span>
+                        <span>+91 9958584228</span>
                     </a>
                 </li>
 
@@ -114,7 +147,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 <li class="topbar__divider" aria-hidden="true"></li>
 
                 <li class="topbar__item">
-                    <a href="#distributor-support" class="topbar__link">
+                    <a href="distributor.html" class="topbar__link">
                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                             class="lucide lucide-truck">
@@ -131,7 +164,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 <li class="topbar__divider" aria-hidden="true"></li>
 
                 <li class="topbar__item">
-                    <a href="#retailer-support" class="topbar__link">
+                    <a href="contactus.html" class="topbar__link">
                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                             class="lucide lucide-shield-check">
@@ -193,7 +226,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <header class="header" id="siteHeader">
         <div class="container header-inner">
             <!-- ---------- Logo ---------- -->
-            <a href="index.html" class="logo" aria-label="Aurelis Pharma home">
+            <a href="index.html" class="logo" aria-label="Fair Ford Pharmaceuticals — home">
                 <span class="logo-mark" aria-hidden="true">
                     <img src=https://res.cloudinary.com/dp4yririh/image/upload/v1782967649/fairford/site/m5d8pmtzdjr4dcgctvuc.png alt="Fair Ford Pharmaceuticals Pvt. Ltd. logo" width="60" height="60">
 
@@ -209,12 +242,17 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 <ul class="nav-list">
                     <li><a href="index.html" class="nav-link is-active">Home</a></li>
                     <li><a href="product.html" class="nav-link">Products</a></li>
-                    <li><a href="About.html" class="nav-link" target="_blank">About</a></li>
-                    <li><a href="contactus.html" target="_blank" class="nav-link">Contact</a></li>
+                    <li><a href="About.html" class="nav-link">About</a></li>
+                    <li><a href="contactus.html" class="nav-link">Contact</a></li>
 
                     <li><a href="uphaar.html" class="nav-link nav-link--promo">
                             <span class="promo-dot" aria-hidden="true"></span>
                             Uphaar
+                        </a>
+                    </li>
+                    <li><a href="nueva-vida.html" class="nav-link nav-link--nueva">
+                            <span class="nueva-gem" aria-hidden="true"></span>
+                            NUEVA VIDA
                         </a>
                     </li>
                 </ul>
@@ -223,14 +261,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <!-- ---------- Right Actions ---------- -->
             <div class="actions">
                 <!-- Search -->
-                <a href="search.html" target="_self"><button class="icon-btn" data-action="search"
-                        aria-label="Search products">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                            stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="11" cy="11" r="7" />
-                            <path d="m20 20-3.5-3.5" />
-                        </svg>
-                    </button>
+                <a href="search.html" class="icon-btn" aria-label="Search products">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <circle cx="11" cy="11" r="7" />
+                        <path d="m20 20-3.5-3.5" />
+                    </svg>
                 </a>
 
                 <!-- Wishlist -->
@@ -309,7 +345,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 </span>
                 <span class="logo-text">
                     <span class="logo-name">Fair Ford</span>
-                    <span class="logo-tag">•Health care </span>
+                    <span class="logo-tag"> pharmaceuticals </span>
                 </span>
             </a>
 
@@ -355,14 +391,19 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     <path d="m9 18 6-6-6-6" />
                 </svg>
             </a>
-            <!-- Account shortcuts (also visible inside drawer on small screens) -->
-            <div class="drawer-section-title">Account</div>
-            <a href="#" class="drawer-link">Wishlist
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                    stroke-linejoin="round">
+            <a href="nueva-vida.html" class="drawer-link drawer-link--nueva">NUEVA VIDA
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="m9 18 6-6-6-6" />
                 </svg>
             </a>
+            <!-- Account shortcuts (also visible inside drawer on small screens) -->
+            <div class="drawer-section-title">Account</div>
+            <button type="button" class="drawer-link" data-action="wishlist">Wishlist
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round" aria-hidden="true">
+                    <path d="m9 18 6-6-6-6" />
+                </svg>
+            </button>
             <a href="retailer.html" class="drawer-link" id="drawerProfileLink">My Profile
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                     stroke-linejoin="round">
@@ -372,16 +413,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </nav>
 
         <div class="drawer-footer">
-            <button class="drawer-cta" id="drawerLoginBtn" type="button"
-                onclick="window.location.href='login&signup.html'">
+            <a class="drawer-cta" id="drawerLoginBtn" href="login&amp;signup.html">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-                    stroke-linecap="round" stroke-linejoin="round">
+                    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
                     <path d="m10 17 5-5-5-5" />
                     <path d="M15 12H3" />
                 </svg>
-                <a href="login&signup.html">Retailer Login </a>
-            </button>
+                Retailer Login
+            </a>
             <button class="drawer-cta drawer-logout" id="drawerLogoutBtn" type="button" style="display:none;">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
                     stroke-linecap="round" stroke-linejoin="round">
@@ -395,171 +435,153 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </div>
     </aside>
 
+    <main id="main">
+
     <!-- ================================================================
-       DEMO PAGE CONTENT (so scroll behavior is observable)
-       Remove this <main> block when integrating into your project.
-       ================================================================ -->
-    <section class="hero">
+         HERO SLIDER — one panel, three slides
+         The panel is a single contained card: rounded, elevated, with the
+         artwork filling it edge to edge and a caption bar carrying each
+         slide's title and CTA. Panel shape is 3:2 because two of the three
+         banners are 3:2 and fill it exactly; the 16:9 UPHAAR banner keeps
+         its own edge-matched gradient behind it so its thin top/bottom
+         margin is invisible rather than a grey band.
+         ================================================================ -->
+    <section class="fh-hero" id="fhHero" aria-roledescription="carousel"
+             aria-label="Fair Ford highlights">
+        <div class="fh-hero__panel">
 
-        <!-- Navigation Arrows -->
-        <button class="hero-arrow hero-arrow--prev" id="heroPrev" aria-label="Previous slide">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
-                stroke-linejoin="round">
-                <path d="m15 18-6-6 6-6" />
-            </svg>
-        </button>
-        <button class="hero-arrow hero-arrow--next" id="heroNext" aria-label="Next slide">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
-                stroke-linejoin="round">
-                <path d="m9 18 6-6-6-6" />
-            </svg>
-        </button>
+            <div class="fh-hero__stage">
 
-        <!-- Slides Track -->
-        <div class="hero-track" id="heroTrack">
+                <!-- SLIDE 1 — Fair Ford Pharmaceuticals -->
+                <figure class="fh-slide fh-slide--ff is-active"
+                        role="group" aria-roledescription="slide" aria-label="1 of 3: Fair Ford Pharmaceuticals">
+                    <img class="fh-slide__art" width="1536" height="1024" fetchpriority="high" decoding="async"
+                         src="https://res.cloudinary.com/dp4yririh/image/upload/v1787375353/ChatGPT_Image_Aug_22_2026_10_38_47_AM_xbwsfh.png"
+                         alt="Fair Ford Pharmaceuticals — Trusted Care. Better Living. WHO-GMP certified medicines.">
+                </figure>
 
-            <!-- SLIDE 1 -->
-            <div class="hero-slide">
-                <div class="container">
-                    <div class="hero-wrapper">
-                        <div class="hero-content">
-                            <div class="hero-badge">WHO-GMP CERTIFIED MANUFACTURER · EST. 2013</div>
-                            <h1>Empowering Healthcare.<span>Across India.</span></h1>
-                            <p>Serving Stockists, Retail Pharmacies &amp; Hospitals with quality medicines, exceptional value, and profitable business opportunities.</p>
-                            <div class="hero-buttons">
-                                <a href="retailer.html"><button class="btn-primary">Open partner portal</button></a>
-                                <a href="contactus.html"><button class="btn-secondary">Request a quote</button></a>
-                            </div>
-                        </div>
-                        <div class="hero-image">
-                            <img src="https://res.cloudinary.com/dp4yririh/image/upload/v1785305256/Website_Image_fdlfjd.jpg" alt="Fairford pharmaceutical products">
-                        </div>
-                    </div>
-                </div>
+                <!-- SLIDE 2 — UPHAAR -->
+                <figure class="fh-slide fh-slide--uphaar"
+                        role="group" aria-roledescription="slide"
+                        aria-label="2 of 3: UPHAAR, the chemist's growth program" aria-hidden="true">
+                    <img class="fh-slide__art" width="1672" height="941" fetchpriority="low" decoding="async"
+                         src="https://res.cloudinary.com/dp4yririh/image/upload/v1787375632/ChatGPT_Image_Aug_22_2026_10_43_12_AM_hgfxfz.png"
+                         alt="UPHAAR — thoughtfully crafted for better living. Premium rewards for chemists.">
+                </figure>
+
+                <!-- SLIDE 3 — NUEVA VIDA -->
+                <figure class="fh-slide fh-slide--nueva"
+                        role="group" aria-roledescription="slide"
+                        aria-label="3 of 3: NUEVA VIDA nutraceuticals" aria-hidden="true">
+                    <img class="fh-slide__art" width="1626" height="967" fetchpriority="low" decoding="async"
+                         src="https://res.cloudinary.com/dp4yririh/image/upload/v1787383407/ChatGPT_Image_Aug_22_2026_12_53_05_PM_ixpljr.png"
+                         alt="NUEVA VIDA WOMEN — Feel Strong. Live Vibrantly. Daily wellness support for women.">
+                </figure>
             </div>
 
-            <!-- SLIDE 2 -->
-            <div class="hero-slide hero-slide--teal">
-                <div class="container">
-                    <div class="hero-wrapper">
-                        <div class="hero-content">
-                            <div class="hero-badge hero-badge--teal">EXCLUSIVE CHEMIST REWARDS PROGRAM</div>
-                            <h1>Uphaar Ki Bahaar <span class="accent--teal">Double Rewards Await.</span></h1>
-                            <p>Buy through our website and enjoy exclusive extra discounts &amp; cashback, over and above the Uphaar Ki Bahaar rewards. Shop smarter. Earn more.</p>
-                            <div class="hero-buttons">
-                                <button class="btn-primary btn-primary--teal">Join UPHAAR &rsaquo;</button>
-                                <button class="btn-secondary">Watch demo</button>
-                            </div>
+            <!-- Caption bar — one per slide, cross-faded with the artwork -->
+            <div class="fh-hero__bars">
+
+                <div class="fh-bar fh-bar--ff is-active">
+                    <div class="fh-bar__text">
+                        <p class="fh-bar__title">Fair Ford <em>Pharmaceuticals</em></p>
+                        <p class="fh-bar__sub">WHO-GMP certified manufacturing &middot; Nationwide distribution</p>
+                    </div>
+                    <div class="fh-bar__side">
+                        <div class="fh-hero__dots" aria-label="Choose slide">
+                            <button type="button" class="fh-dot is-active" aria-label="Go to slide 1"><span class="fh-dot__fill"></span></button>
+                            <button type="button" class="fh-dot" aria-label="Go to slide 2"><span class="fh-dot__fill"></span></button>
+                            <button type="button" class="fh-dot" aria-label="Go to slide 3"><span class="fh-dot__fill"></span></button>
                         </div>
-                        <div class="hero-image hero-image--teal"><a href="uphaar.html" target="_blank">
-                                <img src="https://res.cloudinary.com/dp4yririh/image/upload/v1785305256/Website_Image_A_seeibh.jpg" alt="Uphaar Ki Bahaar"></a>
-                        </div>
+                        <a class="fh-bar__btn" href="product.html">
+                            Explore our range
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+                        </a>
                     </div>
                 </div>
-            </div>
 
-            <!-- SLIDE 3 -->
-            <div class="hero-slide hero-slide--dark">
-                <div class="container">
-                    <div class="hero-wrapper">
-                        <div class="hero-content">
-                            <div class="hero-badge hero-badge--dark">WHO-GMP CERTIFIED</div>
-                            <h1>Complete Healthcare.<span>Portfolio.</span></h1>
-                            <p>A trusted pharmaceutical partner with a nationwide presence, offering a comprehensive portfolio of Analgesics, Cardiology, Dermatology, Orthopedics, Neurology, Nutraceuticals, and many more fast-moving healthcare products.</p>
-                            <div class="hero-buttons">
-                                <a href="https://storage.googleapis.com/fairford-assets-436195425441/FF_E-CATALOGUE_2026-27.pdf" target="_blank" rel="noopener"><button class="btn-primary">View catalog</button></a>
-                                <button class="btn-secondary">Download price list</button>
-                            </div>
-                        </div>
-                        <div class="hero-image hero-image--dark">
-                            <img src=https://res.cloudinary.com/dp4yririh/image/upload/v1782967652/fairford/site/fwqz83mw3jmy3gbmna3k.jpg alt="Fairford immunity and wellness products">
-                        </div>
+                <div class="fh-bar fh-bar--uphaar" aria-hidden="true">
+                    <div class="fh-bar__text">
+                        <p class="fh-bar__title">UPHAAR <em>Ki Bahaar</em></p>
+                        <p class="fh-bar__sub">Cashback on every category &middot; Retailer dashboard &middot; GST training</p>
+                    </div>
+                    <div class="fh-bar__side">
+                        <a class="fh-bar__btn" href="uphaar.html" tabindex="-1">
+                            Join UPHAAR
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+                        </a>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <!-- Dot Navigation -->
-        <div class="hero-dots">
-            <button class="hero-dot active" data-index="0" aria-label="Go to slide 1"></button>
-            <button class="hero-dot" data-index="1" aria-label="Go to slide 2"></button>
-            <button class="hero-dot" data-index="2" aria-label="Go to slide 3"></button>
-        </div>
-
-        <!-- Stats — always visible below slides -->
-        <div class="container">
-            <div class="hero-stats">
-                <div class="stat-box">
-                    <h2>700+</h2><span>DISTRIBUTOR PARTNERS</span>
+                <div class="fh-bar fh-bar--nueva" aria-hidden="true">
+                    <div class="fh-bar__text">
+                        <p class="fh-bar__title">NUEVA <em>VIDA</em></p>
+                        <p class="fh-bar__sub">Science backed &middot; Nature inspired &middot; Premium nutraceuticals</p>
+                    </div>
+                    <div class="fh-bar__side">
+                        <a class="fh-bar__btn" href="nueva-vida.html" tabindex="-1">
+                            Explore NUEVA VIDA
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+                        </a>
+                    </div>
                 </div>
-                <div class="stat-box">
-                    <h2>100K+</h2><span>CHEMIST SHOPS</span>
-                </div>
-                <!-- <div class="stat-box">
-                    <h2>3</h2><span>MANUFACTURING UNITS</span>
-                </div> -->
             </div>
         </div>
     </section>
 
-    <!-- Categories Grid -->
-    <div class="therapeutic-section">
-        <div class="container">
-            <!-- Header Section -->
-            <div class="header-section animate-in">
-                <!-- Label with dividers -->
-                <div class="label-wrapper">
-                    <div class="divider-right"></div>
-                </div>
+    <!-- ================================================================
+         DISTRIBUTOR & CHEMIST NETWORK — counters animate together
+         ================================================================ -->
+    <section class="fh-stats" id="fhStats" aria-label="Fair Ford distribution network">
+        <div class="fh-stats__inner">
 
-                <!-- Main Heading -->
-                <h2 class="main-heading">
-                    Ten therapeutic divisions<br />
-                    <span style="color: #0f4c81;">W.H.O. GMP CERTIFIED</span>
-                </h2>
-
-                <!-- Supporting text -->
-                <p class="supporting-text">
-                    WHO-GMP certified manufacturing with nationwide distribution.
-                </p>
-            </div>
-
-            <!-- Search and Filters -->
-            <div class="controls-section animate-in stagger-1">
-                <!-- Search Bar -->
-                <div class="search-wrapper">
-                    <i class="fa fa-magnifying-glass search-icon"></i>
-                    <input type="text" id="searchInput" class="search-input"
-                        placeholder="Search medicines, brands, salts" />
-                </div>
-
-                <!-- Filter Pills -->
-                <div class="filter-pills">
-                    <button class="filter-pill active" data-filter="All">All</button>
-                    <button class="filter-pill" data-filter="Chronic Care">Chronic Care</button>
-                    <button class="filter-pill" data-filter="Acute">Acute</button>
-                    <button class="filter-pill" data-filter="Wellness">Wellness</button>
-                    <button class="filter-pill" data-filter="Specialty">Specialty</button>
+            <div class="fh-stat fh-rise">
+                <span class="fh-stat__icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M10 17h4V5a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v12h3" />
+                        <path d="M14 9h4l3 4v4h-2" />
+                        <circle cx="7.5" cy="17.5" r="2.5" />
+                        <circle cx="17.5" cy="17.5" r="2.5" />
+                    </svg>
+                </span>
+                <div>
+                    <p class="fh-stat__num"><span data-count="700">0</span><span class="fh-stat__suffix">+</span></p>
+                    <p class="fh-stat__label">Distributor Partners</p>
                 </div>
             </div>
 
-            <!-- Division Cards Grid -->
-            <a href="product.html"><div class="divisions-grid animate-in stagger-2" id="divisionsGrid">
-                <!-- Cards will be generated by JavaScript -->
-            </div></a>
-
-            <!-- CTA Buttons -->
-            <div class="cta-section animate-in stagger-3">
-                <button class="btn btn-primary">Download price list</button>
-                <a href="product.html"><button class="btn btn-secondary">View full catalog</button></a>
+            <div class="fh-stat fh-rise" style="--fh-d:130ms">
+                <span class="fh-stat__icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 21h18" />
+                        <path d="M4 21V9l8-6 8 6v12" />
+                        <path d="M12 12v5" />
+                        <path d="M9.5 14.5h5" />
+                    </svg>
+                </span>
+                <div>
+                    <p class="fh-stat__num"><span data-count="100000">0</span><span class="fh-stat__suffix">+</span></p>
+                    <p class="fh-stat__label">Chemist Shops</p>
+                </div>
             </div>
         </div>
-    </div>
+    </section>
 
-    <!-- ===========================
-       TOP SELLING PRODUCTS SECTION
-  ============================ -->
-    <section class="top-products" aria-labelledby="top-products-heading">
+    <!-- ===================================================================
+         TOP SELLING PRODUCTS — premium, live product showcase
+         Header → Browse CTA → Search + Category filters → Featured →
+         Product grid → Full-catalogue CTA. Data is fetched live from the
+         public /api/products endpoint (real Fair Ford products) by
+         js/home-products.js; badges are honest (New = real isNewArrival
+         flag, Featured = editorial emphasis only). No prices, no invented
+         claims. Degrades to the static catalogue CTA if data can't load.
+         =================================================================== -->
+    <section class="top-products fhp" id="fhpProducts" aria-labelledby="top-products-heading">
         <!-- Decorative floating blue glow orbs -->
         <div class="bg-glow bg-glow--1" aria-hidden="true"></div>
         <div class="bg-glow bg-glow--2" aria-hidden="true"></div>
@@ -567,433 +589,92 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <div class="bg-grid" aria-hidden="true"></div>
 
         <div class="container">
-            <!-- Section Header -->
-            <header class="sections-header">
-                <span class="eyebrow">
-                    <span class="eyebrow__dot" aria-hidden="true"></span>
-                    <i class="fa-solid fa-prescription-bottle-medical" aria-hidden="true"></i>
-                    Trusted by 500+ Pharma Distributors
-                </span>
-
-                <h2 id="top-products-heading" class="section-title">
-                    Top Selling <span class="section-title__accent">Products</span>
-                </h2>
-
-                <p class="section-subtitle">
-                    Premium pharmaceutical formulations curated for B2B buyers — sourced
-                    from WHO-GMP certified manufacturers and dispatched globally.
-                </p>
+            <!-- Section header -->
+            <header class="sections-header fhp-head">
+                <div class="fhp-head__text">
+                    <span class="eyebrow">
+                        <span class="eyebrow__dot" aria-hidden="true"></span>
+                        <i class="fa-solid fa-prescription-bottle-medical" aria-hidden="true"></i>
+                        Trusted by 700+ distributor partners
+                    </span>
+                    <h2 id="top-products-heading" class="section-title">
+                        Top Selling <span class="section-title__accent">Products</span>
+                    </h2>
+                    <p class="section-subtitle">
+                        A curated selection from our WHO-GMP range — genuine formulations
+                        trusted by chemists and stockists across India.
+                    </p>
+                </div>
+                <a class="fhp-browse" href="product.html">
+                    Browse full catalogue
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+                </a>
             </header>
 
-            <!-- Slider Wrapper -->
-            <div class="slider-wrapper">
-                <!-- Custom Navigation Arrows -->
-                <button class="nav-arrow nav-arrow--prev" aria-label="Previous product" type="button">
-                    <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
-                </button>
-
-                <button class="nav-arrow nav-arrow--next" aria-label="Next product" type="button">
-                    <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
-                </button>
-
-                <!-- Swiper Carousel -->
-                <div class="swiper products-swiper">
-                    <div class="swiper-wrapper">
-
-                        <!-- 1. Prega Raj Pregnancy Test -->
-                        <article class="swiper-slide product-card">
-                            <div class="product-card__media">
-                                <span class="product-card__badge">
-                                    <i class="fa-solid fa-fire" aria-hidden="true"></i> Best Seller
-                                </span>
-                                <img src="https://res.cloudinary.com/dp4yririh/image/upload/v1782732899/fairford/products/x2nztkwrtzn6pjjo11s6.png" alt="Prega Raj hCG rapid pregnancy test kit" loading="lazy" width="600" height="600"
-                                    onerror="this.onerror=null;this.src='/Prega%20Raj%20Test%20Kit.png'" />
-                            </div>
-                            <div class="product-card__body">
-                                <span class="product-card__category">
-                                    <i class="fa-solid fa-flask-vial" aria-hidden="true"></i> Diagnostics
-                                </span>
-                                <h3 class="product-card__title">Prega Raj Pregnancy Test</h3>
-                                <p class="product-card__desc">
-                                    One-step hCG rapid pregnancy test device — a clear, accurate result at home in just 5 minutes.
-                                </p>
-                                <div class="product-card__meta">
-                                    <div class="product-card__rating" aria-label="Rated 4.8 out of 5">
-                                        <i class="fa-solid fa-star" aria-hidden="true"></i> 4.8
-                                    </div>
-                                </div>
-                                <a href="product.html"><button class="btn-bulk" type="button">
-                                    Order
-                                    <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
-                                </button></a>
-                            </div>
-                        </article>
-
-                        <!-- 2. Dermazest 6 Cream (15gm) -->
-                        <article class="swiper-slide product-card">
-                            <div class="product-card__media">
-                                <span class="product-card__badge product-card__badge--blue">
-                                    <i class="fa-solid fa-shield-virus" aria-hidden="true"></i> Anti-Fungal
-                                </span>
-                                <img src="https://res.cloudinary.com/dp4yririh/image/upload/v1782732594/fairford/products/vkw4gklzvkh5mjuc28qg.png" alt="Dermazest 6 anti-fungal skin cream" loading="lazy" width="600" height="600"
-                                    onerror="this.onerror=null;this.src='/Dermazest%206.png'" />
-                            </div>
-                            <div class="product-card__body">
-                                <span class="product-card__category">
-                                    <i class="fa-solid fa-prescription-bottle-medical" aria-hidden="true"></i> Dermatology
-                                </span>
-                                <h3 class="product-card__title">Dermazest 6 Cream (15gm)</h3>
-                                <p class="product-card__desc">
-                                    Anti-fungal, anti-itching &amp; anti-allergic cream with Ketoconazole, Clobetasol &amp; Tolnaftate.
-                                </p>
-                                <div class="product-card__meta">
-                                    <div class="product-card__rating" aria-label="Rated 4.7 out of 5">
-                                        <i class="fa-solid fa-star" aria-hidden="true"></i> 4.7
-                                    </div>
-                                </div>
-                                <a href="product.html"><button class="btn-bulk" type="button">
-                                    Order
-                                    <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
-                                </button></a>
-                            </div>
-                        </article>
-
-                        <!-- 3. Mucofair DMR 15 Syrup (100ml) -->
-                        <article class="swiper-slide product-card">
-                            <div class="product-card__media">
-                                <span class="product-card__badge product-card__badge--teal">
-                                    <i class="fa-solid fa-lungs" aria-hidden="true"></i> Cough &amp; Cold
-                                </span>
-                                <img src="https://res.cloudinary.com/dp4yririh/image/upload/v1782797636/fairford/products/midwolwbsi9eysbi78to.png" alt="Mucofair DMR 15 cough and cold syrup" loading="lazy" width="600" height="600"
-                                    onerror="this.onerror=null;this.src='/Mucofair%20DMR%2015.png'" />
-                            </div>
-                            <div class="product-card__body">
-                                <span class="product-card__category">
-                                    <i class="fa-solid fa-prescription-bottle-medical" aria-hidden="true"></i> Respiratory
-                                </span>
-                                <h3 class="product-card__title">Mucofair DMR 15 Syrup (100ml)</h3>
-                                <p class="product-card__desc">
-                                    Strawberry-flavoured syrup for dry cough &amp; cold — Dextromethorphan, Chlorpheniramine &amp; Phenylephrine.
-                                </p>
-                                <div class="product-card__meta">
-                                    <div class="product-card__rating" aria-label="Rated 4.6 out of 5">
-                                        <i class="fa-solid fa-star" aria-hidden="true"></i> 4.6
-                                    </div>
-                                </div>
-                                <a href="product.html"><button class="btn-bulk" type="button">
-                                    Order
-                                    <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
-                                </button></a>
-                            </div>
-                        </article>
-
-                        <!-- 4. Aclofair-SP Tablets -->
-                        <article class="swiper-slide product-card">
-                            <div class="product-card__media">
-                                <span class="product-card__badge">
-                                    <i class="fa-solid fa-bolt" aria-hidden="true"></i> Fast Relief
-                                </span>
-                                <img src="https://res.cloudinary.com/dp4yririh/image/upload/v1782967669/fairford/site/tgdcck95zlbj513z5goj.png" alt="Aclofair-SP pain and inflammation relief tablets" loading="lazy" width="600" height="600"
-                                    onerror="this.onerror=null;this.src='/Aclofair-SP.png'" />
-                            </div>
-                            <div class="product-card__body">
-                                <span class="product-card__category">
-                                    <i class="fa-solid fa-tablets" aria-hidden="true"></i> Pain Relief
-                                </span>
-                                <h3 class="product-card__title">Aclofair-SP Tablets</h3>
-                                <p class="product-card__desc">
-                                    Aceclofenac, Paracetamol &amp; Serratiopeptidase — strong relief from pain, swelling &amp; inflammation.
-                                </p>
-                                <div class="product-card__meta">
-                                    <div class="product-card__rating" aria-label="Rated 4.7 out of 5">
-                                        <i class="fa-solid fa-star" aria-hidden="true"></i> 4.7
-                                    </div>
-                                </div>
-                                <a href="product.html"><button class="btn-bulk" type="button">
-                                    Order
-                                    <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
-                                </button></a>
-                            </div>
-                        </article>
-
-                        <!-- 5. Aclofair-P Tablets -->
-                        <article class="swiper-slide product-card">
-                            <div class="product-card__media">
-                                <span class="product-card__badge product-card__badge--green">
-                                    <i class="fa-solid fa-tablets" aria-hidden="true"></i> Pain Relief
-                                </span>
-                                <img src="https://res.cloudinary.com/dp4yririh/image/upload/v1783487898/fairford/products/gqduzroecv45f2t1f78n.png" alt="Aclofair-P aceclofenac and paracetamol tablets" loading="lazy" width="600" height="600"
-                                    onerror="this.onerror=null;this.src='/Aclofair-P.png'" />
-                            </div>
-                            <div class="product-card__body">
-                                <span class="product-card__category">
-                                    <i class="fa-solid fa-tablets" aria-hidden="true"></i> Analgesic
-                                </span>
-                                <h3 class="product-card__title">Aclofair-P Tablets</h3>
-                                <p class="product-card__desc">
-                                    Aceclofenac &amp; Paracetamol tablets for effective relief from everyday pain and fever.
-                                </p>
-                                <div class="product-card__meta">
-                                    <div class="product-card__rating" aria-label="Rated 4.6 out of 5">
-                                        <i class="fa-solid fa-star" aria-hidden="true"></i> 4.6
-                                    </div>
-                                </div>
-                                <a href="product.html"><button class="btn-bulk" type="button">
-                                    Order
-                                    <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
-                                </button></a>
-                            </div>
-                        </article>
-
-                        <!-- 6. Diclofair Pain Relief Gel (30gm) -->
-                        <article class="swiper-slide product-card">
-                            <div class="product-card__media">
-                                <span class="product-card__badge product-card__badge--blue">
-                                    <i class="fa-solid fa-hand-holding-medical" aria-hidden="true"></i> Topical Gel
-                                </span>
-                                <img src="https://res.cloudinary.com/dp4yririh/image/upload/v1785256849/fairford/products/rkdp0b9ipoxqo3uqbmz0.png" alt="Diclofair diclofenac pain relief gel" loading="lazy" width="600" height="600"
-                                    onerror="this.onerror=null;this.src='/Diclofair%20Gel.png'" />
-                            </div>
-                            <div class="product-card__body">
-                                <span class="product-card__category">
-                                    <i class="fa-solid fa-pump-medical" aria-hidden="true"></i> Pain Relief
-                                </span>
-                                <h3 class="product-card__title">Diclofair Pain Relief Gel (30gm)</h3>
-                                <p class="product-card__desc">
-                                    Diclofenac, Linseed Oil, Methyl Salicylate &amp; Menthol gel for quick relief from strains, sprains &amp; joint pain.
-                                </p>
-                                <div class="product-card__meta">
-                                    <div class="product-card__rating" aria-label="Rated 4.8 out of 5">
-                                        <i class="fa-solid fa-star" aria-hidden="true"></i> 4.8
-                                    </div>
-                                </div>
-                                <a href="product.html"><button class="btn-bulk" type="button">
-                                    Order
-                                    <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
-                                </button></a>
-                            </div>
-                        </article>
-
-                        <!-- 7. Itoford Plus Tablets -->
-                        <article class="swiper-slide product-card">
-                            <div class="product-card__media">
-                                <span class="product-card__badge product-card__badge--purple">
-                                    <i class="fa-solid fa-shield-virus" aria-hidden="true"></i> Anti-Fungal
-                                </span>
-                                <img src="https://res.cloudinary.com/dp4yririh/image/upload/v1783493145/fairford/site/uvmz3fdwlsebt0tyt5hg.png" alt="Itoford Plus terbinafine and itraconazole antifungal tablets" loading="lazy" width="600" height="600"
-                                    onerror="this.onerror=null;this.src='/Itoford%20Plus.png'" />
-                            </div>
-                            <div class="product-card__body">
-                                <span class="product-card__category">
-                                    <i class="fa-solid fa-capsules" aria-hidden="true"></i> Anti-Fungal
-                                </span>
-                                <h3 class="product-card__title">Itoford Plus Tablets</h3>
-                                <p class="product-card__desc">
-                                    Terbinafine &amp; Itraconazole (250/200 mg) — dual-action oral therapy for stubborn fungal infections.
-                                </p>
-                                <div class="product-card__meta">
-                                    <div class="product-card__rating" aria-label="Rated 4.7 out of 5">
-                                        <i class="fa-solid fa-star" aria-hidden="true"></i> 4.7
-                                    </div>
-                                </div>
-                                <a href="product.html"><button class="btn-bulk" type="button">
-                                    Order
-                                    <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
-                                </button></a>
-                            </div>
-                        </article>
-
-                        <!-- 8. Valentine Gold Tablets -->
-                        <article class="swiper-slide product-card">
-                            <div class="product-card__media">
-                                <span class="product-card__badge product-card__badge--amber">
-                                    <i class="fa-solid fa-heart" aria-hidden="true"></i> Men's Wellness
-                                </span>
-                                <img src="https://res.cloudinary.com/dp4yririh/image/upload/v1782794178/fairford/products/fnkzuwoanh1tvzjmjncx.png" alt="Valentine Gold dapoxetine and sildenafil tablets" loading="lazy" width="600" height="600"
-                                    onerror="this.onerror=null;this.src='/Valentine%20Gold.png'" />
-                            </div>
-                            <div class="product-card__body">
-                                <span class="product-card__category">
-                                    <i class="fa-solid fa-mars" aria-hidden="true"></i> Men's Health
-                                </span>
-                                <h3 class="product-card__title">Valentine Gold Tablets</h3>
-                                <p class="product-card__desc">
-                                    Dapoxetine 60 &amp; Sildenafil 100 — clinically formulated support for men's performance and confidence.
-                                </p>
-                                <div class="product-card__meta">
-                                    <div class="product-card__rating" aria-label="Rated 4.6 out of 5">
-                                        <i class="fa-solid fa-star" aria-hidden="true"></i> 4.6
-                                    </div>
-                                </div>
-                                <a href="product.html"><button class="btn-bulk" type="button">
-                                    Order
-                                    <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
-                                </button></a>
-                            </div>
-                        </article>
-
-                        <!-- 9. Benfozet-CD3 Tablets -->
-                        <article class="swiper-slide product-card">
-                            <div class="product-card__media">
-                                <span class="product-card__badge product-card__badge--blue">
-                                    <i class="fa-solid fa-bone" aria-hidden="true"></i> Bone &amp; Nerve
-                                </span>
-                                <img src="https://res.cloudinary.com/dp4yririh/image/upload/v1782797097/fairford/products/pqh3xxvojumuoa2wlo4a.png" alt="Benfozet-CD3 bone and nerve health tablets" loading="lazy" width="600" height="600"
-                                    onerror="this.onerror=null;this.src='/Benfozet-CD3.png'" />
-                            </div>
-                            <div class="product-card__body">
-                                <span class="product-card__category">
-                                    <i class="fa-solid fa-bone" aria-hidden="true"></i> Neuro Care
-                                </span>
-                                <h3 class="product-card__title">Benfozet-CD3 Tablets</h3>
-                                <p class="product-card__desc">
-                                    Calcium, Alpha Lipoic Acid, Benfotiamine &amp; Vitamin D3 for bone strength and healthy nerves.
-                                </p>
-                                <div class="product-card__meta">
-                                    <div class="product-card__rating" aria-label="Rated 4.7 out of 5">
-                                        <i class="fa-solid fa-star" aria-hidden="true"></i> 4.7
-                                    </div>
-                                </div>
-                                <a href="product.html"><button class="btn-bulk" type="button">
-                                    Order
-                                    <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
-                                </button></a>
-                            </div>
-                        </article>
-
-                        <!-- 10. EVEC-400 Softgel (Vitamin E 400 IU) -->
-                        <article class="swiper-slide product-card">
-                            <div class="product-card__media">
-                                <span class="product-card__badge">
-                                    <i class="fa-solid fa-fire" aria-hidden="true"></i> Best Seller
-                                </span>
-                                <img src="https://res.cloudinary.com/dp4yririh/image/upload/v1782797195/fairford/products/japqvjfulv3hzwmbjvsj.png" alt="EVEC-400 Vitamin E 400 IU softgel capsules" loading="lazy" width="600" height="600"
-                                    onerror="this.onerror=null;this.src='/EVEC-400.png'" />
-                            </div>
-                            <div class="product-card__body">
-                                <span class="product-card__category">
-                                    <i class="fa-solid fa-capsules" aria-hidden="true"></i> Skin Wellness
-                                </span>
-                                <h3 class="product-card__title">EVEC-400 Softgel (Vitamin E 400 IU)</h3>
-                                <p class="product-card__desc">
-                                    Vitamin E 400 IU softgels for glowing, healthy skin and daily antioxidant support.
-                                </p>
-                                <div class="product-card__meta">
-                                    <div class="product-card__rating" aria-label="Rated 4.8 out of 5">
-                                        <i class="fa-solid fa-star" aria-hidden="true"></i> 4.8
-                                    </div>
-                                </div>
-                                <a href="product.html"><button class="btn-bulk" type="button">
-                                    Order
-                                    <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
-                                </button></a>
-                            </div>
-                        </article>
-
-                        <!-- 11. Quneed Tablets -->
-                        <article class="swiper-slide product-card">
-                            <div class="product-card__media">
-                                <span class="product-card__badge product-card__badge--green">
-                                    <i class="fa-solid fa-heart-pulse" aria-hidden="true"></i> Supplement
-                                </span>
-                                <img src="https://res.cloudinary.com/dp4yririh/image/upload/v1782797308/fairford/products/qvh4wtxowjkwu8favrug.png" alt="Quneed coenzyme Q10 and L-arginine fertility supplement tablets" loading="lazy" width="600" height="600"
-                                    onerror="this.onerror=null;this.src='/Quneed.png'" />
-                            </div>
-                            <div class="product-card__body">
-                                <span class="product-card__category">
-                                    <i class="fa-solid fa-heart" aria-hidden="true"></i> Fertility Care
-                                </span>
-                                <h3 class="product-card__title">Quneed Tablets</h3>
-                                <p class="product-card__desc">
-                                    Co-enzyme Q10, L-arginine, Omega-3, Selenium &amp; Zinc — antioxidant support for fertility &amp; vitality.
-                                </p>
-                                <div class="product-card__meta">
-                                    <div class="product-card__rating" aria-label="Rated 4.6 out of 5">
-                                        <i class="fa-solid fa-star" aria-hidden="true"></i> 4.6
-                                    </div>
-                                </div>
-                                <a href="product.html"><button class="btn-bulk" type="button">
-                                    Order
-                                    <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
-                                </button></a>
-                            </div>
-                        </article>
-
-                        <!-- 12. Calcifair-K27 Forte Capsules -->
-                        <article class="swiper-slide product-card">
-                            <div class="product-card__media">
-                                <span class="product-card__badge product-card__badge--teal">
-                                    <i class="fa-solid fa-bone" aria-hidden="true"></i> Bone Health
-                                </span>
-                                <img src="https://res.cloudinary.com/dp4yririh/image/upload/v1782797131/fairford/products/gomux6tgrxzfnkvr50rj.png" alt="Calcifair-K27 Forte calcium and vitamin K2-7 softgel capsules" loading="lazy" width="600" height="600"
-                                    onerror="this.onerror=null;this.src='/Calcifair-K27%20Forte.png'" />
-                            </div>
-                            <div class="product-card__body">
-                                <span class="product-card__category">
-                                    <i class="fa-solid fa-capsules" aria-hidden="true"></i> Calcium Care
-                                </span>
-                                <h3 class="product-card__title">Calcifair-K27 Forte Capsules</h3>
-                                <p class="product-card__desc">
-                                    Calcium, Calcitriol, Methylcobalamin &amp; Vitamin K2-7 softgels for strong bones — for all ages.
-                                </p>
-                                <div class="product-card__meta">
-                                    <div class="product-card__rating" aria-label="Rated 4.7 out of 5">
-                                        <i class="fa-solid fa-star" aria-hidden="true"></i> 4.7
-                                    </div>
-                                </div>
-                                <a href="product.html"><button class="btn-bulk" type="button">
-                                    Order
-                                    <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
-                                </button></a>
-                            </div>
-                        </article>
-
-                        <!-- 13. Tendofair Forte Tablets -->
-                        <article class="swiper-slide product-card">
-                            <div class="product-card__media">
-                                <span class="product-card__badge product-card__badge--green">
-                                    <i class="fa-solid fa-person-running" aria-hidden="true"></i> Joint Care
-                                </span>
-                                <img src="https://res.cloudinary.com/dp4yririh/image/upload/v1783493134/fairford/site/hx97pqrzao3mpftvnpzo.png" alt="Tendofair Forte collagen and chondroitin joint support tablets" loading="lazy" width="600" height="600"
-                                    onerror="this.onerror=null;this.src='/Tendofair%20Forte.png'" />
-                            </div>
-                            <div class="product-card__body">
-                                <span class="product-card__category">
-                                    <i class="fa-solid fa-bone" aria-hidden="true"></i> Joint Health
-                                </span>
-                                <h3 class="product-card__title">Tendofair Forte Tablets</h3>
-                                <p class="product-card__desc">
-                                    Collagen Peptide Type-II, L-Arginine, Chondroitin &amp; Vitamin C for advanced cartilage &amp; joint support.
-                                </p>
-                                <div class="product-card__meta">
-                                    <div class="product-card__rating" aria-label="Rated 4.9 out of 5">
-                                        <i class="fa-solid fa-star" aria-hidden="true"></i> 4.9
-                                    </div>
-                                </div>
-                                <a href="product.html"><button class="btn-bulk" type="button">
-                                    Order
-                                    <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
-                                </button></a>
-                            </div>
-                        </article>
-                    </div>
-
-                    <!-- Modern Pagination Dots -->
-                    <div class="swiper-pagination products-pagination"></div>
+            <!-- Toolbar: search + category filters -->
+            <div class="fhp-toolbar">
+                <div class="fhp-search">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+                    <input type="search" id="fhpSearch" placeholder="Search products or compositions…" autocomplete="off" aria-label="Search products">
+                </div>
+                <div class="fhp-chips" id="fhpChips" role="tablist" aria-label="Filter by category">
+                    <button class="fhp-chip is-on" type="button" role="tab" aria-selected="true" data-cat="__all">All</button>
+                    <!-- category chips injected by js/home-products.js -->
                 </div>
             </div>
 
-            <!-- View all CTA -->
-            <div class="section-footer">
-                <a href="product.html" class="btn-outline">
-                    View Full Catalog
-                    <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>
-                </a>
+            <!-- Featured products (emphasised) -->
+            <div class="fhp-featured" id="fhpFeatured" aria-label="Featured products"></div>
+
+            <!-- Supporting product grid -->
+            <div class="fhp-grid" id="fhpGrid" aria-live="polite" aria-busy="true">
+                <div class="fhp-skel" aria-hidden="true"></div>
+                <div class="fhp-skel" aria-hidden="true"></div>
+                <div class="fhp-skel" aria-hidden="true"></div>
+                <div class="fhp-skel" aria-hidden="true"></div>
+                <div class="fhp-skel" aria-hidden="true"></div>
+                <div class="fhp-skel" aria-hidden="true"></div>
+                <div class="fhp-skel" aria-hidden="true"></div>
+                <div class="fhp-skel" aria-hidden="true"></div>
             </div>
+
+            <!-- No-match state -->
+            <div class="fhp-empty" id="fhpEmpty" hidden>
+                <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3M8 11h6"/></svg>
+                <p>No products match your search.</p>
+                <button class="fhp-btn fhp-btn--ghost" id="fhpClear" type="button">Clear search &amp; filters</button>
+            </div>
+
+            <!-- Full-catalogue CTA -->
+            <div class="fhp-cta fh-rise">
+                <div class="fhp-cta__text">
+                    <h3>Explore our complete range</h3>
+                    <p>165+ pharmaceutical &amp; wellness formulations, manufactured to WHO-GMP
+                       standards and distributed across India. Distributor pricing unlocks on approval.</p>
+                </div>
+                <div class="fhp-cta__actions">
+                    <a class="fhp-btn fhp-btn--solid" id="fhpViewAll" href="product.html">
+                        View all products
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+                    </a>
+                    <a class="fhp-btn fhp-btn--ghost"
+                       href="https://storage.googleapis.com/fairford-assets-436195425441/FF_E-CATALOGUE_2026-27.pdf"
+                       target="_blank" rel="noopener">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+                        Download e-catalogue
+                    </a>
+                </div>
+            </div>
+
+            <noscript>
+                <div class="fhp-cta" style="margin-top:18px">
+                    <div class="fhp-cta__text"><h3>Browse the catalogue</h3><p>Explore our complete range of pharmaceutical and wellness products.</p></div>
+                    <div class="fhp-cta__actions"><a class="fhp-btn fhp-btn--solid" href="product.html">View all products</a></div>
+                </div>
+            </noscript>
         </div>
     </section>
 
-    <!--  3 ways  -->
     <section class="sections-3ways" aria-labelledby="buy-direct-heading">
 
         <!-- Header -->
@@ -1028,19 +709,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     co-marketing support.
                 </p>
                 <ul class="feature-list">
-                    <li>Exclusive territory pricing &amp; volume slabs</li>
-                    <li>Priority dispatch with same-day shipping</li>
-                    <li>Dedicated account manager &amp; ops team</li>
-                    <li>Quarterly business reviews &amp; demand forecasts</li>
+                    <li>Orders routed to you automatically by pincode &amp; territory</li>
+                    <li>Email alert the moment an order lands in your area</li>
+                    <li>Full catalogue access with distributor pricing</li>
                 </ul>
                 <div class="stats">
                     <div>
                         <div class="stat-value">700+</div>
                         <div class="stat-label">Partner network</div>
-                    </div>
-                    <div>
-                        <div class="stat-value">₹2.4Cr</div>
-                        <div class="stat-label">Avg monthly GMV</div>
                     </div>
                 </div>
 
@@ -1069,23 +745,19 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 <span class="tag-badge">Uphaar Rewards</span>
                 <h2 class="card-title">Retailers</h2>
                 <p class="card-description">
-                    Order from your phone, earn cashback on every purchase, and let AI suggest the right products for your
-                    shop’s demand pattern.
+                    Order from your phone, track every delivery, and earn rewards through the Uphaar
+                    programme on the products you already stock.
                 </p>
                 <ul class="feature-list">
-                    <li>Instant cashback credited to your wallet</li>
-                    <li>AI-powered reorder suggestions &amp; demand insights</li>
-                    <li>Free same-day delivery in serviced pincodes</li>
+                    <li>Order online — cash on delivery or pay online</li>
+                    <li>Order history &amp; delivery tracking in your dashboard</li>
+                    <li>Rewards through the Uphaar chemist programme</li>
                     <li>Exclusive Uphaar member-only schemes</li>
                 </ul>
                 <div class="stats">
                     <div>
                         <div class="stat-value">100K+</div>
                         <div class="stat-label">Chemist shops</div>
-                    </div>
-                    <div>
-                        <div class="stat-value">₹48K</div>
-                        <div class="stat-label">Avg yearly cashback</div>
                     </div>
                 </div>
                 <!-- join uphaar button -->
@@ -1116,23 +788,18 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 <span class="tag-badge">For Institutions</span>
                 <h2 class="card-title">Hospitals</h2>
                 <p class="card-description">
-                    Streamlined procurement with custom contracts, GST-compliant invoicing, and a dedicated team for
-                    tender &amp; rate-contract bids.
+                    Bulk requirements handled directly by our commercial team, with GST-compliant
+                    pricing on every line item.
                 </p>
                 <ul class="feature-list">
-                    <li>Custom rate contracts &amp; annual MOUs</li>
-                    <li>Bulk procurement portal with PO automation</li>
-                    <li>Tender response &amp; documentation support</li>
-                    <li>NABH-compliant cold-chain logistics</li>
+                    <li>Full catalogue with composition, strength &amp; pack size</li>
+                    <li>GST-compliant pricing shown per product</li>
+                    <li>Request a quote for bulk requirements</li>
                 </ul>
                 <div class="stats">
                     <div>
                         <div class="stat-value">240+</div>
                         <div class="stat-label">Hospitals served</div>
-                    </div>
-                    <div>
-                        <div class="stat-value">₹50Cr+</div>
-                        <div class="stat-label">Annual procurement</div>
                     </div>
                 </div>
                 <!-- request a quote button -->
@@ -1147,43 +814,47 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             </article>
         </div>
     </section>
-    <!-- Uphaar content -->
-    <section class="uphaar-hero">
 
-        <!-- LEFT CONTENT -->
-        <div class="uphaar-content">
+    <!-- ================================================================
+         UPHAAR — the chemist's growth program
+         The artwork is a composed banner, so it is shown whole inside a
+         framed panel with a caption bar carrying the programme name and
+         CTA, rather than cropped into a background block.
+         ================================================================ -->
+    <section class="fh-section fh-uphaar" aria-labelledby="fh-uphaar-heading">
+        <div class="fh-shell">
 
-            <div class="uphaar-tag">EXCLUSIVE • CHEMIST PROGRAM</div>
+            <header class="fh-head fh-rise">
+                <span class="fh-eyebrow"><i aria-hidden="true"></i>Exclusive &middot; Chemist Program</span>
+                <h2 id="fh-uphaar-heading">UPHAAR — the chemist's <span>growth program</span></h2>
+                <p>A premium loyalty and growth platform for retailers who buy from Fair Ford.
+                   Earn on every order and run your shop from a free retailer dashboard.</p>
+            </header>
 
-            <h1>
-                UPHAAR — <br>
-                the chemist's <span>growth program.</span>
-            </h1>
+            <div class="fh-uphaar__frame fh-rise">
+                <a class="fh-uphaar__media" href="uphaar.html" aria-label="Discover the UPHAAR rewards programme">
+                    <img src="https://res.cloudinary.com/dp4yririh/image/upload/v1787296218/ChatGPT_Image_Aug_21_2026_12_28_59_PM_htywlv.png"
+                         alt="UPHAAR rewards — premium rewards for Fair Ford chemist partners"
+                         width="1672" height="941" loading="lazy" decoding="async">
+                </a>
 
-            <p>
-                A premium loyalty & growth platform for retailers who buy from Fairford. <br>
-                Earn on every order, unlock tier benefits, and run your shop on a free smart dashboard.
-            </p>
-
-            <ul class="uphaar-features">
-                <li>Cashback up to 10% on every category</li>
-                <!-- <li>Tier rewards — Silver, Gold & Platinum</li> -->
-                <li>Smart retailer dashboard — orders, sales, AI restocks</li>
-                <li>Training & support on GST and digital tools</li>
-            </ul>
-
-            <div class="uphaar-buttons">
-                <button class="uphaar-btn-primary"> <a href="uphaar.html">Join UPHAAR </a></button>
-                <button class="uphaar-btn-secondary">See member benefits</button>
+                <div class="fh-uphaar__bar">
+                    <div>
+                        <p class="fh-uphaar__title">UPHAAR <em>Ki Bahaar</em></p>
+                        <p class="fh-uphaar__sub">Cashback on every category &middot; Retailer dashboard &middot; GST &amp; digital training</p>
+                    </div>
+                    <a class="fh-uphaar__btn" href="uphaar.html">
+                        Join UPHAAR
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+                    </a>
+                </div>
             </div>
-
-        </div>
-
-
-        
-
         </div>
     </section>
+
+
+    </main>
     <!-- ===footer === -->
 
     <footer class="footer">
@@ -1201,10 +872,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 <div class="footer-section company-info">
                     <div class="footer-logo">
                         <!-- <i class="fas fa-rocket"></i> -->
-                        <span class="logo-text">FAIR FORD Pharmaceuticals <br>PVT. LTD.</span>
+                        <span class="logo-text">Fair Ford Pharmaceuticals <br>Pvt. Ltd.</span>
                     </div>
                     <p class="company-description">
-                        At FAIRFORD Pharmaceuticals PVT. LTD. We are committed to delivering high-quality healthcare
+                        At Fair Ford Pharmaceuticals Pvt. Ltd. we are committed to delivering high-quality healthcare
                         solutions that improve lives. With a focus on innovation and excellence, we strive to be a
                         trusted partner in the pharmaceutical industry.</p>
                     <!-- Social Media Icons -->
@@ -1274,7 +945,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         <i class="fas fa-phone"></i>
                         <div>
                             <p class="contact-label">Phone</p>
-                            <a href="tel:8595939723" class="contact-value">8595939723</a>
+                            <a href="tel:9958584228" class="contact-value">9958584228</a>
                             <!-- <a href="tel:9958584228" class="contact-value">9958584228</a> -->
                         </div>
                     </div>
@@ -1316,7 +987,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <!-- Footer Bottom Bar -->
             <div class="footer-bottom">
                 <div class="copyright">
-                    <p>&copy; 2026 FAIRFORD Pharmaceuticals PVT. LTD. All rights reserved.</p>
+                    <p>&copy; 2026 Fair Ford Pharmaceuticals Pvt. Ltd. All rights reserved.</p>
                 </div>
                 <div class="footer-credit">
                     <!-- Each half is one unbreakable unit so the line wraps between
@@ -1324,51 +995,22 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     <p>
                         <span class="fc-part">Designed and Created by <a href="https://www.linkedin.com/company/fair-ford-pharmaceuticals/" target="_blank" rel="noopener">Fair Ford and Team</a> <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="#e53e3e" stroke="none" aria-hidden="true" class="footer-heart-svg"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></span>
                         <span class="fc-sep" aria-hidden="true">|</span>
-                        <span class="fc-part">Powered by Fair Ford Pharmaceuticals PVT. LTD.</span>
+                        <span class="fc-part">Powered by Fair Ford Pharmaceuticals Pvt. Ltd.</span>
                     </p>
                 </div>
             </div>
         </div>    
     </footer>
-    <!-- Overlay (backdrop for sidebars) -->
-    <div class="overlay" id="overlay"></div>
-
-    <!-- CART SIDEBAR -->
-    <aside class="sidebar" id="cartSidebar" aria-label="Cart">
-        <div class="sidebar-head">
-            <h2 class="sidebar-title">Order Cart <span class="sidebar-count" id="cartSideCount">0 items</span></h2>
-            <button class="sidebar-close" data-close="cart" aria-label="Close">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M18 6 6 18M6 6l12 12" />
-                </svg>
-            </button>
-        </div>
-        <div class="sidebar-body" id="cartBody"></div>
-        <div class="sidebar-foot" id="cartFoot" style="display:none;"></div>
-    </aside>
-
-    <!-- WISHLIST SIDEBAR -->
-    <aside class="sidebar" id="wishSidebar" aria-label="Wishlist">
-        <div class="sidebar-head">
-            <h2 class="sidebar-title">Wishlist <span class="sidebar-count" id="wishSideCount">0 items</span></h2>
-            <button class="sidebar-close" data-close="wish" aria-label="Close">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M18 6 6 18M6 6l12 12" />
-                </svg>
-            </button>
-        </div>
-        <div class="sidebar-body" id="wishBody"></div>
-    </aside>
-
-    <!-- TOAST NOTIFICATIONS -->
-    <div class="toast-stack" id="toastStack"></div>
-
-    <!-- Swiper.js JS -->
-    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-
+    <!-- The cart/wishlist slide-over panels, their backdrop and the toast stack
+         are created at runtime by initPanels() in common.js, which is also the
+         single owner of cart state. The static #cartSidebar / #wishSidebar /
+         #overlay / #toastStack markup that used to sit here belonged to the
+         removed second cart implementation. -->
 
     <!-- External JavaScript -->
     <script src="/frontend/js/script.js"></script>
+    <script src="/frontend/js/home.js" defer></script>
+    <script src="/frontend/js/home-products.js" defer></script>
 
     <!-- Shared cart / wishlist (same storage as product pages) -->
     <script src="/frontend/js/api.js"></script>
@@ -1404,13 +1046,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           boot();
         }
       })();
-    </script>
-
-    <!-- Initialize Lucide Icons -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            lucide.createIcons();
-        });
     </script>
 </body>
 

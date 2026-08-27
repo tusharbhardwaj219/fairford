@@ -33,16 +33,22 @@ app.use(helmet({
     directives: {
       defaultSrc:     ["'self'"],
       // checkout.razorpay.com serves the Checkout SDK; without it the payment
-      // modal is blocked by CSP and never opens.
-      scriptSrc:      ["'self'", "'unsafe-inline'", 'https://cdnjs.cloudflare.com', 'https://cdn.jsdelivr.net', 'https://checkout.razorpay.com'],
+      // modal is blocked by CSP and never opens. cdn.razorpay.com serves the
+      // risk-detection bundle that Checkout pulls in itself — omitting it left
+      // every live payment running with fraud detection blocked.
+      // googletagmanager.com serves BOTH the GTM container and gtag.js; without
+      // it neither analytics snippet on the pages could ever execute.
+      scriptSrc:      ["'self'", "'unsafe-inline'", 'https://cdnjs.cloudflare.com', 'https://cdn.jsdelivr.net', 'https://checkout.razorpay.com', 'https://cdn.razorpay.com', 'https://www.googletagmanager.com'],
       scriptSrcAttr:  ["'unsafe-inline'"], // inline onclick handlers used across the pages
-      styleSrc:       ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com', 'https://cdnjs.cloudflare.com', 'https://cdn.jsdelivr.net'],
-      fontSrc:        ["'self'", 'data:', 'https://fonts.gstatic.com', 'https://cdnjs.cloudflare.com', 'https://cdn.jsdelivr.net'],
+      styleSrc:       ["'self'", "'unsafe-inline'", 'https://api.fontshare.com', 'https://fonts.googleapis.com', 'https://cdnjs.cloudflare.com', 'https://cdn.jsdelivr.net'],
+      fontSrc:        ["'self'", 'data:', 'https://cdn.fontshare.com', 'https://fonts.gstatic.com', 'https://cdnjs.cloudflare.com', 'https://cdn.jsdelivr.net'],
       imgSrc:         ["'self'", 'data:', 'https:'],
       // Checkout posts telemetry to lumberjack.* and talks to api.razorpay.com.
-      connectSrc:     ["'self'", 'https://api.razorpay.com', 'https://lumberjack.razorpay.com', 'https://lumberjack-metrics.razorpay.com'],
+      // GA4/GTM beacon to google-analytics.com and googletagmanager.com.
+      connectSrc:     ["'self'", 'https://api.razorpay.com', 'https://lumberjack.razorpay.com', 'https://lumberjack-metrics.razorpay.com', 'https://www.google-analytics.com', 'https://analytics.google.com', 'https://stats.g.doubleclick.net', 'https://www.googletagmanager.com'],
       // Razorpay renders its modal (and bank/UPI redirects) inside iframes.
-      frameSrc:       ["'self'", 'https://www.google.com', 'https://api.razorpay.com', 'https://checkout.razorpay.com'],
+      // googletagmanager.com covers the GTM <noscript> fallback iframe.
+      frameSrc:       ["'self'", 'https://www.google.com', 'https://api.razorpay.com', 'https://checkout.razorpay.com', 'https://www.googletagmanager.com'],
       objectSrc:      ["'none'"],
       baseUri:        ["'self'"],
       frameAncestors: ["'self'"],
@@ -195,6 +201,45 @@ app.get('/', (_req, res) =>
   res.sendFile(path.join(__dirname, '..', 'frontend', 'public', 'index.html'))
 );
 
+// ── LEGACY URL REDIRECTS ──────────────────────────────────────────────────────
+// The site previously ran on a WooCommerce-style URL scheme (/product/<slug>/,
+// /product-category/<slug>/). Those URLs are still indexed and inbound-linked
+// but this app never served them, so every one of them hits the 404 handler
+// below and the link equity is lost.
+//
+// 301 (permanent) so search engines transfer ranking to the new URL. Products
+// are matched on the `slug` field the Product model already generates from the
+// name; anything that no longer exists falls back to the catalogue rather than
+// 404-ing, which keeps the visitor on-site.
+const Product = require('./models/Product');
+
+app.get(['/product/:slug', '/product/:slug/'], async (req, res) => {
+  try {
+    const slug = String(req.params.slug || '').toLowerCase();
+    const hit = await Product.findOne({ slug }).select('_id slug').lean();
+    if (hit) return res.redirect(301, `/productdetail.html?slug=${encodeURIComponent(hit.slug)}`);
+  } catch (_) {
+    // fall through to the catalogue
+  }
+  return res.redirect(301, '/product.html');
+});
+
+// Legacy category archives → the catalogue, pre-filtered where the name still
+// matches a live category. product.html reads ?category=<name> (added earlier).
+app.get(['/product-category/:slug', '/product-category/:slug/'], async (req, res) => {
+  try {
+    const Category = require('./models/Category');
+    const slug = String(req.params.slug || '').toLowerCase();
+    const cat = await Category.findOne({ categorySlug: slug }).select('categoryName').lean();
+    if (cat && cat.categoryName) {
+      return res.redirect(301, `/product.html?category=${encodeURIComponent(cat.categoryName)}`);
+    }
+  } catch (_) {
+    // fall through to the catalogue
+  }
+  return res.redirect(301, '/product.html');
+});
+
 // ── SEO: robots.txt + sitemap.xml ───────────────────────────────────────────────
 // Prefer a real public origin; fall back to the production domain (FRONTEND_URL
 // defaults to localhost in dev, which is useless in a sitemap).
@@ -217,8 +262,12 @@ app.get('/robots.txt', (_req, res) => {
 });
 
 app.get('/sitemap.xml', (_req, res) => {
-  const pages = ['/', '/product.html', '/About.html', '/contactus.html', '/uphaar.html',
-                 '/registration.html', '/login&signup.html', '/privacy&policy.html', '/T&C.html'];
+  // Public, indexable pages only. login&signup.html is deliberately absent —
+  // it carries noindex, so listing it here would contradict the page itself.
+  // search.html and distributor.html were missing and are genuine landing pages.
+  const pages = ['/', '/product.html', '/About.html', '/contactus.html', '/uphaar.html', '/nueva-vida.html',
+                 '/registration.html', '/distributor.html', '/search.html',
+                 '/privacy&policy.html', '/T&C.html'];
   // Page names contain literal & (login&signup.html etc.), which must be
   // XML-escaped inside <loc> or the sitemap is malformed.
   const xmlEsc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');

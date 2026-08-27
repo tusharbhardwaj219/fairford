@@ -200,6 +200,49 @@ function refreshPayOnlineButton() {
     .catch(function () { _ffOnlinePayOn = false; show(false); });
 }
 
+/* One-time migration of the retired 'fairford.v1' cart.
+   index.html, About.html and contactus.html used to run a second cart store
+   under that key, so a visitor could have items there that this cart never
+   saw. Fold any such items into ff_cart (summing quantities on collision),
+   then drop the old key so this runs once per browser.
+
+   Its ids came from a hardcoded demo catalogue, so they will usually not
+   resolve against the real product list — the cart renderer already skips
+   unresolvable ids, and this way nothing is silently thrown away. */
+(function migrateLegacyCart() {
+  var LEGACY = 'fairford.v1';
+  var raw;
+  try { raw = localStorage.getItem(LEGACY); } catch (e) { return; }
+  if (!raw) return;
+
+  try {
+    var legacy = JSON.parse(raw) || {};
+    var legacyCart = legacy.cart || {};
+    var current = JSON.parse(localStorage.getItem('ff_cart') || '[]');
+
+    Object.keys(legacyCart).forEach(function (id) {
+      var qty = Number(legacyCart[id]) || 0;
+      if (qty <= 0) return;
+      var hit = current.filter(function (x) { return x.id === String(id); })[0];
+      if (hit) hit.qty += qty;
+      else current.push({ id: String(id), qty: qty });
+    });
+
+    var legacyWish = Array.isArray(legacy.wishlist) ? legacy.wishlist : [];
+    var wish = JSON.parse(localStorage.getItem('ff_wish') || '[]');
+    legacyWish.forEach(function (id) {
+      if (wish.indexOf(String(id)) < 0) wish.push(String(id));
+    });
+
+    localStorage.setItem('ff_cart', JSON.stringify(current));
+    localStorage.setItem('ff_wish', JSON.stringify(wish));
+  } catch (e) {
+    console.warn('[cart] legacy migration skipped:', e);
+  }
+
+  try { localStorage.removeItem(LEGACY); } catch (e) { /* ignore */ }
+})();
+
 const store = {
   get cart() {
     try { return JSON.parse(localStorage.getItem('ff_cart') || '[]'); } catch(e) { return []; }
@@ -475,9 +518,9 @@ function renderHeader(active) {
   <div class="topbar__container">
     <ul class="topbar__contact" aria-label="Contact information">
       <li class="topbar__item">
-        <a href="tel:+918595939723" class="topbar__link" aria-label="Call us">
+        <a href="tel:+919958584228" class="topbar__link" aria-label="Call us">
           <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384"/></svg>
-          <span>+91 8595939723</span>
+          <span>+91 9958584228</span>
         </a>
       </li>
       <li class="topbar__divider" aria-hidden="true"></li>
@@ -536,17 +579,16 @@ function renderHeader(active) {
       <ul class="nav-list">
         <li><a href="index.html" class="${navCls('home')}">Home</a></li>
         <li><a href="product.html" class="${navCls('products')}">Products</a></li>
-        <li><a href="About.html" class="${navCls('about')}" target="_blank">About</a></li>
-        <li><a href="contactus.html" class="${navCls('contact')}" target="_blank">Contact</a></li>
+        <li><a href="About.html" class="${navCls('about')}">About</a></li>
+        <li><a href="contactus.html" class="${navCls('contact')}">Contact</a></li>
         <li><a href="uphaar.html" class="nav-link nav-link--promo"><span class="promo-dot" aria-hidden="true"></span>Uphaar</a></li>
+        <li><a href="nueva-vida.html" class="nav-link nav-link--nueva"><span class="nueva-gem" aria-hidden="true"></span>NUEVA VIDA</a></li>
       </ul>
     </nav>
 
     <div class="actions">
-      <a href="search.html" target="_self">
-        <button class="icon-btn" data-action="search" aria-label="Search products">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-        </button>
+      <a href="search.html" class="icon-btn" aria-label="Search products">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
       </a>
       <button class="icon-btn" id="wishlistBtn" data-action="wishlist" aria-label="Wishlist">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
@@ -600,9 +642,10 @@ function renderHeader(active) {
     <a href="About.html" class="drawer-link">About Us<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></a>
     <a href="contactus.html" class="drawer-link">Contact<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></a>
     <a href="uphaar.html" class="drawer-link drawer-link--promo">Uphaar<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></a>
+    <a href="nueva-vida.html" class="drawer-link drawer-link--nueva">NUEVA VIDA<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></a>
     <div class="drawer-section-title">Account</div>
-    <a href="#" class="drawer-link">Wishlist<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></a>
-    <a href="#" class="drawer-link" id="drawerProfileLink">My Profile<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></a>
+    <button type="button" class="drawer-link" data-action="wishlist">Wishlist<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button>
+    <a href="retailer.html" class="drawer-link" id="drawerProfileLink">My Profile<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></a>
   </nav>
   <div class="drawer-footer">
     <button class="drawer-cta" id="drawerLoginBtn" type="button" onclick="window.location.href='login&signup.html'">
@@ -801,13 +844,16 @@ function initPanels() {
     document.body.style.overflow = '';
   }
 
-  // Header button wiring — delegated on body so it survives any header re-render
+  // Header button wiring — delegated on body so it survives any header re-render.
+  // Matched on [data-action] rather than the #cartBtn/#wishlistBtn ids: the ids
+  // can only ever exist once per page, so duplicate entry points (the mobile
+  // drawer's Wishlist item, for example) had no way to open the same panel.
   document.body.addEventListener('click', function(e) {
-    if (e.target.closest('#cartBtn')) {
+    if (e.target.closest('[data-action="cart"]')) {
       e.stopPropagation();
       store._refreshCartPanel();
       openPanel('ff-cart-panel');
-    } else if (e.target.closest('#wishlistBtn')) {
+    } else if (e.target.closest('[data-action="wishlist"]')) {
       e.stopPropagation();
       store._refreshWishPanel();
       openPanel('ff-wish-panel');
@@ -992,9 +1038,9 @@ function renderFooter() {
 
         <div class="footer-section company-info">
           <div class="footer-logo">
-            <span class="logo-text">FAIR FORD Pharmaceuticals <br>PVT. LTD.</span>
+            <span class="logo-text">Fair Ford Pharmaceuticals <br>Pvt. Ltd.</span>
           </div>
-          <p class="company-description">At FAIRFORD Pharmaceuticals PVT. LTD. We are committed to delivering high-quality healthcare solutions that improve lives. With a focus on innovation and excellence, we strive to be a trusted partner in the pharmaceutical industry.</p>
+          <p class="company-description">At Fair Ford Pharmaceuticals Pvt. Ltd. we are committed to delivering high-quality healthcare solutions that improve lives. With a focus on innovation and excellence, we strive to be a trusted partner in the pharmaceutical industry.</p>
           <div class="social-links">
             <a href="https://www.facebook.com/profile.php?id=61550892159031" class="social-icon" title="Facebook" aria-label="Follow us on Facebook" target="_blank">
               ${svgFacebook}
@@ -1049,7 +1095,7 @@ function renderFooter() {
             ${svgPhone}
             <div>
               <p class="contact-label">Phone</p>
-              <a href="tel:8595939723" class="contact-value">8595939723</a>
+              <a href="tel:9958584228" class="contact-value">9958584228</a>
             </div>
           </div>
           <div class="contact-item">
@@ -1086,7 +1132,7 @@ function renderFooter() {
 
       <div class="footer-bottom">
         <div class="copyright">
-          <p>&copy; ${year} FAIRFORD Pharmaceuticals PVT. LTD. All rights reserved.</p>
+          <p>&copy; ${year} Fair Ford Pharmaceuticals Pvt. Ltd. All rights reserved.</p>
         </div>
         <div class="footer-credit">
           <!-- Each half is one unbreakable unit so the line wraps between them
@@ -1094,7 +1140,7 @@ function renderFooter() {
           <p>
             <span class="fc-part">Designed and Created by <a href="https://www.linkedin.com/company/fair-ford-pharmaceuticals/" target="_blank" rel="noopener">Fair Ford and Team</a> ${svgHeart}</span>
             <span class="fc-sep" aria-hidden="true">|</span>
-            <span class="fc-part">Powered by Fair Ford Pharmaceuticals PVT. LTD.</span>
+            <span class="fc-part">Powered by Fair Ford Pharmaceuticals Pvt. Ltd.</span>
           </p>
         </div>
       </div>

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-5B2HT6FW');</script>
+<!-- End Google Tag Manager -->
+ <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-BMMC558M13"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-BMMC558M13');
+</script>
+  <meta charset="UTF-8" />
+    <meta name="robots" content="noindex, nofollow" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fair Ford — Retailer</title>
+  <meta name="description" content="Fair Ford retailer portal — browse the catalogue, place orders and track deliveries." />
+<link rel="preconnect" href="https://api.fontshare.com">
+    <link rel="preconnect" href="https://cdn.fontshare.com" crossorigin>
+    <link href="https://api.fontshare.com/v2/css?f%5B%5D=clash-display@400,500,600,700&display=swap" rel="stylesheet">
+    <link href="https://api.fontshare.com/v2/css?f%5B%5D=satoshi@400,500,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/frontend/css/typography.css">
+  <link rel="stylesheet" href="/frontend/css/retailer.css" />
+  <!-- Page loader (see css/loader.css + js/loader.js). Not deferred:
+       the overlay must exist before first paint. -->
+  <link rel="stylesheet" href="/frontend/css/loader.css" />
+  <script src="/frontend/js/loader.js"></script>
+</head>
+<body><!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5B2HT6FW"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+  <header class="rt-header">
+    <div class="rt-brand">Fair Ford Pharma <small>Retailer ordering</small></div>
+    <div class="rt-user">
+      <span id="rtUserName">…</span>
+      <button class="rt-logout" id="rtLogout">Logout</button>
+    </div>
+  </header>
+
+  <main class="rt-wrap">
+    <!-- The page had no <h1>; its highest heading was the address card's <h2>. -->
+    <h1 class="rt-page-title">Retailer portal</h1>
+
+    <!-- KYC / status banner -->
+    <div class="rt-banner warn" id="rtBanner">
+      Your account is <strong>pending approval</strong>. You can browse and set your address,
+      but you can place orders only after an admin activates your account.
+    </div>
+
+    <!-- Shop & delivery address (drives order routing) -->
+    <section class="rt-card">
+      <h2>Shop &amp; delivery address <span class="sub">orders are routed to the nearest distributor by your pincode</span></h2>
+      <div class="rt-form-row">
+        <div class="rt-field" style="flex:1 1 220px;">
+          <label for="afShop">Shop name</label>
+          <input id="afShop" type="text" placeholder="Shop name" />
+        </div>
+        <div class="rt-field" style="flex:1 1 220px;">
+          <label for="afStreet">Street</label>
+          <input id="afStreet" type="text" placeholder="Street / area" />
+        </div>
+        <div class="rt-field">
+          <label for="afCity">City</label>
+          <input id="afCity" type="text" placeholder="City" />
+        </div>
+        <div class="rt-field">
+          <label for="afState">State</label>
+          <input id="afState" type="text" placeholder="State" />
+        </div>
+        <div class="rt-field">
+          <label for="afPincode">Pincode</label>
+          <input id="afPincode" type="text" inputmode="numeric" maxlength="6" placeholder="6-digit" />
+        </div>
+        <div class="rt-field" style="flex:0 0 auto; justify-content:flex-end;">
+          <label>&nbsp;</label>
+          <button class="btn btn-primary" id="afSave">Save address</button>
+        </div>
+      </div>
+    </section>
+
+    <div class="rt-grid">
+      <!-- Products -->
+      <section class="rt-card">
+        <h2>Products</h2>
+        <input class="rt-search" id="rtSearch" type="search" placeholder="Search medicines by name or brand…" />
+        <div class="rt-products" id="rtProducts">
+          <p class="rt-empty">Loading products…</p>
+        </div>
+      </section>
+
+      <!-- Cart -->
+      <section class="rt-card rt-cart">
+        <h2>Your cart</h2>
+        <div id="rtCartBody">
+          <p class="rt-empty">Your cart is empty.</p>
+        </div>
+        <div class="rt-totals" id="rtTotals" style="display:none;">
+          <div><span>Subtotal</span><span id="ttSub">₹0</span></div>
+          <!-- GST is per-product (5/12/18%), so no single rate can be named here. -->
+          <div><span>GST</span><span id="ttGst">₹0</span></div>
+          <div class="grand"><span>Total</span><span id="ttGrand">₹0</span></div>
+        </div>
+        <button class="btn btn-primary" id="rtPayOnline" style="width:100%; margin-top:14px; display:none;">
+          Pay online · UPI / Card / Netbanking
+        </button>
+        <button class="btn btn-ghost" id="rtPlace" style="width:100%; margin-top:10px; display:none;">
+          Place order · Cash on delivery
+        </button>
+        <p class="cod-note" id="rtCodNote" style="display:none;">Pay securely online, or choose cash on delivery.</p>
+      </section>
+    </div>
+
+    <!-- Orders -->
+    <section class="rt-card">
+      <h2>My orders</h2>
+      <div id="rtOrders">
+        <p class="rt-empty">Loading orders…</p>
+      </div>
+    </section>
+  </main>
+
+  <div class="rt-toast" id="rtToast"></div>
+
+  <!-- Razorpay Standard Checkout SDK (must load before payment.js) -->
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <script src="/frontend/js/logout-confirm.js"></script>
+  <script src="/frontend/js/payment.js"></script>
+  <script src="/frontend/js/retailer.js"></script>
+</body>
+</html>

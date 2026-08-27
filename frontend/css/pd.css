@@ -195,7 +195,7 @@
   display: inline-flex;
   align-items: center;
   font-size: .75rem;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: .05em;
   text-transform: uppercase;
   color: var(--pd-blue);
@@ -217,9 +217,9 @@
 .pd-chip-teal { background: rgba(22,163,74,.1);  color: #15803D;  border: 1px solid rgba(22,163,74,.2);  }
 
 .pd-prod-title {
-  font-family: "Bricolage Grotesque", "Plus Jakarta Sans", sans-serif;
+  font-family: var(--ff-font-heading, 'Manrope', system-ui, sans-serif);
   font-size: clamp(1.6rem, 1.2rem + 1.4vw, 2.2rem);
-  font-weight: 800;
+  font-weight: 700;
   color: var(--pd-text);
   line-height: 1.15;
   letter-spacing: -.025em;
@@ -251,7 +251,7 @@
 .pd-star-half  { color: #F59E0B; opacity: .6; }
 .pd-star-empty { color: #D1D5DB; }
 .pd-stars-sm .pd-star { font-size: .85rem; }
-.pd-rat-num  { font-size: .95rem; font-weight: 800; color: var(--pd-text); }
+.pd-rat-num  { font-size: .95rem; font-weight: 700; color: var(--pd-text); }
 .pd-rat-cnt  { font-size: .8rem;  color: var(--pd-muted); }
 .pd-verif {
   display: inline-flex;
@@ -335,7 +335,7 @@
 }
 .pd-price-card-label  { font-size: .7rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; opacity: .75; margin-bottom: 6px; }
 .pd-price-card-main .pd-price-card-label, .pd-price-card-accent .pd-price-card-label { color: rgba(255,255,255,.8); }
-.pd-price-card-amount { font-family: "Bricolage Grotesque", sans-serif; font-size: 1.55rem; font-weight: 800; color: var(--pd-text); line-height: 1; }
+.pd-price-card-amount { font-family: var(--ff-font-heading, 'Manrope', system-ui, sans-serif); font-size: 1.55rem; font-weight: 700; color: var(--pd-text); line-height: 1; }
 .pd-price-card-main .pd-price-card-amount,
 .pd-price-card-accent .pd-price-card-amount { color: #fff; }
 .pd-price-striked { text-decoration: line-through; opacity: .55; }
@@ -433,7 +433,7 @@
   justify-content: center;
   gap: 8px;
   padding: 13px 18px;
-  font-family: "Bricolage Grotesque", "Plus Jakarta Sans", sans-serif;
+  font-family: var(--ff-font-body, 'Inter', system-ui, sans-serif);
   font-size: .9rem;
   font-weight: 700;
   border-radius: 12px;
@@ -522,9 +522,9 @@
   margin-bottom: 24px;
 }
 .pd-sect-title {
-  font-family: "Bricolage Grotesque", "Plus Jakarta Sans", sans-serif;
+  font-family: var(--ff-font-heading, 'Manrope', system-ui, sans-serif);
   font-size: 1.25rem;
-  font-weight: 800;
+  font-weight: 700;
   color: var(--pd-text);
   letter-spacing: -.02em;
 }
@@ -616,7 +616,7 @@
 
 .pd-tab-inner { max-width: 720px; }
 .pd-tab-h {
-  font-family: "Bricolage Grotesque", sans-serif;
+  font-family: var(--ff-font-heading, 'Manrope', system-ui, sans-serif);
   font-size: 1.05rem;
   font-weight: 700;
   color: var(--pd-text);
@@ -698,7 +698,7 @@
   display: grid;
   place-items: center;
   font-size: .75rem;
-  font-weight: 800;
+  font-weight: 700;
   flex-shrink: 0;
 }
 .pd-comp-name { font-size: .9rem; font-weight: 600; color: var(--pd-text); }
@@ -765,9 +765,9 @@
   gap: 12px;
 }
 .pd-rat-big {
-  font-family: "Bricolage Grotesque", sans-serif;
+  font-family: var(--ff-font-heading, 'Manrope', system-ui, sans-serif);
   font-size: 2.8rem;
-  font-weight: 800;
+  font-weight: 700;
   color: var(--pd-text);
   line-height: 1;
 }
@@ -822,7 +822,7 @@
   color: #fff;
   display: grid;
   place-items: center;
-  font-weight: 800;
+  font-weight: 700;
   font-size: 1rem;
   flex-shrink: 0;
 }
@@ -967,7 +967,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.pd-sw-price { font-size: 1rem; font-weight: 800; color: var(--pd-blue); margin-top: 2px; }
+.pd-sw-price { font-size: 1rem; font-weight: 700; color: var(--pd-blue); margin-top: 2px; }
 
 .pd-sw-qty {
   display: flex;
@@ -1176,9 +1176,9 @@
 
 /* ── Hero heading ── */
 .ph-hero-title {
-  font-family: "Bricolage Grotesque", "Plus Jakarta Sans", sans-serif;
+  font-family: var(--ff-font-heading, 'Manrope', system-ui, sans-serif);
   font-size: clamp(2.4rem, 1.6rem + 3vw, 4.2rem);
-  font-weight: 800;
+  font-weight: 700;
   color: #fff;
   line-height: 1.04;
   letter-spacing: -.04em;
@@ -1216,7 +1216,7 @@
   align-items: center;
   gap: 9px;
   padding: 14px 26px;
-  font-family: "Plus Jakarta Sans", "Bricolage Grotesque", sans-serif;
+  font-family: var(--ff-font-body, 'Inter', system-ui, sans-serif);
   font-size: .88rem;
   font-weight: 700;
   border-radius: 12px;
@@ -1295,9 +1295,9 @@
 }
 .ph-stat2-num {
   display: block;
-  font-family: "Bricolage Grotesque", sans-serif;
+  font-family: var(--ff-font-heading, 'Manrope', system-ui, sans-serif);
   font-size: 1.45rem;
-  font-weight: 800;
+  font-weight: 700;
   color: #fff;
   line-height: 1;
   letter-spacing: -.02em;
@@ -1694,7 +1694,7 @@ body.pd-sw-active .back-to-top {
 
 /* ── Product name ── */
 .pl-pname {
-  font-family: "Bricolage Grotesque", "Plus Jakarta Sans", sans-serif;
+  font-family: var(--ff-font-heading, 'Manrope', system-ui, sans-serif);
   font-size: .93rem;
   font-weight: 700;
   color: #111827;
@@ -1728,6 +1728,61 @@ body.pd-sw-active .back-to-top {
   white-space: nowrap;
 }
 
+/* Composition (salt) — the field pharmacy buyers scan for. Clamped to two
+   lines so a long formulation cannot push the price and CTA out of alignment
+   across the grid; the full string stays available as the title attribute. */
+.pl-composition {
+  margin-top: 6px;
+  font-size: .72rem;
+  line-height: 1.35;
+  color: #6B7280;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Minimum order quantity — shown only when it is greater than 1. */
+.pl-moq {
+  margin-top: 5px;
+  font-size: .67rem;
+  font-weight: 700;
+  letter-spacing: .01em;
+  color: #0F4C81;
+}
+
+/* "Load more" — the grid renders in pages of 36 to keep first paint light. */
+.pl-load-more-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 28px 0 8px;
+}
+.pl-load-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 26px;
+  font-family: inherit;
+  font-size: .875rem;
+  font-weight: 700;
+  color: #0F4C81;
+  background: #fff;
+  border: 1.5px solid #DCE6F2;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background .18s ease, border-color .18s ease, transform .18s ease;
+}
+.pl-load-more:hover {
+  background: #F8FAFC;
+  border-color: #0F4C81;
+  transform: translateY(-1px);
+}
+.pl-load-more:focus-visible {
+  outline: 2px solid #0F4C81;
+  outline-offset: 2px;
+}
+
 /* ── Rating row ── */
 .pl-rating-row {
   display: flex;
@@ -1759,9 +1814,9 @@ body.pd-sw-active .back-to-top {
   gap: 6px;
 }
 .pl-price-main {
-  font-family: "Bricolage Grotesque", sans-serif;
+  font-family: var(--ff-font-heading, 'Manrope', system-ui, sans-serif);
   font-size: 1.2rem;
-  font-weight: 800;
+  font-weight: 700;
   color: #0F4C81;
   letter-spacing: -.025em;
   line-height: 1;
@@ -1910,7 +1965,7 @@ body.pd-sw-active .back-to-top {
 }
 .pl-empty-icon svg { width: 34px; height: 34px; }
 .pl-empty-state h3 {
-  font-family: "Bricolage Grotesque", "Plus Jakarta Sans", sans-serif;
+  font-family: var(--ff-font-heading, 'Manrope', system-ui, sans-serif);
   font-size: 1.25rem;
   font-weight: 700;
   color: #111827;

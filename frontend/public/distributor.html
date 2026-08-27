@@ -1,290 +1,218 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- Google Tag Manager -->
-  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-  })(window,document,'script','dataLayer','GTM-5B2HT6FW');</script>
-  <!-- End Google Tag Manager -->
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-BMMC558M13"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-BMMC558M13');
-  </script>
   <meta charset="UTF-8" />
-    <meta name="robots" content="noindex, nofollow" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Fair Ford — Distributor Portal</title>
-  <link rel="stylesheet" href="/frontend/css/distributor.css" />
+  <meta name="theme-color" content="#0F4C81" />
+  <title>Distributor Portal — Fair Ford Pharmaceuticals</title>
+  <meta name="description" content="Fair Ford Pharmaceuticals distributor portal — sign in to manage and fulfil orders, or register your distribution business with KYC verification." />
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="preconnect" href="https://res.cloudinary.com" crossorigin />
+  <link rel="stylesheet" href="/frontend/css/typography.css">
+  <link rel="stylesheet" href="/frontend/css/portal.css">
+  <link rel="icon" type="image/png" href="https://res.cloudinary.com/dp4yririh/image/upload/v1782967649/fairford/site/m5d8pmtzdjr4dcgctvuc.png">
 </head>
-<body>
-  <!-- Google Tag Manager (noscript) -->
-  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5B2HT6FW"
-  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-  <!-- End Google Tag Manager (noscript) -->
+<body class="pf pf-body">
 
-  <!-- ══════════ AUTH SECTION (shown when not logged in) ══════════ -->
-  <div class="da-auth-wrap" id="dtAuthSection" style="display:none;">
-
-    <!-- Brand panel (left on desktop, top on mobile) -->
-    <div class="da-brand-panel">
-      <div class="da-brand-logo">
-        <h1>Fair Ford Pharma</h1>
-        <p>Distributor Portal</p>
+  <!-- ══════════ AUTH (logged out) ══════════ -->
+  <div id="dtAuth" class="pf-auth" style="display:none">
+    <!-- brand panel -->
+    <aside class="pf-auth-brand">
+      <span class="pf-auth-orb pf-auth-orb--a" aria-hidden="true"></span>
+      <span class="pf-auth-orb pf-auth-orb--b" aria-hidden="true"></span>
+      <a class="pf-brand-logo" href="/index.html">
+        <img src="https://res.cloudinary.com/dp4yririh/image/upload/v1782967649/fairford/site/m5d8pmtzdjr4dcgctvuc.png" alt="Fair Ford">
+        <span><b>Fair Ford Pharma</b><span>Distributor Portal</span></span>
+      </a>
+      <div class="pf-brand-body">
+        <h2>Fulfil orders for your territory.</h2>
+        <p>Sign in to receive and dispatch orders auto-routed to you by retailer pincode — or register your distribution business to join the network.</p>
+        <ul class="pf-feats">
+          <li class="pf-feat"><span class="pf-feat-ico"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></span><span><b>Territory-based routing</b><span>Orders reach you by retailer pincode and city coverage.</span></span></li>
+          <li class="pf-feat"><span class="pf-feat-ico"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/><rect x="6" y="10" width="4" height="10" rx="1"/><rect x="14" y="6" width="4" height="14" rx="1"/></svg></span><span><b>Order management</b><span>Approve, dispatch and track deliveries in one place.</span></span></li>
+          <li class="pf-feat"><span class="pf-feat-ico"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg></span><span><b>Verified network</b><span>Admin-approved accounts with KYC verification.</span></span></li>
+        </ul>
       </div>
+      <div class="pf-brand-foot">&copy; <span id="dtYear"></span> Fair Ford Pharmaceuticals Pvt. Ltd.</div>
+    </aside>
 
-      <ul class="da-features">
-        <li>
-          <div class="da-feat-icon">
-            <svg viewBox="0 0 24 24"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.63L18.3 9.37a1 1 0 0 0-.79-.37H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></svg>
-          </div>
-          <div class="da-feat-text">
-            <strong>Territory-Based Routing</strong>
-            <span>Orders auto-routed to you by retailer pincode and city coverage</span>
-          </div>
-        </li>
-        <li>
-          <div class="da-feat-icon">
-            <svg viewBox="0 0 24 24"><path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/><rect x="6" y="10" width="4" height="10" rx="1"/><rect x="14" y="6" width="4" height="14" rx="1"/></svg>
-          </div>
-          <div class="da-feat-text">
-            <strong>Order Management</strong>
-            <span>Approve, dispatch, and track deliveries from a single dashboard</span>
-          </div>
-        </li>
-        <li>
-          <div class="da-feat-icon">
-            <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
-          </div>
-          <div class="da-feat-text">
-            <strong>Verified Network</strong>
-            <span>Admin-approved accounts with KYC verification for trusted partnerships</span>
-          </div>
-        </li>
-        <li>
-          <div class="da-feat-icon">
-            <svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
-          </div>
-          <div class="da-feat-text">
-            <strong>Real-Time Notifications</strong>
-            <span>Email alerts on new orders so you never miss a fulfilment request</span>
-          </div>
-        </li>
-      </ul>
+    <!-- form panel -->
+    <div class="pf-auth-panel">
+      <div class="pf-auth-card pf-auth-card--wide">
+        <a class="pf-back" href="/index.html"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg> Back to storefront</a>
 
-      <div class="da-brand-footer">
-        &copy; 2026 Fair Ford Pharma. All rights reserved.
-      </div>
-    </div>
-
-    <!-- Form panel (right on desktop, bottom on mobile) -->
-    <div class="da-form-panel">
-      <div class="da-form-card">
-
-        <a href="/index.html" class="da-back">
-          <svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>
-          Back to storefront
-        </a>
-
-        <div class="da-form-header">
-          <h2>Distributor Access</h2>
-          <p>Sign in to manage your orders or create a new distributor account</p>
+        <div class="pf-tabs" role="tablist">
+          <button class="pf-tab is-on" id="tabLogin" type="button" role="tab">Login</button>
+          <button class="pf-tab" id="tabSignup" type="button" role="tab">Create account</button>
         </div>
 
-        <div class="da-tabs">
-          <button class="da-tab active" id="tabLogin" onclick="switchTab('login')">Login</button>
-          <button class="da-tab" id="tabSignup" onclick="switchTab('signup')">Create Account</button>
+        <div class="pf-note pf-note--err" id="authErr"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg><span id="authErrText"></span></div>
+        <div class="pf-note pf-note--warn" id="authWarn"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h16.9a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg><span id="authWarnText"></span></div>
+
+        <!-- ─── LOGIN ─── -->
+        <div id="paneLogin">
+          <div class="pf-auth-head"><h1>Welcome back</h1><p>Sign in to your distributor account.</p></div>
+          <form id="loginForm" novalidate>
+            <div class="pf-field">
+              <label for="loginEmail">Email address</label>
+              <div class="pf-inwrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg><input class="pf-input" type="email" id="loginEmail" autocomplete="email" placeholder="you@company.com" required></div>
+              <span class="pf-err" role="alert"></span>
+            </div>
+            <div class="pf-field">
+              <label for="loginPass">Password</label>
+              <div class="pf-inwrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><input class="pf-input" type="password" id="loginPass" autocomplete="current-password" placeholder="Your password" required><button type="button" class="pf-pw-toggle" data-toggle="loginPass" aria-label="Show password"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></div>
+              <span class="pf-err" role="alert"></span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px">
+              <label class="pf-check" style="margin:0"><input type="checkbox" id="loginRemember"> <span>Remember me</span></label>
+              <a class="pf-link" href="forgot-password.html">Forgot password?</a>
+            </div>
+            <button class="pf-btn pf-btn-primary pf-btn-lg pf-btn-block pf-submit" id="loginBtn" type="submit">
+              <span class="pf-submit-txt">Sign in</span><span class="pf-spin"></span>
+            </button>
+          </form>
+          <p class="pf-auth-alt">Don't have an account? <a class="pf-link" id="toSignup">Create a distributor account</a></p>
+          <div class="pf-auth-support">Trouble signing in? <a class="pf-link" href="contactus.html">Contact support</a></div>
         </div>
 
-        <div class="da-err" id="dtAuthErr">
-          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-          <span id="dtAuthErrText"></span>
+        <!-- ─── SIGNUP WIZARD ─── -->
+        <div id="paneSignup" style="display:none">
+          <div class="pf-auth-head"><h1>Create a distributor account</h1><p>A quick 6-step application. Your account is reviewed by our team before activation.</p></div>
+
+          <div class="pf-steps" id="wSteps">
+            <div class="pf-step active" data-step="1"><span class="pf-step-dot">1</span><span class="pf-step-lbl">Basic</span></div>
+            <div class="pf-step" data-step="2"><span class="pf-step-dot">2</span><span class="pf-step-lbl">Business</span></div>
+            <div class="pf-step" data-step="3"><span class="pf-step-dot">3</span><span class="pf-step-lbl">GST &amp; Licence</span></div>
+            <div class="pf-step" data-step="4"><span class="pf-step-dot">4</span><span class="pf-step-lbl">Address</span></div>
+            <div class="pf-step" data-step="5"><span class="pf-step-dot">5</span><span class="pf-step-lbl">KYC docs</span></div>
+            <div class="pf-step" data-step="6"><span class="pf-step-dot">6</span><span class="pf-step-lbl">Review</span></div>
+          </div>
+
+          <form id="signupForm" novalidate>
+            <!-- Step 1 -->
+            <div class="pf-wstep is-on" data-wstep="1">
+              <div class="pf-wstep-head"><h2>Basic information</h2><p>How we'll identify and reach you.</p></div>
+              <div class="pf-form-row">
+                <div class="pf-field"><label for="rgName">Full name<span class="pf-req">*</span></label><input class="pf-input" id="rgName" autocomplete="name" placeholder="Your name" required><span class="pf-err" role="alert"></span></div>
+                <div class="pf-field"><label for="rgPhone">Mobile number<span class="pf-req">*</span></label><input class="pf-input" id="rgPhone" type="tel" inputmode="numeric" maxlength="10" autocomplete="tel" placeholder="10-digit mobile" required><span class="pf-err" role="alert"></span></div>
+              </div>
+              <div class="pf-field"><label for="rgEmail">Email address<span class="pf-req">*</span></label><input class="pf-input" id="rgEmail" type="email" autocomplete="email" placeholder="you@company.com" required><span class="pf-err" role="alert"></span></div>
+              <div class="pf-form-row">
+                <div class="pf-field"><label for="rgPass">Password<span class="pf-req">*</span></label>
+                  <div class="pf-inwrap"><input class="pf-input" id="rgPass" type="password" autocomplete="new-password" placeholder="Create a strong password" required style="padding-left:14px"><button type="button" class="pf-pw-toggle" data-toggle="rgPass" aria-label="Show password"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></div>
+                  <div class="pf-pw-meter" aria-hidden="true"><span class="pf-pw-bar"></span><span class="pf-pw-bar"></span><span class="pf-pw-bar"></span><span class="pf-pw-bar"></span></div>
+                  <span class="pf-pw-label" id="rgPassLabel">Min 12 characters · upper, lower, number &amp; symbol (@$!%*?&amp;)</span>
+                  <span class="pf-err" role="alert"></span>
+                </div>
+                <div class="pf-field"><label for="rgConfirm">Confirm password<span class="pf-req">*</span></label>
+                  <div class="pf-inwrap"><input class="pf-input" id="rgConfirm" type="password" autocomplete="new-password" placeholder="Repeat password" required style="padding-left:14px"><button type="button" class="pf-pw-toggle" data-toggle="rgConfirm" aria-label="Show password"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></div>
+                  <span class="pf-err" role="alert"></span>
+                </div>
+              </div>
+              <div class="pf-wnav"><button type="button" class="pf-btn pf-btn-primary" data-next="1">Continue</button></div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="pf-wstep" data-wstep="2">
+              <div class="pf-wstep-head"><h2>Business information</h2><p>Your distribution company details.</p></div>
+              <div class="pf-field"><label for="rgBusiness">Business / company name<span class="pf-req">*</span></label><input class="pf-input" id="rgBusiness" autocomplete="organization" placeholder="e.g. Sharma Distributors Pvt. Ltd." required><span class="pf-err" role="alert"></span></div>
+              <div class="pf-field"><label for="rgContactRole">Your role <span class="pf-optional">(optional)</span></label>
+                <select class="pf-select" id="rgContactRole"><option value="">Select…</option><option>Owner / Proprietor</option><option>Partner / Director</option><option>Manager</option><option>Authorised representative</option></select>
+              </div>
+              <div class="pf-wnav"><button type="button" class="pf-btn pf-btn-ghost" data-prev="2">Back</button><button type="button" class="pf-btn pf-btn-primary" data-next="2">Continue</button></div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="pf-wstep" data-wstep="3">
+              <div class="pf-wstep-head"><h2>GST &amp; licence details</h2><p>Required for pharmaceutical trade compliance.</p></div>
+              <div class="pf-field"><label for="rgGst">GST number<span class="pf-req">*</span></label><input class="pf-input" id="rgGst" placeholder="e.g. 27AABCU9603R1ZM" maxlength="15" style="text-transform:uppercase"><span class="pf-hint">15-character GSTIN</span><span class="pf-err" role="alert"></span></div>
+              <div class="pf-field"><label for="rgLicence">Drug licence number<span class="pf-req">*</span></label><input class="pf-input" id="rgLicence" placeholder="e.g. 20B/21B-XXXXX"><span class="pf-err" role="alert"></span></div>
+              <div class="pf-field"><label for="rgPan">PAN number <span class="pf-optional">(optional)</span></label><input class="pf-input" id="rgPan" placeholder="e.g. AABCU9603R" maxlength="10" style="text-transform:uppercase"><span class="pf-err" role="alert"></span></div>
+              <div class="pf-wnav"><button type="button" class="pf-btn pf-btn-ghost" data-prev="3">Back</button><button type="button" class="pf-btn pf-btn-primary" data-next="3">Continue</button></div>
+            </div>
+
+            <!-- Step 4 -->
+            <div class="pf-wstep" data-wstep="4">
+              <div class="pf-wstep-head"><h2>Base address</h2><p>Your operating location. Your service territory &amp; pincodes are assigned by our team on approval.</p></div>
+              <div class="pf-field"><label for="rgAddress">Street address<span class="pf-req">*</span></label><input class="pf-input" id="rgAddress" autocomplete="street-address" placeholder="Building, street, area" required><span class="pf-err" role="alert"></span></div>
+              <div class="pf-form-row--3">
+                <div class="pf-field"><label for="rgCity">City<span class="pf-req">*</span></label><input class="pf-input" id="rgCity" autocomplete="address-level2" placeholder="City" required><span class="pf-err" role="alert"></span></div>
+                <div class="pf-field"><label for="rgState">State<span class="pf-req">*</span></label><input class="pf-input" id="rgState" autocomplete="address-level1" placeholder="State" required><span class="pf-err" role="alert"></span></div>
+                <div class="pf-field"><label for="rgPincode">PIN code<span class="pf-req">*</span></label><input class="pf-input" id="rgPincode" inputmode="numeric" maxlength="6" placeholder="6-digit" required><span class="pf-err" role="alert"></span></div>
+              </div>
+              <div class="pf-note pf-note--info is-on" style="position:static"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg><span>Territory &amp; serviceable pincodes are configured by Fair Ford after KYC approval — you don't set these yourself.</span></div>
+              <div class="pf-wnav"><button type="button" class="pf-btn pf-btn-ghost" data-prev="4">Back</button><button type="button" class="pf-btn pf-btn-primary" data-next="4">Continue</button></div>
+            </div>
+
+            <!-- Step 5 -->
+            <div class="pf-wstep" data-wstep="5">
+              <div class="pf-wstep-head"><h2>KYC documents</h2><p>Upload clear scans or photos. JPG, PNG or PDF · up to 5 MB each.</p></div>
+              <div id="kycDrops"></div>
+              <div class="pf-wnav"><button type="button" class="pf-btn pf-btn-ghost" data-prev="5">Back</button><button type="button" class="pf-btn pf-btn-primary" data-next="5">Continue</button></div>
+            </div>
+
+            <!-- Step 6 -->
+            <div class="pf-wstep" data-wstep="6">
+              <div class="pf-wstep-head"><h2>Review &amp; submit</h2><p>Please confirm your details before submitting for approval.</p></div>
+              <div class="pf-info-grid" id="reviewGrid" style="margin-bottom:16px"></div>
+              <label class="pf-check" style="margin-bottom:16px"><input type="checkbox" id="rgConsent" required> <span>I confirm the information and documents are accurate, and I accept the <a class="pf-link" href="T&C.html" target="_blank" rel="noopener">Terms &amp; Conditions</a> and <a class="pf-link" href="privacy&policy.html" target="_blank" rel="noopener">Privacy Policy</a>.</span></label>
+              <div class="pf-wnav"><button type="button" class="pf-btn pf-btn-ghost" data-prev="6">Back</button>
+                <button type="submit" class="pf-btn pf-btn-primary pf-submit" id="signupBtn"><span class="pf-submit-txt">Submit application</span><span class="pf-spin"></span></button>
+              </div>
+            </div>
+          </form>
+          <p class="pf-auth-alt">Already registered? <a class="pf-link" id="toLogin">Sign in</a></p>
         </div>
-
-        <!-- ── Login form ── -->
-        <form class="da-auth-form active" id="loginForm" onsubmit="return handleLogin(event)">
-          <div class="da-field">
-            <label>Email</label>
-            <div class="da-input-wrap">
-              <svg viewBox="0 0 24 24"><path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
-              <input type="email" id="loginEmail" required placeholder="you@company.com" autocomplete="email" />
-            </div>
-          </div>
-          <div class="da-field">
-            <label>Password</label>
-            <div class="da-input-wrap">
-              <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-              <input type="password" id="loginPass" required placeholder="Enter your password" autocomplete="current-password" />
-            </div>
-          </div>
-          <button class="da-submit" type="submit" id="loginBtn">Sign In</button>
-        </form>
-
-        <!-- ── Signup form ── -->
-        <form class="da-auth-form" id="signupForm" onsubmit="return handleSignup(event)">
-          <div class="da-row">
-            <div class="da-field">
-              <label>Full Name <span class="req">*</span></label>
-              <div class="da-input-wrap">
-                <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                <input type="text" id="regName" required placeholder="Your name" autocomplete="name" />
-              </div>
-            </div>
-            <div class="da-field">
-              <label>Email <span class="req">*</span></label>
-              <div class="da-input-wrap">
-                <svg viewBox="0 0 24 24"><path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
-                <input type="email" id="regEmail" required placeholder="you@company.com" autocomplete="email" />
-              </div>
-            </div>
-          </div>
-
-          <div class="da-field">
-            <label>Business / Company Name</label>
-            <div class="da-input-wrap">
-              <svg viewBox="0 0 24 24"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></svg>
-              <input type="text" id="regBusiness" placeholder="Your distribution company" />
-            </div>
-          </div>
-
-          <div class="da-row">
-            <div class="da-field">
-              <label>Phone</label>
-              <div class="da-input-wrap">
-                <svg viewBox="0 0 24 24"><path d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384"/></svg>
-                <input type="tel" id="regPhone" placeholder="10-digit mobile" />
-              </div>
-            </div>
-            <div class="da-field">
-              <label>GST Number</label>
-              <div class="da-input-wrap">
-                <svg viewBox="0 0 24 24"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>
-                <input type="text" id="regGst" placeholder="e.g. 27AABCU9603R1ZM" />
-              </div>
-            </div>
-          </div>
-
-          <div class="da-field">
-            <label>Address</label>
-            <div class="da-input-wrap">
-              <svg viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-              <input type="text" id="regAddress" placeholder="Street address" />
-            </div>
-          </div>
-
-          <div class="da-row">
-            <div class="da-field">
-              <label>City</label>
-              <input class="no-icon" type="text" id="regCity" placeholder="City" />
-            </div>
-            <div class="da-field">
-              <label>State</label>
-              <input class="no-icon" type="text" id="regState" placeholder="State" />
-            </div>
-            <div class="da-field">
-              <label>PIN Code</label>
-              <input class="no-icon" type="text" id="regPincode" placeholder="6-digit" maxlength="6" />
-            </div>
-          </div>
-
-          <div class="da-field">
-            <label>Password <span class="req">*</span></label>
-            <div class="da-input-wrap">
-              <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-              <input type="password" id="regPass" required placeholder="Create a strong password" autocomplete="new-password" />
-            </div>
-            <div class="da-pw-hint">Min 12 characters with uppercase, lowercase, number, and special character (@$!%*?&amp;)</div>
-          </div>
-
-          <div class="da-field">
-            <label>Confirm Password <span class="req">*</span></label>
-            <div class="da-input-wrap">
-              <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-              <input type="password" id="regConfirm" required placeholder="Repeat your password" autocomplete="new-password" />
-            </div>
-          </div>
-
-          <button class="da-submit" type="submit" id="signupBtn">Create Distributor Account</button>
-        </form>
-
-        <div class="da-switch" id="dtSwitch">
-          Don't have an account? <a onclick="switchTab('signup')">Sign up</a>
-        </div>
-
       </div>
     </div>
-
   </div>
 
-  <!-- ══════════ DASHBOARD (shown when logged in) ══════════ -->
-  <div id="dtDashboard" style="display:none;">
-    <header class="rt-header">
-      <div class="rt-brand">Fair Ford Pharma <small>Distributor fulfillment</small></div>
-      <div class="rt-user">
-        <span id="dtUserName">&hellip;</span>
-        <button class="rt-logout" id="dtLogout">Logout</button>
+  <!-- ══════════ DASHBOARD (logged in) ══════════ -->
+  <div id="dtDash" style="display:none">
+    <header class="pf-topbar">
+      <div class="pf-topbar-inner">
+        <a class="pf-topbar-logo" href="/index.html"><img src="https://res.cloudinary.com/dp4yririh/image/upload/v1782967649/fairford/site/m5d8pmtzdjr4dcgctvuc.png" alt="Fair Ford"><span><b>Fair Ford Pharma</b><small>Distributor</small></span></a>
+        <div class="pf-topbar-spacer"></div>
+        <div class="pf-topbar-user">
+          <div class="pf-topbar-name" id="dtName">Distributor<small id="dtEmail"></small></div>
+          <div class="pf-avatar" id="dtAvatar">D</div>
+          <button class="pf-btn pf-btn-ghost pf-btn-sm" id="dtLogout">Logout</button>
+        </div>
       </div>
     </header>
 
-    <main class="rt-wrap">
-      <!-- KYC / status banner -->
-      <div class="rt-banner warn" id="dtBanner">
-        Your account is <strong>pending approval</strong>. You'll be able to view and fulfil orders
-        once an admin activates your account.
+    <main class="pf-wrap">
+      <div class="pf-pagehead"><div><h1>Dashboard</h1><p>Orders routed to your territory, at a glance.</p></div>
+        <button class="pf-btn pf-btn-ghost pf-btn-sm" id="dtRefresh"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/></svg> Refresh</button>
       </div>
 
-      <!-- Coverage (read-only — managed by admin) -->
-      <section class="rt-card">
-        <h2>My coverage <span class="sub">to change territory or pincodes, contact Fair Ford admin</span></h2>
-        <div class="rt-form-row">
-          <div class="rt-field" style="flex:1 1 220px;">
-            <label>Business name</label>
-            <input id="dfBusiness" type="text" disabled />
+      <div class="pf-banner pf-banner--warn" id="dtBanner" style="display:none"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h16.9a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg><span><b>Account pending approval.</b> You'll be able to view and fulfil orders once an admin activates your account after KYC review.</span></div>
+
+      <div class="pf-tiles" id="dtTiles"></div>
+
+      <section class="pf-card">
+        <div class="pf-card-head"><h2>Order management</h2><span class="pf-sub" id="dtOrderCount"></span></div>
+        <div class="pf-card-body">
+          <div class="pf-toolbar" style="margin-bottom:16px">
+            <div class="pf-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg><input id="dtSearch" type="search" placeholder="Search order # or retailer…"></div>
+            <select class="pf-select" id="dtStatusFilter"><option value="">All statuses</option><option value="pending">Pending</option><option value="approved">Accepted</option><option value="dispatched">Dispatched</option><option value="delivered">Delivered</option><option value="cancelled">Cancelled</option></select>
+            <select class="pf-select" id="dtDateFilter"><option value="">Any time</option><option value="7">Last 7 days</option><option value="30">Last 30 days</option><option value="90">Last 90 days</option></select>
           </div>
-          <div class="rt-field" style="flex:1 1 220px;">
-            <label>Base address</label>
-            <input id="dfAddress" type="text" disabled />
-          </div>
-          <div class="rt-field">
-            <label>Territory</label>
-            <input id="dfTerritory" type="text" disabled />
-          </div>
-          <div class="rt-field">
-            <label>Serviceable pincodes</label>
-            <input id="dfPincodes" type="text" disabled />
-          </div>
-          <div class="rt-field">
-            <label>Contact</label>
-            <input id="dfContact" type="text" disabled />
-          </div>
+          <div id="dtOrders"><div class="pf-empty"><div class="pf-empty-ico"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4zM3 6h18M16 10a4 4 0 0 1-8 0"/></svg></div><h3>Loading orders…</h3></div></div>
         </div>
       </section>
 
-      <!-- Orders -->
-      <section class="rt-card">
-        <h2>Order queue <span class="sub">orders routed to you by nearest-distributor matching</span></h2>
-        <select class="rt-search" id="dtStatusFilter">
-          <option value="">All statuses</option>
-          <option value="pending">Pending</option>
-          <option value="approved">Approved</option>
-          <option value="dispatched">Dispatched</option>
-          <option value="delivered">Delivered</option>
-          <option value="returned">Returned</option>
-          <option value="cancelled">Cancelled</option>
-        </select>
-        <div id="dtOrders">
-          <p class="rt-empty">Loading orders&hellip;</p>
+      <section class="pf-card">
+        <div class="pf-card-head"><h2>My coverage</h2><span class="pf-sub">To change your territory or pincodes, contact Fair Ford admin</span></div>
+        <div class="pf-card-body">
+          <dl class="pf-info-grid" id="dtCoverage"></dl>
+          <a class="pf-btn pf-btn-ghost pf-btn-sm" style="margin-top:16px" href="contactus.html?enquiry=distributor"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg> Request a territory change</a>
         </div>
       </section>
     </main>
   </div>
 
-  <div class="rt-toast" id="dtToast"></div>
+  <div class="pf-toast" id="dtToast" role="status" aria-live="polite"></div>
 
   <script src="/frontend/js/logout-confirm.js"></script>
   <script src="/frontend/js/distributor.js"></script>

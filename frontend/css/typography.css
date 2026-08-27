@@ -1,0 +1,420 @@
+/* ==================================================================
+   FAIR FORD PHARMACEUTICALS — TYPOGRAPHY SYSTEM
+   typography.css · Clash Display (display) + Satoshi (text)
+   ------------------------------------------------------------------
+   Single source of truth for type across the site. Loaded first on
+   every page, before the page's own stylesheet, so anything here can
+   still be overridden locally where a component needs it.
+
+   Roles
+     Clash Display — headings, hero titles, section titles, product
+                     names, statistics and other display numerals.
+     Satoshi       — body copy, navigation, buttons, forms, labels,
+                     tables and every other supporting text.
+
+   Both come from Fontshare, not Google Fonts, so the pages carry two
+   <link> tags (its API returns only the first family per request) and
+   the CSP allows api.fontshare.com + cdn.fontshare.com.
+
+   The site previously ran nine different families (Plus Jakarta Sans,
+   Poppins, DM Sans, Geist, Bricolage Grotesque, Inter, Roboto, Sora,
+   Syne). Rather than rewrite several hundred rules, the legacy variable
+   names those rules already reference are forwarded to the two new
+   roles below — so every existing rule inherits the new system.
+
+   To change the fonts site-wide, change --ff-font-heading and
+   --ff-font-body here. Nothing else needs touching.
+   ================================================================== */
+
+/* ==================================================================
+   SATOSHI WEIGHT 600 SHIM
+   Satoshi ships 300 / 400 / 500 / 700 / 900 — there is no 600. Left
+   alone, the ~90 `font-weight: 600` declarations across this codebase
+   would each round UP to Bold, making buttons, badges, table headers
+   and every <strong> noticeably heavier than intended. Mapping 600 to
+   the Medium file keeps them at the weight the design asks for without
+   rewriting those declarations.
+
+   The URL is content-addressed by Fontshare. If it ever rotates the
+   face simply fails to load and the browser falls back to the family's
+   own 500/700 — degraded, never broken.
+   ================================================================== */
+/* ------------------------------------------------------------------
+   FONT LOADING — Playfair Display (display) + Lato (text), Google Fonts.
+   The CSP already allows fonts.googleapis.com + fonts.gstatic.com. The
+   Uphaar page (uphaar.css) and Nueva Vida page (nueva-vida.css) re-pin
+   --ff-font-heading / --ff-font-body back to their own faces, so this
+   system does NOT change those two pages.
+   ------------------------------------------------------------------ */
+@import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
+
+@font-face {
+    font-family: 'Satoshi';
+    src: url('https://cdn.fontshare.com/wf/P2LQKHE6KA6ZP4AAGN72KDWMHH6ZH3TA/ZC32TK2P7FPS5GFTL46EU6KQJA24ZYDB/7AHDUZ4A7LFLVFUIFSARGIWCRQJHISQP.woff2') format('woff2');
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}
+
+:root {
+    /* ---- Canonical roles ---------------------------------------- */
+    --ff-font-heading: 'Playfair Display', Georgia, Cambria, 'Times New Roman', serif;
+    --ff-font-body:    'Lato', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    /* Kept as a system stack: used for order ids, SKUs and ledger
+       columns in the dashboards, where figures must align. No webfont
+       download, and Satoshi's tabular numerals cover the rest. */
+    --ff-font-mono:    ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+
+    /* ---- Legacy aliases -----------------------------------------
+       Names already used throughout the older stylesheets. Forwarding
+       them keeps ~180 existing declarations working untouched. */
+    --font-heading:        var(--ff-font-heading);
+    --font-display:        var(--ff-font-heading);
+    --font-serif:          var(--ff-font-heading);
+    --font-family-heading: var(--ff-font-heading);
+    --font-body:           var(--ff-font-body);
+    --font-sans:           var(--ff-font-body);
+    --font-family:         var(--ff-font-body);
+    --font:                var(--ff-font-body);
+    --font-mono:           var(--ff-font-mono);
+
+    /* ---- Weights -------------------------------------------------
+       Clash Display tops out at 700, so --fw-extrabold resolves there
+       rather than to a synthesised 800. Both faces carry real cuts at
+       every value below, including 600 via the shim above. */
+    --fw-regular:   400;
+    --fw-medium:    500;
+    --fw-semibold:  600;
+    --fw-bold:      700;
+    --fw-extrabold: 700;
+
+    /* ---- Optical letter-spacing ---------------------------------
+       Clash Display is a display face and already sets fairly tight,
+       so it needs roughly half the negative tracking Manrope did —
+       pulling it in as hard would collide the counters at large sizes.
+       Satoshi sets evenly and wants none at text sizes. */
+    --ls-hero:  -0.018em;
+    --ls-h1:    -0.015em;
+    --ls-h2:    -0.012em;
+    --ls-h3:    -0.009em;
+    --ls-h4:    -0.006em;
+    --ls-body:   0;
+    --ls-label:  0.012em;
+    --ls-caps:   0.11em;
+
+    /* ---- Line heights -------------------------------------------- */
+    --lh-hero:    1.06;
+    --lh-heading: 1.18;
+    --lh-snug:    1.35;
+    --lh-body:    1.7;
+}
+
+/* ==================================================================
+   BASE
+   Low specificity on purpose — these are defaults, not overrides.
+   ================================================================== */
+html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+}
+
+body {
+    font-family: var(--ff-font-body);
+    font-weight: var(--fw-regular);
+    line-height: var(--lh-body);
+    letter-spacing: var(--ls-body);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    /* Ligatures and contextual alternates on; Satoshi's defaults are good. */
+    font-feature-settings: 'liga' 1, 'calt' 1;
+}
+
+/* Form controls do not inherit type by default in any browser. */
+button,
+input,
+select,
+textarea,
+optgroup {
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+    letter-spacing: inherit;
+}
+
+code, kbd, samp, pre {
+    font-family: var(--ff-font-mono);
+    font-feature-settings: normal;
+}
+
+/* ==================================================================
+   HEADINGS — Clash Display
+   Weights follow the brief: 700 for hero, 700 for section titles,
+   600 for subheads. Tracking tightens as size grows.
+   ================================================================== */
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--ff-font-heading);
+    font-optical-sizing: auto;
+    text-wrap: balance;          /* avoids a single orphaned word on a heading */
+}
+
+h1 {
+    font-weight: var(--fw-extrabold);
+    line-height: var(--lh-hero);
+    letter-spacing: var(--ls-h1);
+}
+
+h2 {
+    font-weight: var(--fw-bold);
+    line-height: var(--lh-heading);
+    letter-spacing: var(--ls-h2);
+}
+
+h3 {
+    font-weight: var(--fw-bold);
+    line-height: var(--lh-heading);
+    letter-spacing: var(--ls-h3);
+}
+
+h4 {
+    font-weight: var(--fw-semibold);
+    line-height: var(--lh-snug);
+    letter-spacing: var(--ls-h4);
+}
+
+h5, h6 {
+    font-weight: var(--fw-semibold);
+    line-height: var(--lh-snug);
+    letter-spacing: var(--ls-label);
+}
+
+/* ==================================================================
+   DISPLAY / HERO
+   The hero headline carries the heaviest cut Clash Display offers.
+   Tracking is pulled in hardest here so it reads as one mass.
+   ================================================================== */
+.hero-content h1,
+.hero-content h2,
+.hero-title,
+.nv-band__q,
+.main-heading {
+    font-family: var(--ff-font-heading);
+    font-weight: var(--fw-extrabold);
+    line-height: var(--lh-hero);
+    letter-spacing: var(--ls-hero);
+}
+
+/* Section titles sit a step down: still Clash Display, 700, looser. */
+.section-title,
+.section-heading,
+.sec-head h2,
+.sec-title {
+    font-family: var(--ff-font-heading);
+    font-weight: var(--fw-bold);
+    letter-spacing: var(--ls-h2);
+}
+
+/* ==================================================================
+   NAVIGATION — Satoshi 500/600
+   ================================================================== */
+.nav-link,
+.drawer-link,
+.nav-links a,
+.nav-links-mobile a,
+.topbar__link,
+.footer-links a,
+.footer nav a {
+    font-family: var(--ff-font-body);
+    font-weight: var(--fw-medium);
+    letter-spacing: var(--ls-label);
+}
+
+.nav-link.is-active,
+.nav-link--promo,
+.nav-link--nueva {
+    font-weight: var(--fw-semibold);
+}
+
+/* ==================================================================
+   BUTTONS & FORM CONTROLS — Satoshi 600 / 400
+   ================================================================== */
+button,
+.btn,
+.btn-primary,
+.btn-secondary,
+.btn-signin,
+.drawer-cta,
+.cta-link,
+.nv-btn,
+input[type="submit"],
+input[type="button"] {
+    font-family: var(--ff-font-body);
+    font-weight: var(--fw-semibold);
+    letter-spacing: var(--ls-label);
+}
+
+input,
+select,
+textarea {
+    font-family: var(--ff-font-body);
+    font-weight: var(--fw-regular);
+    letter-spacing: var(--ls-body);
+}
+
+label,
+.form-label,
+.field-label {
+    font-family: var(--ff-font-body);
+    font-weight: var(--fw-medium);
+    letter-spacing: var(--ls-label);
+}
+
+/* Small uppercase eyebrows and badges stay Satoshi — uppercase Clash
+   at small sizes reads as shouting rather than as a label. */
+.badge,
+.tag-badge,
+.hero-badge,
+.eyebrow,
+.chip {
+    font-family: var(--ff-font-body);
+    font-weight: var(--fw-semibold);
+}
+
+/* ==================================================================
+   PRODUCTS — names in Clash Display, copy in Satoshi
+   ================================================================== */
+.product-card__title,
+.product-title,
+.pd-title,
+.product-name,
+.nv-card__name,
+.nv-show__name {
+    font-family: var(--ff-font-heading);
+    font-weight: var(--fw-semibold);
+    letter-spacing: var(--ls-h4);
+}
+
+.product-card__desc,
+.product-desc,
+.pd-desc,
+.product-description,
+.nv-card__cat {
+    font-family: var(--ff-font-body);
+    font-weight: var(--fw-regular);
+}
+
+/* Prices and pack figures read as data, not prose. */
+.product-card__price,
+.price,
+.pd-price {
+    font-family: var(--ff-font-heading);
+    font-weight: var(--fw-bold);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: var(--ls-h4);
+}
+
+/* ==================================================================
+   STATISTICS / COUNTERS — Clash Display 700, aligned figures
+   ================================================================== */
+.stat-box h2,
+.stat-number,
+.stat-value,
+.counter,
+.count,
+.kpi-value,
+.metric-value,
+.sa-stat-value,
+.stat h3 {
+    font-family: var(--ff-font-heading);
+    font-weight: var(--fw-extrabold);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: var(--ls-h2);
+    line-height: 1.05;
+}
+
+.stat-box span,
+.stat-label,
+.kpi-label,
+.metric-label {
+    font-family: var(--ff-font-body);
+    font-weight: var(--fw-medium);
+    letter-spacing: var(--ls-caps);
+}
+
+/* Any table of figures: keep columns aligned. */
+table,
+.table,
+td, th {
+    font-family: var(--ff-font-body);
+    font-variant-numeric: tabular-nums;
+}
+
+th {
+    font-weight: var(--fw-semibold);
+    letter-spacing: var(--ls-label);
+}
+
+/* ==================================================================
+   BODY COPY
+   ================================================================== */
+p, li, dd, dt, blockquote, figcaption, small {
+    font-family: var(--ff-font-body);
+}
+
+p {
+    line-height: var(--lh-body);
+}
+
+strong, b {
+    font-weight: var(--fw-semibold);
+}
+
+/* ==================================================================
+   RESPONSIVE TRACKING
+   Only letter-spacing and line-height are relaxed on smaller screens —
+   font sizes are left to each page's own clamp()/media rules so no
+   existing layout shifts. Tight display tracking that looks composed
+   at 60px looks cramped at 30px, so it is eased back as sizes drop.
+   ================================================================== */
+@media (max-width: 900px) {
+    :root {
+        --ls-hero: -0.012em;
+        --ls-h1:   -0.010em;
+        --ls-h2:   -0.008em;
+        --ls-h3:   -0.006em;
+        --ls-h4:   -0.004em;
+    }
+
+    h1 { line-height: 1.12; }
+    h2, h3 { line-height: 1.22; }
+}
+
+@media (max-width: 560px) {
+    :root {
+        --ls-hero: -0.006em;
+        --ls-h1:   -0.005em;
+        --ls-h2:   -0.004em;
+        --ls-h3:   -0.002em;
+        --ls-h4:    0;
+        --lh-body: 1.65;
+    }
+
+    h1 { line-height: 1.15; }
+
+    /* Long product names and headlines must never push a card wide. */
+    h1, h2, h3, h4,
+    .product-card__title,
+    .hero-content h1,
+    .hero-content h2 {
+        overflow-wrap: break-word;
+        word-break: normal;
+    }
+}
+
+/* ==================================================================
+   ACCESSIBILITY
+   ================================================================== */
+@media (prefers-reduced-motion: reduce) {
+    /* text-wrap: balance forces a re-layout on resize; harmless, but
+       drop the extra work for users who have asked for less motion. */
+    h1, h2, h3, h4, h5, h6 { text-wrap: normal; }
+}

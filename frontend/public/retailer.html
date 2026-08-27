@@ -1,123 +1,138 @@
 <!DOCTYPE html>
 <html lang="en">
-<head><!-- Google Tag Manager -->
-<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-5B2HT6FW');</script>
-<!-- End Google Tag Manager -->
- <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-BMMC558M13"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-BMMC558M13');
-</script>
+<head>
   <meta charset="UTF-8" />
-    <meta name="robots" content="noindex, nofollow" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Fair Ford — Retailer</title>
-  <link rel="stylesheet" href="/frontend/css/retailer.css" />
+  <meta name="theme-color" content="#0F4C81" />
+  <title>Retailer Portal — Fair Ford Pharmaceuticals</title>
+  <meta name="description" content="Fair Ford Pharmaceuticals retailer portal — browse products, reorder, track orders and manage your shop." />
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="preconnect" href="https://res.cloudinary.com" crossorigin />
+  <link rel="stylesheet" href="/frontend/css/typography.css">
+  <link rel="stylesheet" href="/frontend/css/portal.css">
+  <link rel="icon" type="image/png" href="https://res.cloudinary.com/dp4yririh/image/upload/v1782967649/fairford/site/m5d8pmtzdjr4dcgctvuc.png">
 </head>
-<body><!-- Google Tag Manager (noscript) -->
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5B2HT6FW"
-height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-<!-- End Google Tag Manager (noscript) -->
-  <header class="rt-header">
-    <div class="rt-brand">Fair Ford Pharma <small>Retailer ordering</small></div>
-    <div class="rt-user">
-      <span id="rtUserName">…</span>
-      <button class="rt-logout" id="rtLogout">Logout</button>
+<body class="pf pf-body">
+
+  <header class="pf-topbar">
+    <div class="pf-topbar-inner">
+      <a class="pf-topbar-logo" href="/index.html"><img src="https://res.cloudinary.com/dp4yririh/image/upload/v1782967649/fairford/site/m5d8pmtzdjr4dcgctvuc.png" alt="Fair Ford"><span><b>Fair Ford Pharma</b><small>Retailer</small></span></a>
+      <div class="pf-topbar-spacer"></div>
+      <div class="pf-topbar-user">
+        <div class="pf-topbar-name" id="rtUserName">Retailer</div>
+        <div class="pf-avatar" id="rtAvatar">R</div>
+        <button class="pf-btn pf-btn-ghost pf-btn-sm" id="rtLogout">Logout</button>
+      </div>
     </div>
   </header>
 
-  <main class="rt-wrap">
-    <!-- KYC / status banner -->
-    <div class="rt-banner warn" id="rtBanner">
-      Your account is <strong>pending approval</strong>. You can browse and set your address,
-      but you can place orders only after an admin activates your account.
-    </div>
+  <main class="pf-wrap">
+    <div class="pf-banner pf-banner--warn" id="rtBanner" style="display:none"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h16.9a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg><span><b>Account pending approval.</b> You can browse and build a cart now — placing orders unlocks once your KYC is approved.</span></div>
 
-    <!-- Shop & delivery address (drives order routing) -->
-    <section class="rt-card">
-      <h2>Shop &amp; delivery address <span class="sub">orders are routed to the nearest distributor by your pincode</span></h2>
-      <div class="rt-form-row">
-        <div class="rt-field" style="flex:1 1 220px;">
-          <label for="afShop">Shop name</label>
-          <input id="afShop" type="text" placeholder="Shop name" />
+    <!-- section nav -->
+    <nav class="pf-nav" id="rtNav">
+      <button class="pf-nav-btn is-on" data-sec="overview"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg> Overview</button>
+      <button class="pf-nav-btn" data-sec="products"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 4.3 9 5.2M21 8l-9 5-9-5 9-5 9 5zM3 8v8l9 5 9-5V8"/></svg> Products</button>
+      <button class="pf-nav-btn" data-sec="cart"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"/></svg> Cart <span class="pf-nav-badge" id="rtCartBadge">0</span></button>
+      <button class="pf-nav-btn" data-sec="orders"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4zM3 6h18M16 10a4 4 0 0 1-8 0"/></svg> My orders</button>
+      <button class="pf-nav-btn" data-sec="rewards"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12v10H4V12M2 7h20v5H2zM12 22V7M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg> Rewards</button>
+      <button class="pf-nav-btn" data-sec="wishlist"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 1 0-7.8 7.8l8.9 8.9 8.8-8.9a5.5 5.5 0 0 0 0-7.8z"/></svg> Wishlist <span class="pf-nav-badge" id="rtWishBadge">0</span></button>
+      <button class="pf-nav-btn" data-sec="profile"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Profile</button>
+    </nav>
+
+    <!-- OVERVIEW -->
+    <section class="pf-section is-on" data-sec="overview">
+      <div class="pf-pagehead"><div><h1 id="rtHello">Welcome back</h1><p>Your ordering activity at a glance.</p></div></div>
+      <div class="pf-tiles" id="rtTiles"></div>
+      <div class="pf-card">
+        <div class="pf-card-head"><h2>Quick actions</h2></div>
+        <div class="pf-card-body" style="display:flex;gap:10px;flex-wrap:wrap">
+          <button class="pf-btn pf-btn-primary" data-go="products"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg> Order products</button>
+          <button class="pf-btn pf-btn-ghost" id="rtReorderLast"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5"/></svg> Reorder last order</button>
+          <button class="pf-btn pf-btn-ghost" data-go="orders"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg> Track orders</button>
+          <button class="pf-btn pf-btn-ghost" data-go="rewards"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12v10H4V12M2 7h20v5H2zM12 22V7M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg> Uphaar rewards</button>
         </div>
-        <div class="rt-field" style="flex:1 1 220px;">
-          <label for="afStreet">Street</label>
-          <input id="afStreet" type="text" placeholder="Street / area" />
-        </div>
-        <div class="rt-field">
-          <label for="afCity">City</label>
-          <input id="afCity" type="text" placeholder="City" />
-        </div>
-        <div class="rt-field">
-          <label for="afState">State</label>
-          <input id="afState" type="text" placeholder="State" />
-        </div>
-        <div class="rt-field">
-          <label for="afPincode">Pincode</label>
-          <input id="afPincode" type="text" inputmode="numeric" maxlength="6" placeholder="6-digit" />
-        </div>
-        <div class="rt-field" style="flex:0 0 auto; justify-content:flex-end;">
-          <label>&nbsp;</label>
-          <button class="btn btn-primary" id="afSave">Save address</button>
-        </div>
+      </div>
+      <div class="pf-card">
+        <div class="pf-card-head"><h2>Recent orders</h2><a class="pf-link pf-sub" data-go="orders">View all</a></div>
+        <div class="pf-card-body" id="rtRecent"><div class="pf-empty"><p>Loading…</p></div></div>
       </div>
     </section>
 
-    <div class="rt-grid">
-      <!-- Products -->
-      <section class="rt-card">
-        <h2>Products</h2>
-        <input class="rt-search" id="rtSearch" type="search" placeholder="Search medicines by name or brand…" />
-        <div class="rt-products" id="rtProducts">
-          <p class="rt-empty">Loading products…</p>
-        </div>
-      </section>
+    <!-- PRODUCTS -->
+    <section class="pf-section" data-sec="products">
+      <div class="pf-pagehead"><div><h1>Products</h1><p>Search the catalogue and add to your cart.</p></div></div>
+      <div class="pf-search" style="max-width:420px;margin-bottom:18px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg><input id="rtSearch" type="search" placeholder="Search by product or brand…"></div>
+      <div class="pf-prod-grid" id="rtProducts"><div class="pf-empty" style="grid-column:1/-1"><p>Loading products…</p></div></div>
+    </section>
 
-      <!-- Cart -->
-      <section class="rt-card rt-cart">
-        <h2>Your cart</h2>
-        <div id="rtCartBody">
-          <p class="rt-empty">Your cart is empty.</p>
+    <!-- CART -->
+    <section class="pf-section" data-sec="cart">
+      <div class="pf-pagehead"><div><h1>Your cart</h1><p>Review items and place your order.</p></div></div>
+      <div class="pf-card"><div class="pf-card-body">
+        <div id="rtCartBody"><div class="pf-empty"><div class="pf-empty-ico"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"/></svg></div><h3>Your cart is empty</h3><p>Add products to build an order.</p><button class="pf-btn pf-btn-primary" data-go="products">Browse products</button></div></div>
+        <div class="pf-totals" id="rtTotals" style="display:none">
+          <div class="pf-totals-row"><span>Subtotal</span><span id="ttSub">₹0</span></div>
+          <div class="pf-totals-row"><span>GST</span><span id="ttGst">₹0</span></div>
+          <div class="pf-totals-row grand"><span>Total</span><span id="ttGrand">₹0</span></div>
+          <button class="pf-btn pf-btn-primary pf-btn-lg pf-btn-block" id="rtPlace" style="margin-top:16px;display:none">Place order · Cash on delivery</button>
+          <button class="pf-btn pf-btn-ghost pf-btn-block" id="rtPayOnline" style="margin-top:10px;display:none">Pay online</button>
+          <p class="pf-hint" id="rtCodNote" style="display:none;text-align:center;margin-top:10px">Cash on delivery · routed to your nearest serviceable stockist</p>
         </div>
-        <div class="rt-totals" id="rtTotals" style="display:none;">
-          <div><span>Subtotal</span><span id="ttSub">₹0</span></div>
-          <!-- GST is per-product (5/12/18%), so no single rate can be named here. -->
-          <div><span>GST</span><span id="ttGst">₹0</span></div>
-          <div class="grand"><span>Total</span><span id="ttGrand">₹0</span></div>
-        </div>
-        <button class="btn btn-primary" id="rtPayOnline" style="width:100%; margin-top:14px; display:none;">
-          Pay online · UPI / Card / Netbanking
-        </button>
-        <button class="btn btn-ghost" id="rtPlace" style="width:100%; margin-top:10px; display:none;">
-          Place order · Cash on delivery
-        </button>
-        <p class="cod-note" id="rtCodNote" style="display:none;">Pay securely online, or choose cash on delivery.</p>
-      </section>
-    </div>
+      </div></div>
+    </section>
 
-    <!-- Orders -->
-    <section class="rt-card">
-      <h2>My orders</h2>
-      <div id="rtOrders">
-        <p class="rt-empty">Loading orders…</p>
+    <!-- ORDERS -->
+    <section class="pf-section" data-sec="orders">
+      <div class="pf-pagehead"><div><h1>My orders</h1><p>Track status, reorder, or view details.</p></div></div>
+      <div id="rtOrders"><div class="pf-empty"><p>Loading…</p></div></div>
+    </section>
+
+    <!-- REWARDS (Uphaar progress + cashback wallet) -->
+    <section class="pf-section" data-sec="rewards">
+      <div class="pf-pagehead"><div><h1>Uphaar rewards &amp; wallet</h1><p>Progress earned on your real delivered orders, plus any cashback credited.</p></div>
+        <a class="pf-btn pf-btn-ghost pf-btn-sm" href="uphaar.html" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6M10 14 21 3"/></svg> Full programme</a></div>
+      <div id="rtUphaar"><div class="pf-empty"><p>Loading rewards…</p></div></div>
+      <div class="pf-card" style="margin-top:16px">
+        <div class="pf-card-head"><h2>Cashback wallet</h2><span class="pf-wallet-bal" id="rtWalletBalance">₹0</span></div>
+        <div class="pf-card-body" id="rtWalletLedger"><div class="pf-empty"><p>Loading…</p></div></div>
       </div>
+      <div class="pf-card" style="margin-top:16px">
+        <div class="pf-card-head"><h2>Active schemes</h2><span class="pf-sub">Uphaar cashback you can earn now</span></div>
+        <div class="pf-card-body" id="rtSchemes"><div class="pf-empty"><p>Loading…</p></div></div>
+      </div>
+    </section>
+
+    <!-- WISHLIST -->
+    <section class="pf-section" data-sec="wishlist">
+      <div class="pf-pagehead"><div><h1>Wishlist</h1><p>Saved products — add them to your cart anytime.</p></div></div>
+      <div class="pf-prod-grid" id="rtWishlist"></div>
+    </section>
+
+    <!-- PROFILE -->
+    <section class="pf-section" data-sec="profile">
+      <div class="pf-pagehead"><div><h1>Shop profile</h1><p>Your shop address drives order routing to the nearest stockist.</p></div></div>
+      <div class="pf-card"><div class="pf-card-head"><h2>Shop &amp; delivery address</h2></div><div class="pf-card-body">
+        <div class="pf-field"><label for="afShop">Shop name</label><input class="pf-input" id="afShop" placeholder="Your shop / pharmacy name"></div>
+        <div class="pf-field"><label for="afStreet">Street address</label><input class="pf-input" id="afStreet" placeholder="Building, street, area"></div>
+        <div class="pf-form-row--3">
+          <div class="pf-field"><label for="afCity">City</label><input class="pf-input" id="afCity" placeholder="City"></div>
+          <div class="pf-field"><label for="afState">State</label><input class="pf-input" id="afState" placeholder="State"></div>
+          <div class="pf-field"><label for="afPincode">PIN code</label><input class="pf-input" id="afPincode" inputmode="numeric" maxlength="6" placeholder="6-digit"></div>
+        </div>
+        <button class="pf-btn pf-btn-primary" id="afSave">Save address</button>
+      </div></div>
+      <div class="pf-card"><div class="pf-card-head"><h2>Need help?</h2></div><div class="pf-card-body" style="display:flex;gap:10px;flex-wrap:wrap">
+        <a class="pf-btn pf-btn-ghost" href="contactus.html?enquiry=retailer"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg> Contact support</a>
+        <a class="pf-btn pf-btn-ghost" href="tel:+919958584228">Call +91 99585 84228</a>
+      </div></div>
     </section>
   </main>
 
-  <div class="rt-toast" id="rtToast"></div>
+  <div class="pf-toast" id="rtToast" role="status" aria-live="polite"></div>
 
-  <!-- Razorpay Standard Checkout SDK (must load before payment.js) -->
-  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
   <script src="/frontend/js/logout-confirm.js"></script>
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
   <script src="/frontend/js/payment.js"></script>
   <script src="/frontend/js/retailer.js"></script>
 </body>

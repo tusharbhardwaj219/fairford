@@ -61,6 +61,102 @@ exports.dashboard = async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 };
 
+// ════════════════════════════ ANALYTICS ═══════════════════════════════════════
+/**
+ * Real platform analytics, aggregated from the Order collection.
+ *
+ * The dashboard's charts previously ran on hardcoded arrays — monthly GMV of
+ * [85,92,78,104,122,156] (₹ lakh), a fixed state-wise GMV table, and a fixed
+ * category split. Those figures were roughly two orders of magnitude above the
+ * real book, and the "Export" buttons wrote them to CSV as if they were
+ * reports. Management could have acted on them.
+ *
+ * Everything below is computed from real orders. Cancelled orders are excluded,
+ * matching how listWallet() already treats settlements. `months` is returned
+ * oldest-first and only contains months that actually have orders — the client
+ * renders an explicit "not enough data" state rather than padding a trend line.
+ */
+exports.analytics = async (req, res) => {
+  try {
+    const LIVE = { status: { $nin: ['cancelled'] } };
+
+    const [byMonth, byCategory, totals, byState] = await Promise.all([
+      Order.aggregate([
+        { $match: LIVE },
+        { $group: {
+            _id: { y: { $year: '$createdAt' }, m: { $month: '$createdAt' } },
+            gmv: { $sum: '$totalAmount' },
+            orders: { $sum: 1 },
+        } },
+        { $sort: { '_id.y': 1, '_id.m': 1 } },
+        { $limit: 24 },
+      ]),
+      // Category split by order-line revenue. items[] embeds the product ref,
+      // so join through Product to reach its category.
+      Order.aggregate([
+        { $match: LIVE },
+        { $unwind: '$items' },
+        { $lookup: { from: 'products', localField: 'items.product', foreignField: '_id', as: 'p' } },
+        { $unwind: { path: '$p', preserveNullAndEmptyArrays: true } },
+        // Group on categoryName, the denormalised string on Product —
+        // `category` itself is an ObjectId ref and would surface as a raw id.
+        // orderItemSchema stores the line total as totalPrice (unitPrice is
+        // per-unit); there is no `price` field on an order line.
+        { $group: {
+            _id: { $ifNull: ['$p.categoryName', 'Uncategorised'] },
+            value: { $sum: { $ifNull: ['$items.totalPrice', 0] } },
+        } },
+        { $sort: { value: -1 } },
+        { $limit: 6 },
+      ]),
+      Order.aggregate([
+        { $match: LIVE },
+        { $group: { _id: null, gmv: { $sum: '$totalAmount' }, orders: { $sum: 1 } } },
+      ]),
+      // State-wise GMV, resolved through the ordering retailer's shop address.
+      // Replaces a hardcoded Maharashtra/Karnataka/Delhi/Tamil Nadu/Gujarat table.
+      Order.aggregate([
+        { $match: LIVE },
+        { $lookup: { from: 'retailers', localField: 'retailer', foreignField: '_id', as: 'r' } },
+        { $unwind: { path: '$r', preserveNullAndEmptyArrays: true } },
+        { $group: {
+            _id: { $ifNull: ['$r.shopAddress.state', 'Unknown'] },
+            gmv: { $sum: '$totalAmount' },
+        } },
+        { $sort: { gmv: -1 } },
+        { $limit: 8 },
+      ]),
+    ]);
+
+    // Bars are drawn relative to the strongest state — there is no revenue
+    // target anywhere in the data model to measure against.
+    const topStateGmv = byState.length ? num(byState[0].gmv) : 0;
+
+    const MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+    res.json({
+      months: byMonth.map(r => ({
+        label:  `${MON[r._id.m - 1]} ${r._id.y}`,
+        gmv:    Math.round(num(r.gmv)),
+        orders: num(r.orders),
+      })),
+      categories: byCategory.map(r => ({
+        label: str(r._id) || 'Uncategorised',
+        value: Math.round(num(r.value)),
+      })),
+      states: byState.map(r => ({
+        name: str(r._id) || 'Unknown',
+        gmv:  Math.round(num(r.gmv)),
+        pct:  topStateGmv ? Math.round((num(r.gmv) / topStateGmv) * 1000) / 10 : 0,
+      })),
+      totals: {
+        gmv:    Math.round(num(totals[0] && totals[0].gmv)),
+        orders: num(totals[0] && totals[0].orders),
+      },
+    });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+};
+
 // ════════════════════════════ APPROVALS (Retailer KYC) ════════════════════════
 // retailer.status  pending↔pending · active↔approved · suspended↔rejected
 const RET_TO_APPROVAL = { pending: 'pending', active: 'approved', suspended: 'rejected' };
@@ -372,8 +468,12 @@ exports.getDealerDocs = async (req, res) => {
 // ════════════════════════════ PRODUCTS ════════════════════════════════════════
 function toProduct(p) {
   const catName = (p.category && p.category.categoryName) || p.categoryName || 'General';
-  const imageUrl = (p.image && p.image.url) ||
-                   (p.images && p.images[0] && p.images[0].url) || '';
+  // Ordered gallery for the admin image manager (slot 0 = primary). Falls back
+  // to the legacy single `image` for products saved before the gallery existed.
+  const gallery = ((p.images && p.images.length ? p.images : (p.image && p.image.url ? [p.image] : [])) || [])
+    .map(i => ({ url: (i && i.url) || '', public_id: (i && i.public_id) || '' }))
+    .filter(i => i.url);
+  const imageUrl = (p.image && p.image.url) || (gallery[0] && gallery[0].url) || '';
   return {
     id:               sid(p),
     name:             str(p.name),
@@ -390,8 +490,70 @@ function toProduct(p) {
     status:           str(p.status || 'active'),
     created_date:     fmtDate(p.createdAt),
     description:      str(p.description),
-    imageUrl:         imageUrl,
+    imageUrl:         imageUrl,   // primary only — used by the catalog table
+    images:           gallery,    // full ordered gallery — used by the edit form
   };
+}
+
+// ── Product image gallery reconciliation ─────────────────────────────────────
+// The admin form sends `imagesPlan`: an ordered array (≤4) describing the
+// desired gallery. Each entry is { keep: "<public_id>" } to retain an image the
+// product already has, or { file: "image_N" } to use a newly uploaded file
+// (matched by field name against multer's req.files). Slot 0 becomes the
+// primary image, mirrored to the legacy `image` field so the listing/search/
+// cart thumbnails (which read `image`) stay correct.
+//
+// Security: a `keep` is honoured only when its public_id already belongs to
+// THIS product, so the client can never inject an arbitrary image URL.
+// Cleanup: any newly uploaded file left unreferenced, and any previously
+// stored asset no longer in the gallery, is destroyed on Cloudinary so no
+// orphaned assets accumulate.
+function destroyAsset(publicId) {
+  if (!publicId) return;
+  try {
+    const cloudinary = require('../config/cloudinary');
+    cloudinary.uploader.destroy(publicId).catch(() => {});
+  } catch (_) {}
+}
+
+function resolveGallery(req, existing) {
+  let plan = [];
+  try { plan = JSON.parse(req.body.imagesPlan || '[]'); } catch (_) { plan = []; }
+  if (!Array.isArray(plan)) plan = [];
+  plan = plan.slice(0, 4);
+
+  // multer .any() → req.files is an array; index it by field name.
+  const filesByField = {};
+  (req.files || []).forEach(f => { filesByField[f.fieldname] = f; });
+
+  // public_id → url for images this product already owns.
+  const knownById = {};
+  if (existing) {
+    if (existing.image && existing.image.public_id) knownById[existing.image.public_id] = existing.image.url;
+    (existing.images || []).forEach(i => { if (i && i.public_id) knownById[i.public_id] = i.url; });
+  }
+
+  const images = [];
+  for (const entry of plan) {
+    if (!entry) continue;
+    if (entry.keep) {
+      if (knownById[entry.keep] && !images.some(i => i.public_id === entry.keep)) {
+        images.push({ url: knownById[entry.keep], public_id: entry.keep });
+      }
+    } else if (entry.file) {
+      const f = filesByField[entry.file];
+      if (f) images.push({ url: f.path, public_id: f.filename });
+    }
+  }
+  const capped = images.slice(0, 4);
+  const keptIds = new Set(capped.map(i => i.public_id));
+
+  // Assets to remove: uploaded-but-unused + previously-owned-but-dropped.
+  const destroy = new Set();
+  (req.files || []).forEach(f => { if (!keptIds.has(f.filename)) destroy.add(f.filename); });
+  Object.keys(knownById).forEach(pid => { if (!keptIds.has(pid)) destroy.add(pid); });
+
+  return { images: capped, primary: capped[0] || null, destroy: [...destroy] };
 }
 
 async function resolveCategoryId(name) {
@@ -456,11 +618,17 @@ exports.createProduct = async (req, res) => {
       description: description || '',
       status: status || 'active',
     };
-    // Multer (Cloudinary storage) attaches the uploaded asset to req.file.
-    // `path` is the secure URL Cloudinary returns; `filename` is the public_id
-    // we need to delete the asset later on update/delete.
-    if (req.file) {
-      productData.image = { url: req.file.path, public_id: req.file.filename };
+    // Images: the form always sends `imagesPlan` (4-slot manager). Slot 0 is
+    // the primary, mirrored to the legacy `image` field. Legacy single-`image`
+    // uploads (req.file) are still honoured if a caller ever sends one.
+    if (req.body.imagesPlan !== undefined) {
+      const g = resolveGallery(req, null);
+      productData.images = g.images;
+      productData.image  = g.primary;
+      g.destroy.forEach(destroyAsset);   // clean up any unreferenced uploads
+    } else if (req.file) {
+      productData.image  = { url: req.file.path, public_id: req.file.filename };
+      productData.images = [{ url: req.file.path, public_id: req.file.filename }];
     }
     const p = await Product.create(productData);
     res.status(201).json(toProduct(p));
@@ -490,27 +658,25 @@ exports.updateProduct = async (req, res) => {
     if (status !== undefined) patch.status = status;
     if (category !== undefined) { patch.category = await resolveCategoryId(category); patch.categoryName = category; }
 
-    // Replace the product image: delete the old Cloudinary asset (fire and
-    // forget — failure to clean up shouldn't block the update), then store
-    // the new one. If no file came in, leave the existing image intact.
-    //
-    // Also clear the `images[]` gallery: productdetail.js prefers images[0]
-    // over this primary `image` whenever the gallery is non-empty, so a
-    // leftover gallery entry from before this edit would silently keep the
-    // detail page showing the OLD photo even though everywhere else (product
-    // listing, this dashboard) correctly shows the new one — bit us in
-    // production 2026-08-10 (ACLOFAIR COLD & FLU kept its old "Red" gallery
-    // photo after the primary was changed to the plain teal pack).
-    if (req.file) {
-      const existing = await Product.findById(req.params.id).select('image').lean();
-      if (existing && existing.image && existing.image.public_id) {
-        try {
-          const cloudinary = require('../config/cloudinary');
-          cloudinary.uploader.destroy(existing.image.public_id).catch(() => {});
-        } catch (_) {}
-      }
-      patch.image = { url: req.file.path, public_id: req.file.filename };
-      patch.images = [];
+    // Images: the 4-slot manager sends `imagesPlan` describing the whole
+    // desired gallery (kept + newly uploaded, in order). resolveGallery keeps
+    // `image` (primary) and `images[]` in sync and returns the Cloudinary
+    // assets to destroy (dropped originals + unreferenced uploads). Keeping
+    // both fields consistent avoids the 2026-08-10 bug where the detail page
+    // (prefers images[0]) kept showing an old photo after the primary changed.
+    if (req.body.imagesPlan !== undefined) {
+      const existing = await Product.findById(req.params.id).select('image images').lean();
+      const g = resolveGallery(req, existing || null);
+      patch.image  = g.primary;
+      patch.images = g.images;
+      g.destroy.forEach(destroyAsset);
+    } else if (req.file) {
+      // Legacy single-image path (kept for compatibility).
+      const existing = await Product.findById(req.params.id).select('image images').lean();
+      if (existing && existing.image && existing.image.public_id) destroyAsset(existing.image.public_id);
+      (existing && existing.images || []).forEach(i => i && i.public_id && destroyAsset(i.public_id));
+      patch.image  = { url: req.file.path, public_id: req.file.filename };
+      patch.images = [{ url: req.file.path, public_id: req.file.filename }];
     }
 
     const p = await Product.findByIdAndUpdate(req.params.id, { $set: patch }, { returnDocument: 'after' });

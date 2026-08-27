@@ -20,15 +20,33 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <!-- SEO (title/description are enriched by JS once the product loads) -->
   <title>Fair Ford - Product Details</title>
-  <meta name="description" id="meta-desc" content="Detailed pharmaceutical product information: pricing, composition, specifications, distributor details and delivery." />
+  <meta name="description" id="meta-desc" content="Detailed pharmaceutical product information: composition, strength, pack size, specifications and availability." />
+  <meta name="robots" content="index, follow" />
+  <!-- Canonical, description and OG tags are rewritten per product by
+       productdetail.js once the record resolves (see applyProductMeta).
+       These are the pre-resolve defaults. -->
+  <link rel="canonical" id="canonical-link" href="https://www.fairfordpharma.com/product.html" />
   <meta property="og:type" content="product" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <meta property="og:title" id="og-title" content="Product Details — Fair Ford Pharmaceuticals" />
+  <meta property="og:description" id="og-desc" content="Composition, strength, pack size and availability for Fair Ford pharmaceutical products." />
+  <meta property="og:image" id="og-image" content="https://res.cloudinary.com/dp4yririh/image/upload/v1782967649/fairford/site/m5d8pmtzdjr4dcgctvuc.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="preconnect" href="https://res.cloudinary.com" crossorigin />
+    <link rel="stylesheet" href="/frontend/css/typography.css">
   <link rel="stylesheet" href="/frontend/css/style.css" />
   <link rel="stylesheet" href="/frontend/css/product.css" />
-  <link rel="stylesheet" href="/frontend/css/pd.css?v=2" />
+  <!-- product-marketplace.css supplies the shared `.ffm-*` product cards +
+       rails reused for the Related / You-may-also-like / Recently-viewed
+       strips. product-detail.css owns the rest of this page (`.pdx-*`).
+       The old pd.css is no longer used by any page. -->
+  <link rel="stylesheet" href="/frontend/css/product-marketplace.css" />
+  <link rel="stylesheet" href="/frontend/css/product-detail.css" />
   <link rel="icon" type="image/png" href=https://res.cloudinary.com/dp4yririh/image/upload/v1782967649/fairford/site/m5d8pmtzdjr4dcgctvuc.png>
+  <!-- Page loader (see css/loader.css + js/loader.js). Not deferred:
+       the overlay must exist before first paint. -->
+  <link rel="stylesheet" href="/frontend/css/loader.css" />
+  <link rel="stylesheet" href="/frontend/css/footer.css">
+  <script src="/frontend/js/loader.js"></script>
 </head>
 
 <body><!-- Google Tag Manager (noscript) -->
@@ -37,26 +55,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- End Google Tag Manager (noscript) -->
   <div id="site-header"></div>
 
-  <main class="container detail-wrap">
-    <!-- Loading skeleton (replaced once product resolves) -->
-    <div id="detail-skeleton">
-      <div class="sk sk-line w40" style="height:14px;max-width:320px;margin:20px 0"></div>
-      <div class="hero">
-        <div><div class="sk" style="aspect-ratio:1/1;border-radius:22px"></div>
-          <div style="display:flex;gap:12px;margin-top:14px">
-            <div class="sk" style="width:76px;height:76px;border-radius:13px"></div>
-            <div class="sk" style="width:76px;height:76px;border-radius:13px"></div>
-            <div class="sk" style="width:76px;height:76px;border-radius:13px"></div>
-          </div>
-        </div>
-        <div>
-          <div class="sk sk-line w40"></div>
-          <div class="sk sk-line w80" style="height:30px;margin-top:14px"></div>
-          <div class="sk sk-line w60"></div>
-          <div class="sk" style="height:120px;border-radius:18px;margin-top:22px"></div>
-          <div class="sk" style="height:200px;border-radius:18px;margin-top:18px"></div>
-        </div>
-      </div>
+  <main class="pdx">
+    <!-- Loading skeleton (repainted by productdetail.js showSkeleton()).
+         Inline-styled so it renders correctly before any CSS-dependent JS. -->
+    <div id="detail-skeleton" aria-hidden="true">
+      <div style="max-width:1240px;margin:0 auto;padding:40px 24px;color:#98A2B3;font:600 .9rem/1 system-ui,sans-serif;">Loading product…</div>
     </div>
 
     <!-- Rendered content target -->
@@ -64,15 +67,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </main>
 
   <div id="site-footer"></div>
-
-  <!-- Lightbox for image zoom -->
-  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true">
-    <div class="lb-inner" id="lb-inner">
-      <button class="lb-close" id="lb-close" aria-label="Close">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
-      </button>
-    </div>
-  </div>
 
   <script src="/frontend/js/api.js"></script>
   <script src="/frontend/js/data.js"></script>

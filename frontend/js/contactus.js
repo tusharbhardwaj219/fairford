@@ -185,12 +185,15 @@ async function handleFormSubmit(e) {
 
     try {
         const formData = new FormData(form);
+        // inquiryType comes from the user now; it used to be hardcoded to
+        // 'Business Inquiry' on every submission. Falls back to that same value
+        // so the payload stays valid if the select is ever absent.
         const payload = {
             name:        (formData.get('fullName') || '').trim(),
             email:       (formData.get('email') || '').trim(),
             phone:       (formData.get('phone') || '').replace(/\D/g, '').slice(-10),
             message:     (formData.get('message') || '').trim(),
-            inquiryType: 'Business Inquiry',
+            inquiryType: (formData.get('inquiryType') || 'Business Inquiry').trim(),
         };
 
         const res = await fetch('/api/contact', {
@@ -209,10 +212,41 @@ async function handleFormSubmit(e) {
                 setTimeout(() => successMsg.classList.remove('show'), CONFIG.MESSAGE_HIDE_DELAY);
             }
         } else {
+            // The API returns field-level detail on a 400
+            // ({ errors: [{ field, message }] }) and a plain message on 429.
+            // Both used to be swallowed in favour of one generic error box, so
+            // a rejected phone number or a rate limit read as "something broke".
+            if (Array.isArray(json.errors) && json.errors.length) {
+                json.errors.forEach(function (err) {
+                    // Server field names map to the form's ids, except name→fullName.
+                    var id = err.field === 'name' ? 'fullName' : err.field;
+                    var input = form.querySelector('#' + id);
+                    var slot  = input && input.closest('.cf-field')
+                        ? input.closest('.cf-field').querySelector('.error-message')
+                        : null;
+                    if (input) input.classList.add('error');
+                    // .error-message is display:none until .show is added —
+                    // matching what validateField() does for client-side errors.
+                    if (slot) {
+                        slot.textContent = err.message;
+                        slot.classList.add('show');
+                    }
+                });
+                var firstBad = form.querySelector('.error');
+                if (firstBad) {
+                    firstBad.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    firstBad.focus();
+                }
+            }
             throw new Error(json.message || 'Submission failed');
         }
     } catch (error) {
         if (errorMsg) {
+            // Show what actually went wrong rather than a fixed string.
+            var textEl = errorMsg.querySelector('p') || errorMsg;
+            textEl.textContent = error && error.message
+                ? error.message
+                : 'Something went wrong. Please try again.';
             errorMsg.classList.add('show');
             errorMsg.scrollIntoView({ behavior: 'smooth', block: 'center' });
             setTimeout(() => errorMsg.classList.remove('show'), CONFIG.ERROR_HIDE_DELAY);
@@ -617,246 +651,12 @@ if (typeof module !== 'undefined' && module.exports) {
     module.exports = { validateField, validateForm, debounce, throttle };
 }
 
-/* ============================================================
-   CART / WISHLIST — Store, sidebars, toasts
-   Reads/writes the same localStorage key as search.html so
-   items added there appear here and vice-versa.
-   ============================================================ */
-const _STORAGE_KEY = 'fairford.v1';
-const Store = {
-    state: { cart: {}, wishlist: [] },
-    load() {
-        try {
-            const raw = localStorage.getItem(_STORAGE_KEY);
-            if (raw) this.state = { cart: {}, wishlist: [], ...JSON.parse(raw) };
-        } catch(e) {}
-    },
-    save() {
-        try { localStorage.setItem(_STORAGE_KEY, JSON.stringify(this.state)); } catch(e) {}
-    },
-    cartAdd(id, qty = 1) { this.state.cart[id] = (this.state.cart[id] || 0) + qty; this.save(); },
-    cartSet(id, qty)     { if (qty <= 0) delete this.state.cart[id]; else this.state.cart[id] = qty; this.save(); },
-    cartRemove(id)       { delete this.state.cart[id]; this.save(); },
-    cartCount()          { return Object.values(this.state.cart).reduce((s, n) => s + n, 0); },
-    cartEntries()        { return Object.entries(this.state.cart); },
-    wishRemove(id)       { const i = this.state.wishlist.indexOf(id); if (i >= 0) { this.state.wishlist.splice(i, 1); this.save(); } },
-    wishCount()          { return this.state.wishlist.length; }
-};
-Store.load();
+/* The page-local cart/wishlist store that lived here (localStorage key
+   'fairford.v1', a hardcoded demo PRODUCTS array, its own sidebars and
+   toasts) has been removed. It rendered into the same #cartBody/#cartCount
+   nodes as common.js, so this page ran two carts against two storage keys.
+   common.js is the single owner; it migrates any leftover legacy cart. */
 
-const _PRODUCTS = [
-    { id:'p01', name:'Paracetamol 500mg',      mfr:'Cipla',          pack:'Strip of 10 tabs',   net:9.30,  mrp:15.50,  moq:50,  scheme:'10+1' },
-    { id:'p02', name:'Azithromycin 500mg',      mfr:'Sun Pharma',     pack:'Strip of 3 tabs',    net:78.00, mrp:120.00, moq:20,  scheme:'5+1'  },
-    { id:'p03', name:'Pantoprazole 40mg',       mfr:"Dr Reddy's",    pack:'Strip of 15 tabs',   net:52.00, mrp:85.00,  moq:30,  scheme:'10+2' },
-    { id:'p04', name:'Cetirizine 10mg',         mfr:'Mankind Pharma', pack:'Strip of 10 tabs',   net:13.00, mrp:22.00,  moq:100, scheme:'10+1' },
-    { id:'p05', name:'Amoxicillin 500mg',       mfr:'Alkem Labs',     pack:'Strip of 10 caps',   net:60.00, mrp:95.00,  moq:25,  scheme:'5+1'  },
-    { id:'p06', name:'Metformin 500mg SR',      mfr:'Lupin',          pack:'Strip of 15 tabs',   net:21.00, mrp:35.00,  moq:50,  scheme:'10+1' },
-    { id:'p07', name:'Vitamin D3 60K',          mfr:'Glenmark',       pack:'Pack of 4 sachets',  net:115.00,mrp:180.00, moq:20,  scheme:'10+2' },
-    { id:'p08', name:'Atorvastatin 10mg',       mfr:'Torrent Pharma', pack:'Strip of 10 tabs',   net:47.00, mrp:78.00,  moq:30,  scheme:'10+1' },
-    { id:'p09', name:'Telmisartan 40mg',        mfr:'Macleods',       pack:'Strip of 10 tabs',   net:39.00, mrp:65.00,  moq:30,  scheme:'10+1' },
-    { id:'p10', name:'Omeprazole 20mg',         mfr:'Zydus',          pack:'Strip of 10 caps',   net:25.00, mrp:42.00,  moq:40,  scheme:'10+1' },
-    { id:'p11', name:'Glimepiride 2mg',         mfr:'USV',            pack:'Strip of 10 tabs',   net:54.00, mrp:88.00,  moq:25,  scheme:'5+1'  },
-    { id:'p12', name:'Methylcobalamin 1500mcg', mfr:'Intas',          pack:'Strip of 10 tabs',   net:68.00, mrp:110.00, moq:30,  scheme:'10+1' }
-];
-
-function _productById(id) { return _PRODUCTS.find(p => p.id === id); }
-function _inr(n)  { return '₹' + n.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
-function _init(n) { return n.split(/\s+/).slice(0, 2).map(w => w[0]).join('').toUpperCase(); }
-function _esc(s)  { return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-
-function _toast(msg) {
-    const stack = document.getElementById('toastStack');
-    if (!stack) return;
-    const el = document.createElement('div');
-    el.className = 'toast success';
-    el.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span>' + _esc(msg) + '</span>';
-    stack.appendChild(el);
-    setTimeout(() => el.remove(), 2800);
-}
-
-function refreshCounters() {
-    const cartC = Store.cartCount();
-    const wishC = Store.wishCount();
-    const cb = document.getElementById('cartCount');
-    const wb = document.getElementById('wishlistCount');
-    const cs = document.getElementById('cartSideCount');
-    const ws = document.getElementById('wishSideCount');
-    if (cb) { cb.textContent = cartC; cb.classList.toggle('empty', cartC === 0); }
-    if (wb) { wb.textContent = wishC; wb.classList.toggle('empty', wishC === 0); }
-    if (cs) cs.textContent = cartC + ' item' + (cartC === 1 ? '' : 's');
-    if (ws) ws.textContent = wishC + ' item' + (wishC === 1 ? '' : 's');
-}
-
-function openSidebar(which) {
-    const el = document.getElementById(which === 'cart' ? 'cartSidebar' : 'wishSidebar');
-    const ov = document.getElementById('overlay');
-    if (!el) return;
-    el.classList.add('is-open');
-    if (ov) ov.classList.add('is-open');
-    document.body.style.overflow = 'hidden';
-    if (which === 'cart') _renderCart(); else _renderWishlist();
-}
-
-function closeSidebar(which) {
-    const el = document.getElementById(which === 'cart' ? 'cartSidebar' : 'wishSidebar');
-    if (el) el.classList.remove('is-open');
-    const cartOpen = document.getElementById('cartSidebar') && document.getElementById('cartSidebar').classList.contains('is-open');
-    const wishOpen = document.getElementById('wishSidebar') && document.getElementById('wishSidebar').classList.contains('is-open');
-    if (!cartOpen && !wishOpen) {
-        const ov = document.getElementById('overlay');
-        if (ov) ov.classList.remove('is-open');
-        document.body.style.overflow = '';
-    }
-}
-
-function _renderCart() {
-    const body = document.getElementById('cartBody');
-    const foot = document.getElementById('cartFoot');
-    if (!body) return;
-    const entries = Store.cartEntries();
-    if (entries.length === 0) {
-        body.innerHTML = '<div class="empty-state"><div class="big">Your cart is empty</div><div>Browse products on the <a href="search.html" style="color:#0f4c81">product page</a>.</div></div>';
-        if (foot) foot.style.display = 'none';
-        return;
-    }
-    let subtotal = 0, moqViolations = 0;
-    body.innerHTML = entries.map(([id, qty]) => {
-        const p = _productById(id);
-        if (!p) return '';
-        const lineTotal = p.net * qty;
-        subtotal += lineTotal;
-        const underMoq = qty < p.moq;
-        if (underMoq) moqViolations++;
-        const [paid, free] = p.scheme.split('+').map(Number);
-        const bonus = paid && free ? Math.floor(qty / paid) * free : 0;
-        return '<div class="line">' +
-            '<div class="line-thumb">' + _init(p.name) + '</div>' +
-            '<div><p class="line-name">' + _esc(p.name) + '</p>' +
-            '<p class="line-comp">' + _esc(p.mfr) + ' · ' + _esc(p.pack) + '</p>' +
-            '<p class="line-rate">Net <b>' + _inr(p.net) + '</b> · MOQ ' + p.moq + '</p>' +
-            '<div class="qty"><button data-step="-1" data-id="' + p.id + '">−</button>' +
-            '<input type="number" min="1" value="' + qty + '" data-qty="' + p.id + '">' +
-            '<button data-step="1" data-id="' + p.id + '">+</button></div></div>' +
-            '<div class="line-right"><span class="line-total">' + _inr(lineTotal) + '</span>' +
-            '<button class="line-remove" data-remove="' + p.id + '">Remove</button></div>' +
-            (bonus > 0 ? '<div class="line-scheme-info">+ ' + bonus + ' free unit' + (bonus === 1 ? '' : 's') + ' (scheme ' + p.scheme + ')</div>' : '') +
-            (underMoq ? '<div class="line-moq-warn">Below MOQ — add ' + (p.moq - qty) + ' more unit' + (p.moq - qty === 1 ? '' : 's') + '</div>' : '') +
-            '</div>';
-    }).join('');
-    if (foot) {
-        const gst = subtotal * 0.12;
-        foot.style.display = 'block';
-        foot.innerHTML = '<div class="totals">' +
-            '<div class="totals-row"><span>Subtotal (' + entries.length + ' item' + (entries.length === 1 ? '' : 's') + ')</span><b>' + _inr(subtotal) + '</b></div>' +
-            '<div class="totals-row"><span>GST (12%, estimate)</span><b>' + _inr(gst) + '</b></div>' +
-            '<div class="totals-row grand"><span>Order Total</span><b>' + _inr(subtotal + gst) + '</b></div></div>' +
-            '<button class="btn-checkout" ' + (moqViolations > 0 ? 'disabled' : '') + ' onclick="window.location.href=\'search.html\'">' +
-            (moqViolations > 0 ? 'Resolve ' + moqViolations + ' MOQ issue' + (moqViolations === 1 ? '' : 's') : 'Proceed to Checkout') + '</button>' +
-            '<p class="foot-note">GST invoice with HSN codes generated on confirmation.</p>';
-    }
-}
-
-function _renderWishlist() {
-    const body = document.getElementById('wishBody');
-    if (!body) return;
-    const ids = Store.state.wishlist;
-    if (ids.length === 0) {
-        body.innerHTML = '<div class="empty-state"><div class="big">No saved products</div><div>Save products from the <a href="search.html" style="color:#0f4c81">product page</a>.</div></div>';
-        return;
-    }
-    body.innerHTML = ids.map(id => {
-        const p = _productById(id);
-        if (!p) return '';
-        return '<div class="wish-line">' +
-            '<div class="line-thumb">' + _init(p.name) + '</div>' +
-            '<div><p class="line-name">' + _esc(p.name) + '</p>' +
-            '<p class="line-comp">' + _esc(p.mfr) + ' · ' + _esc(p.pack) + '</p>' +
-            '<p class="line-rate">Net <b>' + _inr(p.net) + '</b> · MOQ ' + p.moq + '</p></div>' +
-            '<div class="wish-actions">' +
-            '<button class="wish-move" data-wmove="' + p.id + '">MOVE TO CART</button>' +
-            '<button class="wish-remove" data-wremove="' + p.id + '">Remove</button></div>' +
-            '</div>';
-    }).join('');
-}
-
-/* Wire cart/wishlist icon buttons and sidebar interactions */
-(function initCartWishlist() {
-    function setup() {
-        /* Icon buttons → open sidebar */
-        document.querySelectorAll('.icon-btn').forEach(function(btn) {
-            btn.addEventListener('click', function() {
-                const action = btn.getAttribute('data-action');
-                if (action === 'cart') openSidebar('cart');
-                else if (action === 'wishlist') openSidebar('wish');
-            });
-        });
-
-        /* Sidebar close buttons */
-        document.querySelectorAll('.sidebar-close').forEach(function(btn) {
-            btn.addEventListener('click', function() { closeSidebar(btn.dataset.close); });
-        });
-
-        /* Overlay click */
-        const ov = document.getElementById('overlay');
-        if (ov) ov.addEventListener('click', function() { closeSidebar('cart'); closeSidebar('wish'); });
-
-        /* Cart body interactions */
-        const cartBody = document.getElementById('cartBody');
-        if (cartBody) {
-            cartBody.addEventListener('click', function(e) {
-                const step = e.target.closest('[data-step]');
-                const rem  = e.target.closest('[data-remove]');
-                if (step) {
-                    const cur = Store.state.cart[step.dataset.id] || 0;
-                    Store.cartSet(step.dataset.id, Math.max(1, cur + Number(step.dataset.step)));
-                    refreshCounters(); _renderCart();
-                } else if (rem) {
-                    Store.cartRemove(rem.dataset.remove);
-                    refreshCounters(); _renderCart();
-                    _toast('Removed from cart');
-                }
-            });
-            cartBody.addEventListener('change', function(e) {
-                const inp = e.target.closest('[data-qty]');
-                if (!inp) return;
-                Store.cartSet(inp.dataset.qty, Math.max(1, parseInt(inp.value, 10) || 1));
-                refreshCounters(); _renderCart();
-            });
-        }
-
-        /* Wishlist body interactions */
-        const wishBody = document.getElementById('wishBody');
-        if (wishBody) {
-            wishBody.addEventListener('click', function(e) {
-                const mv = e.target.closest('[data-wmove]');
-                const rm = e.target.closest('[data-wremove]');
-                if (mv) {
-                    const p = _productById(mv.dataset.wmove);
-                    if (p) { Store.cartAdd(p.id, p.moq); Store.wishRemove(p.id); refreshCounters(); _renderWishlist(); _renderCart(); _toast('Moved to cart at MOQ (' + p.moq + ' units)'); }
-                } else if (rm) {
-                    Store.wishRemove(rm.dataset.wremove);
-                    refreshCounters(); _renderWishlist();
-                    _toast('Removed from wishlist');
-                }
-            });
-        }
-
-        /* Escape key closes open sidebar */
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') { closeSidebar('cart'); closeSidebar('wish'); }
-        });
-
-        refreshCounters();
-    }
-
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', setup);
-    } else {
-        setup();
-    }
-})();
-
-// Profile / account button → role-based dashboard redirect
 (function () {
   function goToDashboard() {
     var userStr = localStorage.getItem('ff_user');

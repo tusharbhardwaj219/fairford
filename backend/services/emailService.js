@@ -84,6 +84,22 @@ const sendAdminNotification = async (contactData) => {
                     <td style="padding:12px 0;border-bottom:1px solid #eee;font-weight:bold;color:#555;">Inquiry Type:</td>
                     <td style="padding:12px 0;border-bottom:1px solid #eee;color:#333;">${esc(contactData.inquiryType)}</td>
                   </tr>
+                  ${contactData.company ? `<tr>
+                    <td style="padding:12px 0;border-bottom:1px solid #eee;font-weight:bold;color:#555;">Company:</td>
+                    <td style="padding:12px 0;border-bottom:1px solid #eee;color:#333;">${esc(contactData.company)}</td>
+                  </tr>` : ''}
+                  ${contactData.businessType ? `<tr>
+                    <td style="padding:12px 0;border-bottom:1px solid #eee;font-weight:bold;color:#555;">Business Type:</td>
+                    <td style="padding:12px 0;border-bottom:1px solid #eee;color:#333;">${esc(contactData.businessType)}</td>
+                  </tr>` : ''}
+                  ${contactData.city ? `<tr>
+                    <td style="padding:12px 0;border-bottom:1px solid #eee;font-weight:bold;color:#555;">State / City:</td>
+                    <td style="padding:12px 0;border-bottom:1px solid #eee;color:#333;">${esc(contactData.city)}</td>
+                  </tr>` : ''}
+                  ${contactData.productRequirement ? `<tr>
+                    <td style="padding:12px 0;border-bottom:1px solid #eee;font-weight:bold;color:#555;">Requirement:</td>
+                    <td style="padding:12px 0;border-bottom:1px solid #eee;color:#333;">${esc(contactData.productRequirement)}</td>
+                  </tr>` : ''}
                   <tr>
                     <td style="padding:12px 0;font-weight:bold;color:#555;vertical-align:top;">Message:</td>
                     <td style="padding:12px 0;color:#333;">${esc(contactData.message)}</td>

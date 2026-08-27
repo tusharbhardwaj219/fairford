@@ -147,292 +147,11 @@
 })();
 
 
-/* ============================================================
-   2. STORE — dead code from old cart/wishlist implementation.
-   Wrapped in IIFE so globals (inr, Store, etc.) don't conflict
-   with the same names in common.js (which now owns cart/wishlist).
-   ============================================================ */
-(function () {
-const STORAGE_KEY = 'fairford.v1';
-const Store = {
-  state: { cart: {}, wishlist: [] },
-
-  load(){
-    try{
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if(raw){ this.state = { cart:{}, wishlist:[], ...JSON.parse(raw) }; }
-    }catch(e){ console.warn('Store load failed', e); }
-  },
-  save(){
-    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(this.state)); }
-    catch(e){ console.warn('Store save failed', e); }
-  },
-
-  /* Cart */
-  cartAdd(id, qty=1){
-    const cur = this.state.cart[id] || 0;
-    this.state.cart[id] = cur + qty;
-    this.save();
-  },
-  cartSet(id, qty){
-    if(qty<=0){ delete this.state.cart[id]; }
-    else{ this.state.cart[id] = qty; }
-    this.save();
-  },
-  cartRemove(id){ delete this.state.cart[id]; this.save(); },
-  cartCount(){ return Object.values(this.state.cart).reduce((s,n)=>s+n,0); },
-  cartEntries(){ return Object.entries(this.state.cart); },
-  cartHas(id){ return !!this.state.cart[id]; },
-
-  /* Wishlist */
-  wishToggle(id){
-    const i = this.state.wishlist.indexOf(id);
-    if(i>=0) this.state.wishlist.splice(i,1);
-    else this.state.wishlist.push(id);
-    this.save();
-    return i<0; // true if newly added
-  },
-  wishRemove(id){
-    const i = this.state.wishlist.indexOf(id);
-    if(i>=0){ this.state.wishlist.splice(i,1); this.save(); }
-  },
-  wishHas(id){ return this.state.wishlist.includes(id); },
-  wishCount(){ return this.state.wishlist.length; }
-};
-Store.load();
-
-/* ============================================================
-   PRODUCT DATA — same as search.html, read from localStorage
-   ============================================================ */
-const PRODUCTS = [
-  { id:'p01', name:'Paracetamol 500mg',      composition:'Paracetamol IP 500mg',              mfr:'Cipla',         pack:'Strip of 10 tabs',   mrp:15.50,  net:9.30,   moq:50,  scheme:'10+1', schedule:'H',   cat:'analgesic' },
-  { id:'p02', name:'Azithromycin 500mg',      composition:'Azithromycin IP 500mg',             mfr:'Sun Pharma',    pack:'Strip of 3 tabs',    mrp:120.00, net:78.00,  moq:20,  scheme:'5+1',  schedule:'H',   cat:'antibiotic' },
-  { id:'p03', name:'Pantoprazole 40mg',       composition:'Pantoprazole Sodium 40mg',          mfr:"Dr Reddy's",   pack:'Strip of 15 tabs',   mrp:85.00,  net:52.00,  moq:30,  scheme:'10+2', schedule:'H1',  cat:'gastric' },
-  { id:'p04', name:'Cetirizine 10mg',         composition:'Cetirizine HCl IP 10mg',            mfr:'Mankind Pharma',pack:'Strip of 10 tabs',   mrp:22.00,  net:13.00,  moq:100, scheme:'10+1', schedule:'H',   cat:'analgesic' },
-  { id:'p05', name:'Amoxicillin 500mg',       composition:'Amoxicillin Trihydrate 500mg',      mfr:'Alkem Labs',    pack:'Strip of 10 caps',   mrp:95.00,  net:60.00,  moq:25,  scheme:'5+1',  schedule:'H',   cat:'antibiotic' },
-  { id:'p06', name:'Metformin 500mg SR',      composition:'Metformin HCl 500mg SR',            mfr:'Lupin',         pack:'Strip of 15 tabs',   mrp:35.00,  net:21.00,  moq:50,  scheme:'10+1', schedule:'H',   cat:'diabetes' },
-  { id:'p07', name:'Vitamin D3 60K',          composition:'Cholecalciferol 60,000 IU',         mfr:'Glenmark',      pack:'Pack of 4 sachets',  mrp:180.00, net:115.00, moq:20,  scheme:'10+2', schedule:'OTC', cat:'vitamin' },
-  { id:'p08', name:'Atorvastatin 10mg',       composition:'Atorvastatin Calcium 10mg',         mfr:'Torrent Pharma',pack:'Strip of 10 tabs',   mrp:78.00,  net:47.00,  moq:30,  scheme:'10+1', schedule:'H',   cat:'cardiac' },
-  { id:'p09', name:'Telmisartan 40mg',        composition:'Telmisartan IP 40mg',               mfr:'Macleods',      pack:'Strip of 10 tabs',   mrp:65.00,  net:39.00,  moq:30,  scheme:'10+1', schedule:'H',   cat:'cardiac' },
-  { id:'p10', name:'Omeprazole 20mg',         composition:'Omeprazole 20mg + Domperidone 10mg',mfr:'Zydus',         pack:'Strip of 10 caps',   mrp:42.00,  net:25.00,  moq:40,  scheme:'10+1', schedule:'H',   cat:'gastric' },
-  { id:'p11', name:'Glimepiride 2mg',         composition:'Glimepiride 2mg + Metformin 500mg', mfr:'USV',           pack:'Strip of 10 tabs',   mrp:88.00,  net:54.00,  moq:25,  scheme:'5+1',  schedule:'H',   cat:'diabetes' },
-  { id:'p12', name:'Methylcobalamin 1500mcg', composition:'Mecobalamin 1500mcg + Folic Acid + B6', mfr:'Intas',    pack:'Strip of 10 tabs',   mrp:110.00, net:68.00,  moq:30,  scheme:'10+1', schedule:'OTC', cat:'vitamin' }
-];
-const GST_RATE = 0.12;
-
-/* Helpers */
-const productById = id => PRODUCTS.find(p => p.id === id);
-const inr  = n => '₹' + n.toLocaleString('en-IN', { minimumFractionDigits:2, maximumFractionDigits:2 });
-const initials = name => name.split(/\s+/).slice(0,2).map(w=>w[0]).join('').toUpperCase();
-const esc  = s => s.replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-
-/* Toast */
-function showToast(msg, kind='success'){
-  const stack = document.getElementById('toastStack');
-  if(!stack) return;
-  const el = document.createElement('div');
-  el.className = 'toast ' + kind;
-  const icon = kind==='warn'
-    ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01"/><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/></svg>'
-    : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
-  el.innerHTML = icon + '<span>' + esc(msg) + '</span>';
-  stack.appendChild(el);
-  setTimeout(()=>el.remove(), 2800);
-}
-
-/* Badge counters */
-function refreshCounters(pulse){
-  const cartC = Store.cartCount();
-  const wishC = Store.wishCount();
-  const cb = document.getElementById('cartCount');
-  const wb = document.getElementById('wishlistCount');
-  const cs = document.getElementById('cartSideCount');
-  const ws = document.getElementById('wishSideCount');
-  if(cb){ cb.textContent = cartC; cb.classList.toggle('empty', cartC===0); }
-  if(wb){ wb.textContent = wishC; wb.classList.toggle('empty', wishC===0); }
-  if(cs) cs.textContent = cartC + ' item' + (cartC===1?'':'s');
-  if(ws) ws.textContent = wishC + ' item' + (wishC===1?'':'s');
-  if(pulse==='cart' && cb){ cb.classList.add('pulse'); setTimeout(()=>cb.classList.remove('pulse'),200); }
-  if(pulse==='wish' && wb){ wb.classList.add('pulse'); setTimeout(()=>wb.classList.remove('pulse'),200); }
-}
-
-/* Open / close sidebars */
-function openSidebar(which){
-  const el = document.getElementById(which==='cart'?'cartSidebar':'wishSidebar');
-  const ov = document.getElementById('overlay');
-  if(!el) return;
-  el.classList.add('is-open');
-  if(ov) ov.classList.add('is-open');
-  document.body.style.overflow = 'hidden';
-  if(which==='cart') renderCart(); else renderWishlist();
-}
-function closeSidebar(which){
-  const el = document.getElementById(which==='cart'?'cartSidebar':'wishSidebar');
-  if(el) el.classList.remove('is-open');
-  const cartOpen = document.getElementById('cartSidebar')?.classList.contains('is-open');
-  const wishOpen = document.getElementById('wishSidebar')?.classList.contains('is-open');
-  if(!cartOpen && !wishOpen){
-    const ov = document.getElementById('overlay');
-    if(ov) ov.classList.remove('is-open');
-    document.body.style.overflow = '';
-  }
-}
-
-/* Render cart sidebar */
-function renderCart(){
-  const body = document.getElementById('cartBody');
-  const foot = document.getElementById('cartFoot');
-  if(!body) return;
-  const entries = Store.cartEntries();
-
-  if(entries.length===0){
-    body.innerHTML = `
-      <div class="empty-state">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-        <div class="big">Your cart is empty</div>
-        <div>Browse products on the <a href="search.html" style="color:var(--color-primary)">product page</a>.</div>
-      </div>`;
-    if(foot) foot.style.display='none';
-    return;
-  }
-
-  let subtotal=0, moqViolations=0;
-  body.innerHTML = entries.map(([id, qty])=>{
-    const p = productById(id); if(!p) return '';
-    const lineTotal = p.net * qty;
-    subtotal += lineTotal;
-    const underMoq = qty < p.moq;
-    if(underMoq) moqViolations++;
-    const [paid, free] = p.scheme.split('+').map(Number);
-    const bonus = paid && free ? Math.floor(qty/paid)*free : 0;
-    return `
-    <div class="line">
-      <div class="line-thumb">${initials(p.name)}</div>
-      <div>
-        <p class="line-name">${esc(p.name)}</p>
-        <p class="line-comp">${esc(p.mfr)} · ${esc(p.pack)}</p>
-        <p class="line-rate">Net <b>${inr(p.net)}</b> · MOQ ${p.moq}</p>
-        <div class="qty">
-          <button data-step="-1" data-id="${p.id}">−</button>
-          <input type="number" min="1" value="${qty}" data-qty="${p.id}">
-          <button data-step="1" data-id="${p.id}">+</button>
-        </div>
-      </div>
-      <div class="line-right">
-        <span class="line-total">${inr(lineTotal)}</span>
-        <button class="line-remove" data-remove="${p.id}">Remove</button>
-      </div>
-      ${bonus>0?`<div class="line-scheme-info">+ ${bonus} free unit${bonus===1?'':'s'} (scheme ${p.scheme})</div>`:''}
-      ${underMoq?`<div class="line-moq-warn">Below MOQ — add ${p.moq-qty} more unit${p.moq-qty===1?'':'s'}</div>`:''}
-    </div>`;
-  }).join('');
-
-  if(foot){
-    const gst = subtotal*GST_RATE;
-    foot.style.display='block';
-    foot.innerHTML = `
-      <div class="totals">
-        <div class="totals-row"><span>Subtotal (${entries.length} item${entries.length===1?'':'s'})</span><b>${inr(subtotal)}</b></div>
-        <div class="totals-row"><span>GST (12%, estimate)</span><b>${inr(gst)}</b></div>
-        <div class="totals-row grand"><span>Order Total</span><b>${inr(subtotal+gst)}</b></div>
-      </div>
-      <button class="btn-checkout" ${moqViolations>0?'disabled':''} onclick="window.location.href='search.html'">
-        ${moqViolations>0?`Resolve ${moqViolations} MOQ issue${moqViolations===1?'':'s'}`:'Proceed to Checkout'}
-      </button>
-      <p class="foot-note">GST invoice with HSN codes generated on confirmation.</p>`;
-  }
-}
-
-/* Render wishlist sidebar */
-function renderWishlist(){
-  const body = document.getElementById('wishBody');
-  if(!body) return;
-  const ids = Store.state.wishlist;
-
-  if(ids.length===0){
-    body.innerHTML = `
-      <div class="empty-state">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-        <div class="big">No saved products</div>
-        <div>Save products from the <a href="search.html" style="color:var(--color-primary)">product page</a>.</div>
-      </div>`;
-    return;
-  }
-
-  body.innerHTML = ids.map(id=>{
-    const p = productById(id); if(!p) return '';
-    return `
-    <div class="wish-line">
-      <div class="line-thumb">${initials(p.name)}</div>
-      <div>
-        <p class="line-name">${esc(p.name)}</p>
-        <p class="line-comp">${esc(p.mfr)} · ${esc(p.pack)}</p>
-        <p class="line-rate">Net <b>${inr(p.net)}</b> · MOQ ${p.moq}</p>
-      </div>
-      <div class="wish-actions">
-        <button class="wish-move" data-wmove="${p.id}">MOVE TO CART</button>
-        <button class="wish-remove" data-wremove="${p.id}">Remove</button>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-/* Wire sidebar interactions once DOM is ready */
-document.addEventListener('DOMContentLoaded', function(){
-  /* Sidebar close buttons */
-  document.querySelectorAll('.sidebar-close').forEach(function(btn){
-    btn.addEventListener('click', function(){ closeSidebar(btn.dataset.close); });
-  });
-
-  /* Overlay click closes both sidebars */
-  const ov = document.getElementById('overlay');
-  if(ov) ov.addEventListener('click', function(){ closeSidebar('cart'); closeSidebar('wish'); });
-
-  /* Cart body — qty step + remove */
-  const cartBody = document.getElementById('cartBody');
-  if(cartBody){
-    cartBody.addEventListener('click', function(e){
-      const step = e.target.closest('[data-step]');
-      const rem  = e.target.closest('[data-remove]');
-      if(step){
-        const cur = Store.state.cart[step.dataset.id] || 0;
-        Store.cartSet(step.dataset.id, Math.max(1, cur + Number(step.dataset.step)));
-        refreshCounters(); renderCart();
-      } else if(rem){
-        Store.cartRemove(rem.dataset.remove);
-        refreshCounters(); renderCart();
-        showToast('Removed from cart');
-      }
-    });
-    cartBody.addEventListener('change', function(e){
-      const inp = e.target.closest('[data-qty]');
-      if(!inp) return;
-      Store.cartSet(inp.dataset.qty, Math.max(1, parseInt(inp.value,10)||1));
-      refreshCounters(); renderCart();
-    });
-  }
-
-  /* Wishlist body — move to cart + remove */
-  const wishBody = document.getElementById('wishBody');
-  if(wishBody){
-    wishBody.addEventListener('click', function(e){
-      const mv = e.target.closest('[data-wmove]');
-      const rm = e.target.closest('[data-wremove]');
-      if(mv){
-        const p = productById(mv.dataset.wmove);
-        if(p){ Store.cartAdd(p.id, p.moq); Store.wishRemove(p.id); refreshCounters('cart'); renderWishlist(); renderCart(); showToast('Moved to cart at MOQ ('+p.moq+' units)'); }
-      } else if(rm){
-        Store.wishRemove(rm.dataset.wremove);
-        refreshCounters(); renderWishlist();
-        showToast('Removed from wishlist');
-      }
-    });
-  }
-
-  /* Show counts on page load */
-  refreshCounters();
-});
-})(); // end dead-code IIFE
+/* The old cart/wishlist store lived here (localStorage key 'fairford.v1', a
+   hardcoded PRODUCTS array of other manufacturers' medicines, and a flat 12%
+   GST constant). It rendered into the same #cartBody/#cartCount nodes as
+   common.js, so the homepage ran two carts against two storage keys at once.
+   common.js is now the single owner and migrates any leftover legacy cart. */
 
 
 // =============HERO SLIDER=================//
@@ -535,99 +254,74 @@ function getIconSVG(iconName, color) {
   return icons[iconName] || icons.heart;
 }
 
-// Therapeutic Divisions Data
-const divisions = [
-  {
-    id: 1,
-    title: 'Cardiac & Hypertension',
-    icon: 'heart',
-    skus: 142,
-    brands: 18,
-    color: '#EF4444',
-    category: 'Chronic Care'
-  },
-  {
-    id: 2,
-    title: 'Diabetic Care',
-    icon: 'activity',
-    skus: 128,
-    brands: 15,
-    color: '#8B5CF6',
-    category: 'Chronic Care'
-  },
-  {
-    id: 3,
-    title: 'Gastroenterology',
-    icon: 'droplet',
-    skus: 156,
-    brands: 21,
-    color: '#10B981',
-    category: 'Specialty'
-  },
-  {
-    id: 4,
-    title: 'Neurology',
-    icon: 'brain',
-    skus: 134,
-    brands: 16,
-    color: '#3B82F6',
-    category: 'Specialty'
-  },
-  {
-    id: 5,
-    title: 'Orthopaedic',
-    icon: 'bone',
-    skus: 118,
-    brands: 14,
-    color: '#F59E0B',
-    category: 'Acute'
-  },
-  {
-    id: 6,
-    title: 'Dermatology',
-    icon: 'sparkles',
-    skus: 145,
-    brands: 19,
-    color: '#EC4899',
-    category: 'Specialty'
-  },
-  {
-    id: 7,
-    title: 'Ayurvedic',
-    icon: 'leaf',
-    skus: 167,
-    brands: 23,
-    color: '#059669',
-    category: 'Wellness'
-  },
-  {
-    id: 8,
-    title: 'Anti-biotics',
-    icon: 'shield',
-    skus: 189,
-    brands: 25,
-    color: '#DC2626',
-    category: 'Acute'
-  },
-  {
-    id: 9,
-    title: 'Nutraceutical',
-    icon: 'plus',
-    skus: 203,
-    brands: 28,
-    color: '#14B8A6',
-    category: 'Wellness'
-  },
-  {
-    id: 10,
-    title: 'Gynaecology',
-    icon: 'users',
-    skus: 124,
-    brands: 17,
-    color: '#A855F7',
-    category: 'Specialty'
-  }
-];
+/* ------------------------------------------------------------------
+   CATALOGUE CATEGORIES
+   Loaded from /api/categories at runtime so the cards, their counts and
+   their links always reflect what is actually in stock.
+
+   This previously held ten hardcoded "therapeutic divisions" (Cardiac &
+   Hypertension, Diabetic Care, …) with invented SKU/brand counts. None of
+   them existed as a category in the database, and the whole grid sat inside
+   one <a href="product.html">, so every card led to the same unfiltered page.
+
+   The map below is presentation only — icon, accent colour, and the group
+   the filter pills use. Categories missing from it still render, via the
+   fallback, so a new category added in the admin panel never disappears.
+   ------------------------------------------------------------------ */
+const CATEGORY_PRESENTATION = {
+  'Tablets':           { icon: 'plus',     color: '#0F4C81', group: 'Dosage form' },
+  'Capsules':          { icon: 'plus',     color: '#6366F1', group: 'Dosage form' },
+  'Syrups':            { icon: 'droplet',  color: '#0EA5E9', group: 'Dosage form' },
+  'Drops':             { icon: 'droplet',  color: '#06B6D4', group: 'Dosage form' },
+  'Injections':        { icon: 'activity', color: '#EF4444', group: 'Dosage form' },
+  'Gels':              { icon: 'sparkles', color: '#8B5CF6', group: 'Dosage form' },
+  'Ointments':         { icon: 'sparkles', color: '#A855F7', group: 'Dosage form' },
+  'Sachets & Powders': { icon: 'leaf',     color: '#F59E0B', group: 'Dosage form' },
+  'Analgesics':        { icon: 'bone',     color: '#F97316', group: 'Therapeutic' },
+  'Antifungals':       { icon: 'shield',   color: '#14B8A6', group: 'Therapeutic' },
+  'Antibiotics':       { icon: 'shield',   color: '#0891B2', group: 'Therapeutic' },
+  'Vitamins':          { icon: 'leaf',     color: '#22C55E', group: 'Wellness' },
+  'Personal Care':     { icon: 'users',    color: '#EC4899', group: 'Wellness' }
+};
+const CATEGORY_FALLBACK = { icon: 'plus', color: '#0F4C81', group: 'Therapeutic' };
+
+// Filled by loadCategories(). Entry shape: {title, count, icon, color, category}
+let divisions = [];
+let divisionsError = false;
+
+function escDiv(s) {
+  return String(s).replace(/[&<>"']/g, function (c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+  });
+}
+
+function loadCategories() {
+  return fetch('/api/categories')
+    .then(function (r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.json();
+    })
+    .then(function (data) {
+      divisions = ((data && data.categories) || [])
+        // Only surface categories a buyer can actually order from.
+        .filter(function (c) { return c.isActive !== false && c.productCount > 0; })
+        .map(function (c) {
+          var p = CATEGORY_PRESENTATION[c.categoryName] || CATEGORY_FALLBACK;
+          return {
+            title: c.categoryName,
+            count: c.productCount,
+            icon:  p.icon,
+            color: p.color,
+            category: p.group
+          };
+        })
+        .sort(function (a, b) { return b.count - a.count; });
+    })
+    .catch(function (err) {
+      divisionsError = true;
+      console.error('[categories] load failed:', err);
+    });
+}
 
 // State Management
 let currentFilter = 'All';
@@ -635,49 +329,50 @@ let searchQuery = '';
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', function () {
-  renderDivisions();
+  renderDivisions();          // paints the loading state
   setupEventListeners();
+  loadCategories().then(renderDivisions);
 });
 
-// Render Division Cards
+// Render Category Cards.
+// Each card is an <a>, so it is keyboard-reachable and opens in a new tab on
+// middle-click — the old markup was a <div> with a JS click handler, wrapped in
+// a page-wide anchor, which gave neither.
 function renderDivisions() {
   const grid = document.getElementById('divisionsGrid');
-  const filteredDivisions = filterDivisions();
+  if (!grid) return;
 
-  if (filteredDivisions.length === 0) {
-    grid.innerHTML = `
+  const note = (msg) => `
             <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: #667085;">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.3; margin-bottom: 16px;">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.3; margin-bottom: 16px;" aria-hidden="true">
                     <circle cx="11" cy="11" r="8"></circle>
                     <path d="m21 21-4.35-4.35"></path>
                 </svg>
-                <p style="font-size: 16px;">No divisions found matching your criteria</p>
-            </div>
-        `;
+                <p style="font-size: 16px;">${msg}</p>
+            </div>`;
+
+  if (divisionsError) { grid.innerHTML = note('Categories could not be loaded. Please refresh the page.'); return; }
+  if (!divisions.length) { grid.innerHTML = note('Loading categories…'); return; }
+
+  const filteredDivisions = filterDivisions();
+  if (filteredDivisions.length === 0) {
+    grid.innerHTML = note('No categories match your search.');
     return;
   }
 
   grid.innerHTML = filteredDivisions.map(division => `
-        <div class="division-card" data-id="${division.id}">
+        <a class="division-card" href="product.html?category=${encodeURIComponent(division.title)}">
             <div class="icon-container" style="background: ${division.color}10;">
                 ${getIconSVG(division.icon, division.color)}
             </div>
-            <h3 class="division-title">${division.title}</h3>
-            <p class="division-meta">${division.brands} brands</p>
+            <h3 class="division-title">${escDiv(division.title)}</h3>
+            <p class="division-meta">${division.count} ${division.count === 1 ? 'product' : 'products'}</p>
             <div class="browse-link">
-                <span>Browse division</span>
-                <span class="browse-arrow">→</span>
+                <span>Browse category</span>
+                <span class="browse-arrow" aria-hidden="true">→</span>
             </div>
-        </div>
+        </a>
     `).join('');
-
-  // Add click handlers to cards
-  document.querySelectorAll('.division-card').forEach(card => {
-    card.addEventListener('click', function () {
-      const divisionId = this.getAttribute('data-id');
-      handleDivisionClick(divisionId);
-    });
-  });
 }
 
 // Filter Divisions
@@ -713,49 +408,20 @@ function setupEventListeners() {
   });
 
   // Search Input
+  // The homepage catalogue is now five static category cards, so this
+  // control is absent there — guard it or the rest of init never runs.
   const searchInput = document.getElementById('searchInput');
-  searchInput.addEventListener('input', function (e) {
+  if (searchInput) searchInput.addEventListener('input', function (e) {
     searchQuery = e.target.value;
     renderDivisions();
   });
 
-
-  // CTA Buttons
-  const primaryBtn = document.querySelector('.btn-primary');
-  const secondaryBtn = document.querySelector('.btn-secondary');
-
-  primaryBtn.addEventListener('click', function () {
-    handleDownloadPriceList();
-  });
-
-  secondaryBtn.addEventListener('click', function () {
-    handleViewCatalog();
-  });
+  // NOTE: the section's two CTAs are plain links (to the e-catalogue PDF and to
+  // product.html). They used to be wired here via document.querySelector(
+  // '.btn-primary'), which matches the FIRST .btn-primary in the document — the
+  // hero's "Open partner portal" — so the hero CTAs fired placeholder alert()s.
 }
 
-// Handle Division Card Click
-function handleDivisionClick(divisionId) {
-  const division = divisions.find(d => d.id === parseInt(divisionId));
-  if (division) {
-    window.location.href = 'product.html?search=' + encodeURIComponent(division.title);
-  }
-}
-
-// Handle Download Price List
-function handleDownloadPriceList() {
-  console.log('Download price list clicked');
-  alert('Price list download started. This would trigger a PDF download in production.');
-  // In production:
-  // window.location.href = '/api/download/price-list';
-}
-
-// Handle View Catalog
-function handleViewCatalog() {
-  console.log('View catalog clicked');
-  alert('Opening full catalog. This would navigate to the catalog page in production.');
-  // In production:
-  // window.location.href = '/catalog';
-}
 
 // Debounce function for search optimization
 function debounce(func, wait) {
@@ -822,6 +488,11 @@ document.querySelectorAll('.animate-in').forEach(el => {
   }
 
   function boot() {
+    // The home "Top Selling" carousel was replaced by the live product
+    // showcase (js/home-products.js). This whole module now only matters if
+    // the old `.products-swiper` markup is present, so no-op otherwise.
+    if (!document.querySelector('.products-swiper')) return;
+
     // Make sure Swiper loaded
     if (typeof Swiper === 'undefined') {
       console.warn('[TopProducts] Swiper.js not found — slider will not initialize.');
@@ -1236,7 +907,7 @@ if ('IntersectionObserver' in window) {
 const currentYear = new Date().getFullYear();
 const copyrightElement = document.querySelector('.copyright p');
 if (copyrightElement) {
-    copyrightElement.textContent = `© ${currentYear} FAIRFORD Pharmaceuticals PVT. LTD. All rights reserved.`;
+    copyrightElement.textContent = `© ${currentYear} Fair Ford Pharmaceuticals Pvt. Ltd. All rights reserved.`;
 }
 
 

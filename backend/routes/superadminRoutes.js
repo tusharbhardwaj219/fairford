@@ -1,13 +1,14 @@
 const router = require('express').Router();
 const c = require('../controllers/superadminController');
 const { verifyToken, authorizeRoles } = require('../middleware/authMiddleware');
-const { uploadProductImage, handleUploadError } = require('../middleware/uploadMiddleware');
+const { uploadProductImage, uploadProductGallery, handleUploadError } = require('../middleware/uploadMiddleware');
 
 // Whole dashboard API is admin/superadmin only.
 router.use(verifyToken, authorizeRoles('admin', 'superadmin'));
 
 // Dashboard
 router.get('/dashboard', c.dashboard);
+router.get('/analytics', c.analytics);
 
 // Approvals (retailer KYC)
 router.get('/approvals', c.listApprovals);
@@ -36,9 +37,13 @@ router.delete('/retailers/:id', c.deleteRetailer);
 // (the field name "image" matches the form input). JSON requests still work —
 // multer just leaves req.body alone when there's no file.
 router.get('/products', c.listProducts);
-router.post('/products', uploadProductImage, handleUploadError, c.createProduct);
+// POST/PUT accept multipart/form-data with up to 4 slot images (image_0..image_3)
+// plus an `imagesPlan` describing the desired gallery. uploadProductGallery is
+// multer .any(); JSON-only requests (no files) still work — the controller only
+// touches images when `imagesPlan` is present.
+router.post('/products', uploadProductGallery, handleUploadError, c.createProduct);
 router.get('/products/:id', c.getProduct);
-router.put('/products/:id', uploadProductImage, handleUploadError, c.updateProduct);
+router.put('/products/:id', uploadProductGallery, handleUploadError, c.updateProduct);
 router.delete('/products/:id', c.deleteProduct);
 
 // Schemes

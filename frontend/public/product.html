@@ -18,375 +18,461 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 </script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0F4C81" />
     <!-- SEO -->
-    <title>Fair Ford- product</title>
+    <title>Pharmaceutical Products — Fair Ford Pharmaceuticals</title>
     <meta name="description"
-        content="Browse verified WHO-GMP certified pharmaceutical products for retailers, distributors and stockists. Filter by category, brand, price, stock and rating." />
-    <meta name="keywords"
-        content="pharma marketplace, B2B pharmaceuticals, wholesale medicines, distributor pricing, tablets, capsules, syrups, injections" />
-    <meta property="og:title" content="MediBridge — B2B Pharma Marketplace" />
-    <meta property="og:type" content="website"/>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-        href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
-        rel="stylesheet" />
+        content="Browse the full Fair Ford pharmaceutical catalogue for retailers, distributors and stockists. Filter by category, composition, pack size, product type and stock availability." />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://www.fairfordpharma.com/product.html" />
+    <!-- Open Graph -->
+    <meta property="og:title" content="Pharmaceutical Products — Fair Ford Pharmaceuticals" />
+    <meta property="og:description" content="Browse the full Fair Ford pharmaceutical catalogue. Filter by category, composition, pack size and stock availability." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://www.fairfordpharma.com/product.html" />
+    <meta property="og:image" content="https://res.cloudinary.com/dp4yririh/image/upload/v1782967649/fairford/site/m5d8pmtzdjr4dcgctvuc.png" />
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Pharmaceutical Products — Fair Ford Pharmaceuticals" />
+    <meta name="twitter:description" content="Browse the full Fair Ford pharmaceutical catalogue by category, composition and availability." />
+    <meta name="twitter:image" content="https://res.cloudinary.com/dp4yririh/image/upload/v1782967649/fairford/site/m5d8pmtzdjr4dcgctvuc.png" />
+
+    <link rel="preconnect" href="https://res.cloudinary.com" crossorigin />
+    <link rel="stylesheet" href="/frontend/css/typography.css">
     <link rel="stylesheet" href="/frontend/css/style.css" />
     <link rel="stylesheet" href="/frontend/css/product.css" />
-    <link rel="stylesheet" href="/frontend/css/pd.css" />
+    <!-- pd.css used to be linked here for the legacy `.pl-*` listing cards.
+         The marketplace below is built entirely from `.ffm-*` classes, so the
+         55KB detail-page stylesheet is no longer downloaded on this page.
+         product-marketplace.css MUST load last — it owns this page. -->
+    <link rel="stylesheet" href="/frontend/css/product-marketplace.css" />
 
-    <link rel="icon" type="image/png" href=https://res.cloudinary.com/dp4yririh/image/upload/v1782967649/fairford/site/m5d8pmtzdjr4dcgctvuc.png>
+    <link rel="icon" type="image/png" href="https://res.cloudinary.com/dp4yririh/image/upload/v1782967649/fairford/site/m5d8pmtzdjr4dcgctvuc.png">
+  <!-- Page loader (see css/loader.css + js/loader.js). Not deferred:
+       the overlay must exist before first paint. -->
+  <link rel="stylesheet" href="/frontend/css/loader.css" />
+  <link rel="stylesheet" href="/frontend/css/footer.css">
+  <script src="/frontend/js/loader.js"></script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": "Pharmaceutical Products",
+    "description": "The Fair Ford Pharmaceuticals B2B catalogue for retailers, distributors, stockists and hospitals.",
+    "url": "https://www.fairfordpharma.com/product.html",
+    "isPartOf": { "@type": "WebSite", "name": "Fair Ford Pharmaceuticals", "url": "https://www.fairfordpharma.com/" },
+    "breadcrumb": {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://www.fairfordpharma.com/index.html" },
+        { "@type": "ListItem", "position": 2, "name": "Products", "item": "https://www.fairfordpharma.com/product.html" }
+      ]
+    }
+  }
+  </script>
 </head>
 <body><!-- Google Tag Manager (noscript) -->
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5B2HT6FW"
 height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- End Google Tag Manager (noscript) -->
+
+    <a class="ffm-skip" href="#catalogue">Skip to product catalogue</a>
+
     <!-- Header injected by common.js -->
     <div id="site-header"></div>
 
-    <!-- Hero banner removed -->
-    <section class="ph-hero" aria-label="Hero" style="display:none">
+    <main class="ffm">
 
-      <!-- Layered background decoration (CSS-only, aria-hidden) -->
-      <div class="ph-bg-grid"  aria-hidden="true"></div>
-      <div class="ph-bg-hex"   aria-hidden="true"></div>
-      <div class="ph-bg-orb"   aria-hidden="true"></div>
-
-      <!-- Molecular structure decorations -->
-      <div class="ph-mol" aria-hidden="true">
-        <div class="ph-mol-dot" style="top:18%;left:3.5%"></div>
-        <div class="ph-mol-dot" style="top:55%;left:6%"></div>
-        <div class="ph-mol-dot" style="top:78%;left:4%"></div>
-        <div class="ph-mol-dot" style="top:30%;left:9%"></div>
-        <div class="ph-mol-line" style="top:18.4%;left:3.7%;width:90px;transform:rotate(25deg)"></div>
-        <div class="ph-mol-line" style="top:55.4%;left:6.2%;width:70px;transform:rotate(-15deg)"></div>
-        <div class="ph-mol-line" style="top:30.4%;left:4.2%;width:85px;transform:rotate(42deg)"></div>
-      </div>
-
-      <div class="container ph-hero-inner">
-
-        <!-- ── LEFT: Content ── -->
-        <div class="ph-hero-content">
-
-          <!-- Certification badge -->
-          <div class="ph-cert-badge" aria-label="WHO-GMP Certified Platform">
-            <div class="ph-cert-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" width="13" height="13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M12 2L3 6v6c0 5.25 3.75 10.15 9 11.25C17.25 22.15 21 17.25 21 12V6L12 2z"/>
-                <path d="M8.5 12l2.5 2.5 5-5"/>
-              </svg>
-            </div>
-            <span>WHO-GMP Certified Platform</span>
-            <div class="ph-cert-pulse" aria-hidden="true"></div>
-            <span class="ph-cert-live">Verified</span>
-          </div>
-
-          <!-- Heading -->
-          <h1 class="ph-hero-title">
-            India's Trusted<br>
-            <span class="ph-grad-text">B2B Pharma</span><br>
-            Marketplace
-          </h1>
-
-          <!-- Subtitle -->
-          <p class="ph-hero-sub">
-            Source verified pharmaceutical products at exclusive trade pricing.
-            Retailer-only access with seamless COD ordering and fastest
-            distributor routing.
-          </p>
-
-          <!-- CTA buttons -->
-          <div class="ph-hero-ctas">
-            <a href="registration.html" class="ph-btn ph-btn-primary">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2z"/><path d="M12 8v8"/><path d="M8 12h8"/>
-              </svg>
-              Request Wholesale Pricing
-            </a>
-            <a href="product.html" class="ph-btn ph-btn-secondary">
-              Browse Products
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path d="M5 12h14M12 5l7 7-7 7"/>
-              </svg>
-            </a>
-          </div>
-
-          <!-- Stats strip -->
-          <div class="ph-stats-strip">
-
-            <div class="ph-stat2">
-              <div class="ph-stat2-icon" aria-hidden="true">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-                  <rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/>
-                  <rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>
-                </svg>
-              </div>
-              <div>
-                <span class="ph-stat2-num">500+</span>
-                <span class="ph-stat2-lbl">Products</span>
-              </div>
-            </div>
-
-            <div class="ph-stat-sep" aria-hidden="true"></div>
-
-            <div class="ph-stat2">
-              <div class="ph-stat2-icon" aria-hidden="true">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-                  <path d="M4 6h16M4 12h16M4 18h10"/>
-                </svg>
-              </div>
-              <div>
-                <span class="ph-stat2-num">50+</span>
-                <span class="ph-stat2-lbl">Categories</span>
-              </div>
-            </div>
-
-            <div class="ph-stat-sep" aria-hidden="true"></div>
-
-            <div class="ph-stat2">
-              <div class="ph-stat2-icon" aria-hidden="true">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-                  <circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/>
-                </svg>
-              </div>
-              <div>
-                <span class="ph-stat2-num">24h</span>
-                <span class="ph-stat2-lbl">Dispatch</span>
-              </div>
-            </div>
-
-            <div class="ph-stat-sep" aria-hidden="true"></div>
-
-            <div class="ph-stat2">
-              <div class="ph-stat2-icon" aria-hidden="true">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-                  <rect x="2" y="5" width="20" height="14" rx="2.5"/><path d="M2 10h20"/>
-                </svg>
-              </div>
-              <div>
-                <span class="ph-stat2-num">COD</span>
-                <span class="ph-stat2-lbl">Payment</span>
-              </div>
-            </div>
-
-          </div>
+      <!-- ============================================================
+           1 · HERO — premium B2B marketplace introduction
+           ============================================================ -->
+      <section class="ffm-hero" aria-labelledby="ffm-hero-title">
+        <div class="ffm-hero-bg" aria-hidden="true">
+          <span class="ffm-hero-grid"></span>
+          <span class="ffm-hero-orb ffm-hero-orb--a"></span>
+          <span class="ffm-hero-orb ffm-hero-orb--b"></span>
         </div>
 
-        <!-- ── RIGHT: Premium dashboard cards ── -->
-        <div class="ph-hero-visual" aria-hidden="true">
-          <div class="ph-dashboard-wrap">
-
-            <!-- Tablets -->
-            <div class="ph-dash-card ph-dash-card-1">
-              <div class="ph-dash-img ph-dash-img-tablet">
-                <svg viewBox="0 0 64 64" width="44" height="44" fill="none">
-                  <rect x="8" y="26" width="48" height="12" rx="6" fill="url(#tg)"/>
-                  <rect x="8" y="26" width="24" height="12" fill="rgba(255,255,255,.14)"/>
-                  <rect x="31" y="26" width="1" height="12" fill="rgba(255,255,255,.3)"/>
-                  <defs>
-                    <linearGradient id="tg" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stop-color="#38BDF8"/>
-                      <stop offset="100%" stop-color="#0F4C81"/>
-                    </linearGradient>
-                  </defs>
-                </svg>
-              </div>
-              <div class="ph-dash-info">
-                <span class="ph-dash-cat">Tablets</span>
-              </div>
-              <div class="ph-dash-trend">
-                <span class="ph-dash-pct">+12%</span>
-                <div class="ph-dash-arrow">
-                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M7 17l10-10M7 7h10v10"/></svg>
-                </div>
-              </div>
-            </div>
-
-            <!-- Syrups -->
-            <div class="ph-dash-card ph-dash-card-2">
-              <div class="ph-dash-img ph-dash-img-syrup">
-                <svg viewBox="0 0 64 64" width="44" height="44" fill="none">
-                  <rect x="24" y="14" width="16" height="6" rx="3" fill="#D97706" opacity=".75"/>
-                  <rect x="20" y="20" width="24" height="34" rx="6" fill="url(#sg)"/>
-                  <rect x="23" y="28" width="18" height="10" rx="2" fill="rgba(255,255,255,.2)"/>
-                  <defs>
-                    <linearGradient id="sg" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stop-color="#FCD34D"/>
-                      <stop offset="100%" stop-color="#D97706"/>
-                    </linearGradient>
-                  </defs>
-                </svg>
-              </div>
-              <div class="ph-dash-info">
-                <span class="ph-dash-cat">Syrups</span>
-              </div>
-              <div class="ph-dash-trend">
-                <span class="ph-dash-pct">+8%</span>
-                <div class="ph-dash-arrow">
-                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M7 17l10-10M7 7h10v10"/></svg>
-                </div>
-              </div>
-            </div>
-
-            <!-- Injectables -->
-            <div class="ph-dash-card ph-dash-card-3">
-              <div class="ph-dash-img ph-dash-img-inject">
-                <svg viewBox="0 0 64 64" width="44" height="44" fill="none">
-                  <rect x="28" y="8"  width="8" height="6"  rx="2" fill="rgba(110,231,183,.6)"/>
-                  <rect x="29" y="14" width="6" height="36" rx="3" fill="url(#ig)"/>
-                  <rect x="30.5" y="20" width="3" height="22" rx="1.5" fill="rgba(255,255,255,.2)"/>
-                  <rect x="26" y="48" width="12" height="5" rx="2.5" fill="#059669" opacity=".9"/>
-                  <defs>
-                    <linearGradient id="ig" x1="0%" y1="0%" x2="0%" y2="100%">
-                      <stop offset="0%" stop-color="#6EE7B7"/>
-                      <stop offset="100%" stop-color="#059669"/>
-                    </linearGradient>
-                  </defs>
-                </svg>
-              </div>
-              <div class="ph-dash-info">
-                <span class="ph-dash-cat">Injectables</span>
-              </div>
-              <div class="ph-dash-trend">
-                <span class="ph-dash-pct">+19%</span>
-                <div class="ph-dash-arrow">
-                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M7 17l10-10M7 7h10v10"/></svg>
-                </div>
-              </div>
-            </div>
-
-            <!-- Supplements -->
-            <div class="ph-dash-card ph-dash-card-4">
-              <div class="ph-dash-img ph-dash-img-supp">
-                <svg viewBox="0 0 64 64" width="44" height="44" fill="none">
-                  <rect x="14" y="16" width="36" height="40" rx="6" fill="url(#pg)"/>
-                  <rect x="18" y="24" width="28" height="16" rx="3" fill="rgba(255,255,255,.18)"/>
-                  <rect x="20" y="26" width="10" height="3" rx="1.5" fill="rgba(255,255,255,.55)"/>
-                  <rect x="20" y="31" width="18" height="2.5" rx="1.25" fill="rgba(255,255,255,.35)"/>
-                  <rect x="20" y="35" width="14" height="2.5" rx="1.25" fill="rgba(255,255,255,.25)"/>
-                  <defs>
-                    <linearGradient id="pg" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stop-color="#A78BFA"/>
-                      <stop offset="100%" stop-color="#7C3AED"/>
-                    </linearGradient>
-                  </defs>
-                </svg>
-              </div>
-              <div class="ph-dash-info">
-                <span class="ph-dash-cat">Supplements</span>
-              </div>
-              <div class="ph-dash-trend">
-                <span class="ph-dash-pct">+5%</span>
-                <div class="ph-dash-arrow">
-                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M7 17l10-10M7 7h10v10"/></svg>
-                </div>
-              </div>
-            </div>
-
-          </div>
-        </div>
-
-      </div>
-    </section>
-
-    <main class="container">
-        <!-- Page heading + breadcrumb -->
-        <div class="page-head">
-            <nav class="breadcrumb" aria-label="Breadcrumb">
-                <a href="#">Home</a><span class="sep">/</span>
-                <span class="current">Products</span>
+        <div class="container ffm-hero-inner">
+          <div class="ffm-hero-copy">
+            <nav class="ffm-crumb" aria-label="Breadcrumb">
+              <a href="index.html">Home</a>
+              <span class="ffm-crumb-sep" aria-hidden="true">/</span>
+              <span aria-current="page">Products</span>
             </nav>
-            <h1>Pharmaceutical Products</h1>
-            <p>Source verified, WHO-GMP certified </p>
+
+            <span class="ffm-gmp">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 12 2 2 4-4"/><path d="M12 3 4 6v6c0 5 8 9 8 9s8-4 8-9V6l-8-3z"/></svg>
+              WHO-GMP Certified Manufacturing
+            </span>
+
+            <h1 id="ffm-hero-title">
+              India's Trusted<br />
+              <span class="ffm-hero-accent">B2B Pharma</span> Marketplace
+            </h1>
+
+            <p class="ffm-hero-sub">
+              Source the complete Fair Ford formulation range — tablets, capsules, syrups,
+              injectables, dermatology and nutraceuticals — with trade pricing, GST-compliant
+              billing and orders routed to your nearest serviceable stockist.
+            </p>
+
+            <div class="ffm-hero-ctas">
+              <a class="ffm-btn ffm-btn-primary ffm-btn-lg" href="#catalogue">
+                <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+                Browse Products
+              </a>
+              <a class="ffm-btn ffm-btn-glass ffm-btn-lg" href="contactus.html?enquiry=wholesale-pricing">
+                <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 15h6M9 11h3"/></svg>
+                Request Wholesale Pricing
+              </a>
+            </div>
+
+            <!-- Figures are read from the live catalogue at runtime (see
+                 paintHeroStats in product.js). No hardcoded product counts. -->
+            <ul class="ffm-hero-stats" id="ffm-hero-stats">
+              <li><b data-stat="products"><span class="ffm-stat-dash">—</span></b><span>Products listed</span></li>
+              <li><b data-stat="categories"><span class="ffm-stat-dash">—</span></b><span>Categories</span></li>
+              <li><b>700+</b><span>Partner network</span></li>
+              <li><b>COD</b><span>&amp; online payment</span></li>
+            </ul>
+          </div>
+
+          <!-- Visual is composed from real catalogue photographs, injected at
+               runtime by product.js. No stock imagery, no invented packaging. -->
+          <div class="ffm-hero-visual" id="ffm-hero-visual" aria-hidden="true"></div>
         </div>
+      </section>
 
-        <div class="shop-layout">
-            <!-- ===== STICKY FILTER SIDEBAR ===== -->
-            <aside class="sidebar" id="sidebar" aria-label="Product filters">
-                <div class="filter-card">
-                    <div class="filter-head">
-                        <h3>Filters</h3>
-                        <a href="#" class="reset-link" id="reset-top">Reset all</a>
-                    </div>
+      <!-- ============================================================
+           2 · TRUST STRIP
+           ============================================================ -->
+      <section class="ffm-trustbar" aria-label="Why buy from Fair Ford">
+        <div class="container ffm-trustbar-inner">
+          <div class="ffm-trustbar-item">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 12 2 2 4-4"/><path d="M12 3 4 6v6c0 5 8 9 8 9s8-4 8-9V6l-8-3z"/></svg>
+            <div><b>WHO-GMP certified</b><span>Multi-stage QC before dispatch</span></div>
+          </div>
+          <div class="ffm-trustbar-item">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+            <div><b>Nearest-stockist routing</b><span>Territory &amp; pincode coverage</span></div>
+          </div>
+          <div class="ffm-trustbar-item">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 15h6M9 11h3"/></svg>
+            <div><b>GST-compliant billing</b><span>Correct rate on every line item</span></div>
+          </div>
+          <div class="ffm-trustbar-item">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+            <div><b>COD or pay online</b><span>Cash on delivery &amp; UPI/card</span></div>
+          </div>
+        </div>
+      </section>
 
-                    <div class="filter-scroll">
-                        <!-- Search -->
-                        <div class="fgroup">
-                            <div class="flabel">Search Product</div>
-                            <div class="search-box" id="search-wrap"></div>
-                        </div>
+      <!-- ============================================================
+           3 · CATEGORY NAVIGATION — built from /api/categories
+           ============================================================ -->
+      <section class="ffm-section ffm-cats-section" aria-labelledby="ffm-cats-title">
+        <div class="container">
+          <header class="ffm-sechead">
+            <div>
+              <span class="ffm-eyebrow">Shop by form &amp; segment</span>
+              <h2 id="ffm-cats-title">Product Categories</h2>
+            </div>
+            <a class="ffm-seclink" href="#catalogue">
+              View full catalogue
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </a>
+          </header>
+          <div class="ffm-cats" id="ffm-cats" role="list"></div>
+        </div>
+      </section>
 
-                        <!-- Category -->
-                        <div class="fgroup">
-                            <div class="flabel">Category</div>
-                            <div id="filter-category"></div>
-                        </div>
+      <!-- ============================================================
+           4 · TOP SELLING — the curated range already published on the
+               home page, resolved against live catalogue records.
+           ============================================================ -->
+      <section class="ffm-section ffm-rail-section" id="ffm-topselling-section" aria-labelledby="ffm-top-title" hidden>
+        <div class="container">
+          <header class="ffm-sechead">
+            <div>
+              <span class="ffm-eyebrow">Frequently ordered</span>
+              <h2 id="ffm-top-title">Top Selling Products</h2>
+              <p class="ffm-secsub">Explore products frequently ordered by Fair Ford's B2B partners.</p>
+            </div>
+            <div class="ffm-rail-nav">
+              <button type="button" class="ffm-rail-btn" data-rail="ffm-topselling" data-dir="-1" aria-label="Scroll left">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+              </button>
+              <button type="button" class="ffm-rail-btn" data-rail="ffm-topselling" data-dir="1" aria-label="Scroll right">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+              </button>
+            </div>
+          </header>
+          <div class="ffm-rail" id="ffm-topselling"></div>
+        </div>
+      </section>
 
-                        <!-- Price -->
-                        <div class="fgroup">
-                            <div class="flabel">Price Range (₹)</div>
-                            <div class="price-inputs">
-                                <div class="pinput"><label>Min</label><input type="number" id="price-min" min="0" />
-                                </div>
-                                <span class="dash">—</span>
-                                <div class="pinput"><label>Max</label><input type="number" id="price-max" min="0" />
-                                </div>
-                            </div>
-                            <div class="range-wrap">
-                                <div class="range-track"></div>
-                                <div class="range-fill" id="range-fill"></div>
-                                <input type="range" id="range-lo" />
-                                <input type="range" id="range-hi" />
-                            </div>
-                            <div class="range-out"><span id="out-lo">₹0</span><span id="out-hi">₹0</span></div>
-                        </div>
+      <!-- ============================================================
+           5 · BUY AGAIN — real reorder data, signed-in retailers only.
+           ============================================================ -->
+      <section class="ffm-section ffm-rail-section" id="ffm-buyagain-section" aria-labelledby="ffm-again-title" hidden>
+        <div class="container">
+          <header class="ffm-sechead">
+            <div>
+              <span class="ffm-eyebrow">From your order history</span>
+              <h2 id="ffm-again-title">Buy Again</h2>
+              <p class="ffm-secsub">Products you have ordered before — reorder in one click.</p>
+            </div>
+            <div class="ffm-rail-nav">
+              <button type="button" class="ffm-rail-btn" data-rail="ffm-buyagain" data-dir="-1" aria-label="Scroll left">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+              </button>
+              <button type="button" class="ffm-rail-btn" data-rail="ffm-buyagain" data-dir="1" aria-label="Scroll right">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+              </button>
+            </div>
+          </header>
+          <div class="ffm-rail" id="ffm-buyagain"></div>
+        </div>
+      </section>
 
-                        <!-- Stock -->
-                        <div class="fgroup">
-                            <div class="flabel">Stock Status</div>
-                            <div id="filter-stock"></div>
-                        </div>
+      <!-- ============================================================
+           6 · THE MARKETPLACE — filters + grid
+           ============================================================ -->
+      <section class="ffm-shop" id="catalogue" aria-labelledby="ffm-shop-title">
+        <div class="container">
 
-                        <!-- Rating -->
-                        <div class="fgroup">
-                            <div class="flabel">Customer Rating</div>
-                            <div id="filter-rating"></div>
-                        </div>
-                    </div>
+          <header class="ffm-shophead">
+            <span class="ffm-eyebrow">The catalogue</span>
+            <h2 id="ffm-shop-title">Pharmaceutical Products</h2>
+            <p>Source verified, WHO-GMP certified pharmaceutical products for your business.</p>
+          </header>
 
-                    <div class="filter-actions">
-                        <button class="btn btn-ghost" id="clear-filters">Clear Filters</button>
-                        <button class="btn btn-primary" id="apply-filters">Apply Filters</button>
-                    </div>
+          <!-- ---- TOOLBAR ---- -->
+          <div class="ffm-toolbar" id="ffm-toolbar">
+            <div class="ffm-toolbar-inner">
+
+              <div class="ffm-search" id="ffm-search">
+                <svg class="ffm-search-ico" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+                <input type="search" id="ffm-search-input" autocomplete="off" spellcheck="false"
+                       role="combobox" aria-expanded="false" aria-autocomplete="list"
+                       aria-controls="ffm-suggest" aria-label="Search products by name, composition, category or product code"
+                       placeholder="Search by brand, composition or product code…" />
+                <button type="button" class="ffm-search-clear" id="ffm-search-clear" aria-label="Clear search" hidden>
+                  <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                </button>
+                <div class="ffm-suggest" id="ffm-suggest" role="listbox" aria-label="Search suggestions" hidden></div>
+              </div>
+
+              <div class="ffm-toolbar-controls">
+                <button type="button" class="ffm-filters-btn" id="ffm-open-filters" aria-controls="ffm-filters" aria-expanded="false">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 5h18M6 12h12M10 19h4"/></svg>
+                  Filters
+                  <span class="ffm-filters-count" id="ffm-filters-count" hidden>0</span>
+                </button>
+
+                <label class="ffm-select">
+                  <span class="ffm-select-label">Sort</span>
+                  <select id="ffm-sort" aria-label="Sort products">
+                    <option value="name" selected>Name: A–Z</option>
+                    <option value="name-desc">Name: Z–A</option>
+                    <option value="price-asc">Price: Low to High</option>
+                    <option value="price-desc">Price: High to Low</option>
+                    <option value="recent">Recently added</option>
+                    <option value="stock">Stock: highest first</option>
+                  </select>
+                </label>
+
+                <div class="ffm-viewtoggle" role="group" aria-label="Change product layout">
+                  <button type="button" data-view="grid" class="is-on" aria-pressed="true" title="Grid view">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+                    <span class="ffm-sr">Grid view</span>
+                  </button>
+                  <button type="button" data-view="list" aria-pressed="false" title="List view">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+                    <span class="ffm-sr">List view</span>
+                  </button>
                 </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ---- LAYOUT ---- -->
+          <div class="ffm-layout">
+
+            <!-- FILTER RAIL (desktop) / BOTTOM SHEET (mobile) -->
+            <aside class="ffm-filters" id="ffm-filters" aria-label="Product filters">
+              <div class="ffm-filters-head">
+                <h3>Filters</h3>
+                <button type="button" class="ffm-reset" id="ffm-reset-top">Reset all</button>
+                <button type="button" class="ffm-sheet-close" id="ffm-close-filters" aria-label="Close filters">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                </button>
+              </div>
+              <div class="ffm-filters-scroll" id="ffm-filters-scroll"></div>
+              <div class="ffm-filters-foot">
+                <button type="button" class="ffm-btn ffm-btn-ghost" id="ffm-clear-filters">Clear all</button>
+                <button type="button" class="ffm-btn ffm-btn-primary" id="ffm-apply-filters">Show <span id="ffm-apply-count">0</span> products</button>
+              </div>
             </aside>
-            <!-- ===== PRODUCTS GRID ===== -->
-            <section>
-                <div class="results-head">
-                    <div class="count-txt"><b id="result-count">0</b> products found</div>
-                    <div class="results-tools">
-                        <button class="btn btn-ghost filter-toggle" id="open-filters" aria-label="Toggle filters">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
-                            Filters
-                        </button>
-                        <select class="sort-select" id="sort-select" aria-label="Sort products">
-                            <!-- A–Z is the default listing order (first + selected). -->
-                            <option value="name" selected>Name: A–Z</option>
-                            <option value="featured">Sort: Featured</option>
-                            <option value="price-asc">Price: Low to High</option>
-                            <option value="price-desc">Price: High to Low</option>
-                            <option value="rating">Top Rated</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="active-chips" id="active-chips"></div>
 
-                <div class="product-grid" id="product-grid" aria-live="polite"></div>
-            </section>
+            <!-- RESULTS -->
+            <div class="ffm-results">
+              <div class="ffm-resulthead">
+                <p class="ffm-resultcount" id="ffm-result-count" aria-live="polite">Loading catalogue…</p>
+                <div class="ffm-chips" id="ffm-chips"></div>
+              </div>
+
+              <div class="ffm-grid" id="ffm-grid" data-view="grid"></div>
+              <div class="ffm-loadmore" id="ffm-loadmore"></div>
+            </div>
+          </div>
         </div>
+      </section>
 
-        <div class="filter-backdrop" id="filter-backdrop"></div>
+      <!-- ============================================================
+           7 · RECENTLY VIEWED
+           ============================================================ -->
+      <section class="ffm-section ffm-rail-section" id="ffm-recent-section" aria-labelledby="ffm-recent-title" hidden>
+        <div class="container">
+          <header class="ffm-sechead">
+            <div>
+              <span class="ffm-eyebrow">Pick up where you left off</span>
+              <h2 id="ffm-recent-title">Recently Viewed</h2>
+            </div>
+            <button type="button" class="ffm-seclink ffm-seclink-btn" id="ffm-recent-clear">Clear history</button>
+          </header>
+          <div class="ffm-rail" id="ffm-recent"></div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           8 · WHY FAIR FORD
+           ============================================================ -->
+      <section class="ffm-section ffm-why" aria-labelledby="ffm-why-title">
+        <div class="container">
+          <header class="ffm-sechead ffm-sechead-center">
+            <div>
+              <span class="ffm-eyebrow">Built for pharmaceutical procurement</span>
+              <h2 id="ffm-why-title">Why B2B Buyers Choose Fair Ford</h2>
+              <p class="ffm-secsub">Everything a distributor, stockist, chemist or hospital procurement team needs to order with confidence.</p>
+            </div>
+          </header>
+
+          <div class="ffm-whygrid">
+            <article class="ffm-whycard">
+              <span class="ffm-whyico"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 12 2 2 4-4"/><path d="M12 3 4 6v6c0 5 8 9 8 9s8-4 8-9V6l-8-3z"/></svg></span>
+              <h3>WHO-GMP certified</h3>
+              <p>Formulations manufactured to WHO-GMP standards, with multi-stage quality control and batch records before every dispatch.</p>
+            </article>
+            <article class="ffm-whycard">
+              <span class="ffm-whyico"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></span>
+              <h3>Routed to your nearest stockist</h3>
+              <p>Every order is matched to the closest serviceable distributor by pincode and territory — shorter transit, fewer handovers.</p>
+            </article>
+            <article class="ffm-whycard">
+              <span class="ffm-whyico"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 15h6M9 11h3"/></svg></span>
+              <h3>GST-compliant invoicing</h3>
+              <p>Each line item carries its own GST rate, so the total you see at checkout is the total on the invoice.</p>
+            </article>
+            <article class="ffm-whycard">
+              <span class="ffm-whyico"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>
+              <h3>Trade pricing on approval</h3>
+              <p>Retailer and distributor price lists unlock once your KYC is approved. Trade rates are never exposed publicly.</p>
+            </article>
+            <article class="ffm-whycard">
+              <span class="ffm-whyico"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></span>
+              <h3>Pan-India distribution</h3>
+              <p>A 700+ strong partner network of distributors, stockists, chemists and hospitals across the country.</p>
+            </article>
+            <article class="ffm-whycard">
+              <span class="ffm-whyico"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20M6 15h4"/></svg></span>
+              <h3>COD or secure online payment</h3>
+              <p>Settle on delivery, or pay by UPI, card or netbanking through an encrypted gateway — whichever suits your books.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           9 · FAQ
+           ============================================================ -->
+      <section class="ffm-section ffm-faq" aria-labelledby="ffm-faq-title">
+        <div class="container ffm-faq-inner">
+          <div class="ffm-faq-intro">
+            <span class="ffm-eyebrow">Ordering &amp; supply</span>
+            <h2 id="ffm-faq-title">Frequently Asked Questions</h2>
+            <p class="ffm-secsub">Answers to the questions our procurement partners ask most. Anything else — our team replies within one business day.</p>
+            <a class="ffm-btn ffm-btn-ghost" href="contactus.html">
+              Talk to our team
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </a>
+          </div>
+
+          <div class="ffm-faq-list">
+            <details class="ffm-faq-item">
+              <summary>Who can order on this platform?<span class="ffm-faq-mark" aria-hidden="true"></span></summary>
+              <div class="ffm-faq-body"><p>The marketplace is for pharmaceutical businesses — retailers, chemists, stockists, distributors, hospitals and institutional buyers. Anyone can browse the catalogue and see MRP; ordering requires a registered account with approved KYC.</p></div>
+            </details>
+            <details class="ffm-faq-item">
+              <summary>Why can't I see trade prices?<span class="ffm-faq-mark" aria-hidden="true"></span></summary>
+              <div class="ffm-faq-body"><p>Trade pricing is confidential and role-specific. Retailer and distributor rates are released by the server only after you sign in with an approved account — they are never present in the public page, so they cannot be read by inspecting it.</p></div>
+            </details>
+            <details class="ffm-faq-item">
+              <summary>How do I register as a retailer?<span class="ffm-faq-mark" aria-hidden="true"></span></summary>
+              <div class="ffm-faq-body"><p>Use the <a href="registration.html">retailer registration form</a> and upload your drug licence, GST certificate and supporting KYC documents. Once our team verifies them, your account is approved and trade pricing unlocks across the catalogue.</p></div>
+            </details>
+            <details class="ffm-faq-item">
+              <summary>Is there a minimum order quantity?<span class="ffm-faq-mark" aria-hidden="true"></span></summary>
+              <div class="ffm-faq-body"><p>Any product carrying an MOQ shows it on the product card and detail page. Where no MOQ is shown, the product can be ordered from a single unit. For large or institutional volumes, <a href="contactus.html?enquiry=wholesale-pricing">request wholesale pricing</a> and we will quote against your requirement.</p></div>
+            </details>
+            <details class="ffm-faq-item">
+              <summary>How are orders delivered?<span class="ffm-faq-mark" aria-hidden="true"></span></summary>
+              <div class="ffm-faq-body"><p>Each order is automatically routed to the nearest distributor or stockist that services your shop's pincode or city, who then fulfils and dispatches it. If your area is not yet covered, checkout tells you at once rather than accepting an order we cannot serve.</p></div>
+            </details>
+            <details class="ffm-faq-item">
+              <summary>What payment methods do you accept?<span class="ffm-faq-mark" aria-hidden="true"></span></summary>
+              <div class="ffm-faq-body"><p>Cash on delivery, or online payment by UPI, card, netbanking and wallets through our secure gateway. Every order is invoiced with GST applied per line item.</p></div>
+            </details>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           10 · CLOSING CTA
+           ============================================================ -->
+      <section class="ffm-cta" aria-labelledby="ffm-cta-title">
+        <div class="container ffm-cta-inner">
+          <div class="ffm-cta-copy">
+            <span class="ffm-gmp ffm-gmp-light">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 12 2 2 4-4"/><path d="M12 3 4 6v6c0 5 8 9 8 9s8-4 8-9V6l-8-3z"/></svg>
+              Partner with Fair Ford
+            </span>
+            <h2 id="ffm-cta-title">Ready to see your trade pricing?</h2>
+            <p>Register your business, upload your drug licence and GST details, and unlock role-specific pricing across the entire catalogue.</p>
+          </div>
+          <div class="ffm-cta-actions">
+            <a class="ffm-btn ffm-btn-primary ffm-btn-lg" href="registration.html">Create a retailer account</a>
+            <a class="ffm-btn ffm-btn-glass ffm-btn-lg" href="contactus.html?enquiry=wholesale-pricing">Request wholesale pricing</a>
+          </div>
+        </div>
+      </section>
     </main>
+
+    <!-- Mobile filter / modal backdrop -->
+    <div class="ffm-backdrop" id="ffm-backdrop" hidden></div>
+
+    <!-- Quick View modal (populated by product.js) -->
+    <div class="ffm-modal" id="ffm-quickview" role="dialog" aria-modal="true" aria-labelledby="ffm-qv-title" hidden>
+      <div class="ffm-modal-card" id="ffm-quickview-card"></div>
+    </div>
+
+    <!-- Compare tray + modal -->
+    <div class="ffm-comparebar" id="ffm-comparebar" hidden></div>
+    <div class="ffm-modal ffm-modal-wide" id="ffm-compare" role="dialog" aria-modal="true" aria-labelledby="ffm-cmp-title" hidden>
+      <div class="ffm-modal-card" id="ffm-compare-card"></div>
+    </div>
 
     <!-- Footer injected by common.js -->
     <div id="site-footer"></div>

@@ -60,8 +60,8 @@
     --cta-bg-hover: linear-gradient(135deg, #34d399 0%, #10b981 100%);
     --cta-shadow: 0 4px 15px rgba(16, 185, 129, 0.35);
     --cta-shadow-hover: 0 6px 20px rgba(16, 185, 129, 0.5);
-    --font-body: "Plus Jakarta Sans", system-ui, sans-serif;
-    --font-display: "Bricolage Grotesque", "Plus Jakarta Sans", sans-serif;
+    --font-body: var(--ff-font-body, 'Inter', system-ui, sans-serif);
+    --font-display: var(--ff-font-heading, 'Manrope', system-ui, sans-serif);
     --color-primary: #0F4C81;
     --color-secondary: #3FA9F5;
     --color-text: #0d1b22;
@@ -107,7 +107,7 @@ html {
 }
 
 body {
-    font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+    font-family: var(--ff-font-body, 'Inter', system-ui, sans-serif);
     color: var(--ink-900);
     background:
         radial-gradient(1200px 600px at 100% -5%, var(--bg-2), transparent 60%),
@@ -141,7 +141,7 @@ h1,
 h2,
 h3,
 h4 {
-    font-family: "Bricolage Grotesque", "Plus Jakarta Sans", sans-serif;
+    font-family: var(--ff-font-heading, 'Manrope', system-ui, sans-serif);
     line-height: 1.15;
     letter-spacing: -.02em;
 }
@@ -368,6 +368,16 @@ h4 {
 /* =============================================================
    STICKY HEADER
    ============================================================= */
+/* The header + topbar are injected into the #site-header wrapper (a direct
+   child of <body>). That wrapper is only as tall as its own contents, so a
+   `position: sticky` .header inside it un-sticks the moment the wrapper
+   scrolls past — the header appeared not to stick at all. `display: contents`
+   dissolves the wrapper box so .header's containing block becomes <body>
+   (full page height); the slim contact topbar scrolls away and the nav bar
+   pins to the top for the whole page — matching the homepage, where <header>
+   is a direct child of <body> and needs no wrapper fix. */
+#site-header { display: contents; }
+
 .header {
     position: sticky;
     top: 0;
@@ -1015,7 +1025,7 @@ h4 {
 
 .page-head h1 {
     font-size: clamp(1.7rem, 1.2rem + 1.6vw, 2.4rem);
-    font-weight: 800;
+    font-weight: 700;
     margin-top: 12px;
 }
 
@@ -1567,9 +1577,9 @@ input[type=range]::-moz-range-thumb {
 
 .price-block .retail {
     font-size: 1.32rem;
-    font-weight: 800;
+    font-weight: 700;
     color: var(--ink-900);
-    font-family: "Bricolage Grotesque", sans-serif;
+    font-family: var(--ff-font-heading, 'Manrope', system-ui, sans-serif);
 }
 
 .price-block .mrp {
@@ -1790,7 +1800,7 @@ input[type=range]::-moz-range-thumb {
 
 .hero-info h1 {
     font-size: clamp(1.7rem, 1.2rem + 1.6vw, 2.4rem);
-    font-weight: 800;
+    font-weight: 700;
     margin: 14px 0 10px;
 }
 
@@ -1850,7 +1860,7 @@ input[type=range]::-moz-range-thumb {
     font-weight: 700;
     color: var(--ink-900);
     margin-top: 4px;
-    font-family: "Bricolage Grotesque", sans-serif;
+    font-family: var(--ff-font-heading, 'Manrope', system-ui, sans-serif);
 }
 
 .pcell .val.big {
@@ -2279,8 +2289,8 @@ input[type=range]::-moz-range-thumb {
 
 .rating-big .num {
     font-size: 3.4rem;
-    font-weight: 800;
-    font-family: "Bricolage Grotesque", sans-serif;
+    font-weight: 700;
+    font-family: var(--ff-font-heading, 'Manrope', system-ui, sans-serif);
     line-height: 1;
     color: var(--ink-900);
 }
@@ -2542,7 +2552,7 @@ input[type=range]::-moz-range-thumb {
     margin-bottom: 14px;
 }
 .footer-logo .logo-text {
-    font-family: "Bricolage Grotesque", "Plus Jakarta Sans", sans-serif;
+    font-family: var(--ff-font-heading, 'Manrope', system-ui, sans-serif);
     font-size: 1.05rem;
     font-weight: 700;
     color: #0f4c81;
@@ -2585,7 +2595,7 @@ input[type=range]::-moz-range-thumb {
 
 /* Section titles */
 .footer-title {
-    font-family: "Bricolage Grotesque", "Plus Jakarta Sans", sans-serif;
+    font-family: var(--ff-font-heading, 'Manrope', system-ui, sans-serif);
     font-size: 1rem;
     font-weight: 600;
     color: #0f4c81;
@@ -2676,7 +2686,7 @@ input[type=range]::-moz-range-thumb {
     margin-bottom: 28px;
 }
 .newsletter-title {
-    font-family: "Bricolage Grotesque", "Plus Jakarta Sans", sans-serif;
+    font-family: var(--ff-font-heading, 'Manrope', system-ui, sans-serif);
     font-size: 1.2rem;
     font-weight: 600;
     color: #0f4c81;
@@ -2703,7 +2713,7 @@ input[type=range]::-moz-range-thumb {
     border: 1px solid var(--color-border);
     border-radius: var(--radius-sm);
     color: #0d1b22;
-    font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+    font-family: var(--ff-font-body, 'Inter', system-ui, sans-serif);
     font-size: 0.9rem;
     transition: border-color 200ms ease, box-shadow 200ms ease;
 }
@@ -2719,7 +2729,7 @@ input[type=range]::-moz-range-thumb {
     color: #fff;
     border: none;
     border-radius: var(--radius-sm);
-    font-family: "Bricolage Grotesque", "Plus Jakarta Sans", sans-serif;
+    font-family: var(--ff-font-body, 'Inter', system-ui, sans-serif);
     font-size: 0.9rem;
     font-weight: 600;
     cursor: pointer;
@@ -3026,7 +3036,7 @@ input[type=range]::-moz-range-thumb {
     background: linear-gradient(135deg, #f8faff 0%, #fff 100%);
 }
 .fpanel-title {
-    font-family: var(--font-display, 'Bricolage Grotesque', sans-serif);
+    font-family: var(--ff-font-heading, 'Manrope', system-ui, sans-serif);
     font-weight: 700;
     font-size: 17px;
     color: #0d1b2a;
@@ -3102,7 +3112,7 @@ input[type=range]::-moz-range-thumb {
     color: #F43F5E;
 }
 .fpanel-empty-big {
-    font-family: var(--font-display, 'Bricolage Grotesque', sans-serif);
+    font-family: var(--ff-font-heading, 'Manrope', system-ui, sans-serif);
     font-weight: 700;
     font-size: 15.5px;
     color: #111827;
@@ -3171,7 +3181,7 @@ input[type=range]::-moz-range-thumb {
 
 .fline-info { min-width: 0; }
 .fline-name {
-    font-family: var(--font-display, 'Bricolage Grotesque', sans-serif);
+    font-family: var(--ff-font-heading, 'Manrope', system-ui, sans-serif);
     font-weight: 700;
     font-size: 13px;
     color: #111827;
@@ -3207,8 +3217,8 @@ input[type=range]::-moz-range-thumb {
     padding-top: 2px;
 }
 .fline-total {
-    font-family: var(--font-display, 'Bricolage Grotesque', sans-serif);
-    font-weight: 800;
+    font-family: var(--ff-font-heading, 'Manrope', system-ui, sans-serif);
+    font-weight: 700;
     font-size: 13.5px;
     color: #111827;
 }
@@ -3275,11 +3285,11 @@ input[type=range]::-moz-range-thumb {
 .ftotals-row.grand {
     font-size: 14.5px;
     color: #111827;
-    font-weight: 800;
+    font-weight: 700;
     border-top: 1.5px solid #E5E7EB;
     margin-top: 8px;
     padding-top: 10px;
-    font-family: var(--font-display, 'Bricolage Grotesque', sans-serif);
+    font-family: var(--ff-font-heading, 'Manrope', system-ui, sans-serif);
 }
 
 /* ── Checkout / Add-All button ── */
@@ -3290,7 +3300,7 @@ input[type=range]::-moz-range-thumb {
     color: #fff;
     font-weight: 700;
     font-size: 13.5px;
-    font-family: var(--font-display, 'Bricolage Grotesque', sans-serif);
+    font-family: var(--ff-font-body, 'Inter', system-ui, sans-serif);
     border-radius: 11px;
     cursor: pointer;
     border: none;

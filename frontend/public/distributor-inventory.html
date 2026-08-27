@@ -20,8 +20,12 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     <meta name="robots" content="noindex, nofollow" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Distributor Inventory — Fair Ford Pharmaceuticals</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/frontend/css/typography.css">
 <link rel="stylesheet" href="/frontend/css/distributor-inventory.css">
+  <!-- Page loader (see css/loader.css + js/loader.js). Not deferred:
+       the overlay must exist before first paint. -->
+  <link rel="stylesheet" href="/frontend/css/loader.css" />
+  <script src="/frontend/js/loader.js"></script>
 </head>
 <body><!-- Google Tag Manager (noscript) -->
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5B2HT6FW"
@@ -43,7 +47,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- ═══════════════════ HEADER ═══════════════════ -->
 <header class="header">
   <div class="header-left">
-    <img src="LOGO.png" alt="Fair Ford" class="header-logo" onerror="this.style.display='none'">
+    <img src="LOGO.png" alt="Fair Ford" class="header-logo" width="40" height="40" onerror="this.style.display='none'">
     <div class="header-title">
       <h1>Distributor Inventory Dashboard</h1>
       <p>Track product dispatch &amp; returns between company and distributors</p>

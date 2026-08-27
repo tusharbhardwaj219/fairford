@@ -24,8 +24,22 @@ const contactValidationRules = [
 
     body('inquiryType')
         .optional()
-        .isIn(['Consultation', 'Business Inquiry', 'Support'])
-        .withMessage('Invalid inquiry type. Choose: Consultation, Business Inquiry, or Support'),
+        .isIn([
+            'Distributor Inquiry', 'Retailer Support', 'Hospital/Institutional Inquiry',
+            'Bulk Order', 'Product Inquiry', 'Business Partnership', 'General Inquiry', 'Other',
+            'Consultation', 'Business Inquiry', 'Support'
+        ])
+        .withMessage('Invalid inquiry type'),
+
+    // Optional structured lead fields (lenient — presentation-quality caps).
+    body('company').optional().trim().isLength({ max: 150 }).withMessage('Company name is too long'),
+    body('businessType').optional().trim().isLength({ max: 60 }).withMessage('Business type is too long'),
+    body('city').optional().trim().isLength({ max: 120 }).withMessage('Location is too long'),
+    body('productRequirement').optional().trim().isLength({ max: 250 }).withMessage('Requirement is too long'),
+
+    // Honeypot: a hidden field real users never fill. Any value = bot → reject
+    // quietly with a generic error (server-side complement to the client check).
+    body('_gotcha').optional().isEmpty().withMessage('Spam detected'),
 ];
 
 const validate = (req, res, next) => {

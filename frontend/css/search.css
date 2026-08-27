@@ -76,9 +76,9 @@
 }
 
 .srch-hero-title {
-    font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+    font-family: var(--ff-font-heading, 'Manrope', system-ui, sans-serif);
     font-size: clamp(28px, 4.5vw, 46px);
-    font-weight: 800;
+    font-weight: 700;
     color: #0d1a2e;
     line-height: 1.13;
     letter-spacing: -0.035em;
@@ -137,7 +137,7 @@
     font-size: 16px;
     font-weight: 500;
     color: #111827;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--ff-font-body, 'Inter', system-ui, sans-serif);
     min-width: 0;
 }
 #ffSearchInput::placeholder {
@@ -234,7 +234,7 @@
     color: #374151;
     cursor: pointer;
     transition: background .15s, border-color .15s, color .15s, transform .15s, box-shadow .15s;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--ff-font-body, 'Inter', system-ui, sans-serif);
 }
 .srch-chip:hover {
     background: #0f4c81;
@@ -284,7 +284,7 @@
 
 #ffCount,
 .srch-count-text {
-    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-family: var(--ff-font-heading, 'Manrope', system-ui, sans-serif);
     font-size: 13.5px;
     font-weight: 700;
     color: #374151;
@@ -440,7 +440,7 @@
 }
 
 .ff-card-name {
-    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-family: var(--ff-font-heading, 'Manrope', system-ui, sans-serif);
     font-size: 14.5px;
     font-weight: 700;
     color: #111827;
@@ -473,9 +473,9 @@
 }
 
 .ff-card-price {
-    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-family: var(--ff-font-heading, 'Manrope', system-ui, sans-serif);
     font-size: 17px;
-    font-weight: 800;
+    font-weight: 700;
     color: #0f4c81;
     letter-spacing: -0.02em;
     white-space: nowrap;
@@ -508,7 +508,7 @@
     font-size: 12.5px;
     font-weight: 600;
     cursor: pointer;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--ff-font-body, 'Inter', system-ui, sans-serif);
     white-space: nowrap;
     transition: background .15s, transform .15s, box-shadow .15s;
 }
@@ -546,9 +546,9 @@
 }
 
 .ff-empty-title {
-    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-family: var(--ff-font-heading, 'Manrope', system-ui, sans-serif);
     font-size: 22px;
-    font-weight: 800;
+    font-weight: 700;
     color: #111827;
     letter-spacing: -0.02em;
     margin: 0 0 10px;
@@ -573,7 +573,7 @@
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--ff-font-body, 'Inter', system-ui, sans-serif);
     transition: background .15s, transform .15s, box-shadow .15s;
 }
 .ff-empty-btn:hover {
@@ -665,7 +665,7 @@
     border-radius: 12px;
     font-size: 14px;
     font-weight: 700;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--ff-font-body, 'Inter', system-ui, sans-serif);
     cursor: pointer;
     white-space: nowrap;
     transition: background .18s, color .18s, transform .18s, box-shadow .18s;
@@ -686,7 +686,7 @@
     background: rgba(15,76,129,.1);
     color: #0f4c81;
     font-size: 11px;
-    font-weight: 800;
+    font-weight: 700;
     padding: 2px 7px;
     border-radius: 999px;
     letter-spacing: .02em;

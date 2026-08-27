@@ -18,28 +18,50 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="UPHAAR — Fair Ford Pharmaceuticals' rewards programme for chemists. Earn cashback on every order and unlock tier rewards as your business grows." />
-    <title>Uphar Ki Bahar 3.0 - Fair Ford Pharmaceuticals</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Cormorant+Garamond:wght@400;600;700&display=swap" rel="stylesheet">
+    <meta name="description" content="UPHAAR 3.0 — Fair Ford Pharmaceuticals' retailer rewards programme. Buy Fair Ford products, earn points and unlock premium gifts and travel experiences. Valid till 31 March 2027." />
+    <title>UPHAAR 3.0 — Retailer Rewards | Fair Ford Pharmaceuticals</title>
+    <link rel="canonical" href="https://www.fairfordpharma.com/uphaar.html" />
+    <meta name="robots" content="index, follow" />
+
+    <!-- Same faces as the NUEVA VIDA page: Jost carries the UI, buttons and
+         body, Cormorant Garamond the editorial headings. Identical request to
+         nueva-vida.html, so the two pages share one cached stylesheet. The
+         Fontshare links (Clash Display / Satoshi) were removed with them —
+         css/uphaar.css remaps the role variables, so nothing here renders in
+         those faces any more and two font requests would have been wasted. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&display=swap">
+    <link rel="stylesheet" href="/frontend/css/typography.css">
     <link rel="stylesheet" href="/frontend/css/uphaar.css">
     <link rel="icon" type="image/png" href=https://res.cloudinary.com/dp4yririh/image/upload/v1782967649/fairford/site/m5d8pmtzdjr4dcgctvuc.png>
+
+    <!-- The hero artwork is the largest paint on the page — start it early. -->
+    <link rel="preconnect" href="https://res.cloudinary.com" crossorigin>
+    <link rel="preload" as="image" fetchpriority="high"
+        href="https://res.cloudinary.com/dp4yririh/image/upload/v1787381052/ChatGPT_Image_Aug_22_2026_12_12_40_PM_iwu4kx.png">
+
+  <!-- Page loader (see css/loader.css + js/loader.js). Not deferred:
+       the overlay must exist before first paint. -->
+  <link rel="stylesheet" href="/frontend/css/loader.css" />
+  <script src="/frontend/js/loader.js"></script>
 </head>
 <body><!-- Google Tag Manager (noscript) -->
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5B2HT6FW"
 height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- End Google Tag Manager (noscript) -->
 
-    <!-- Luxury Announcement Bar -->
+    <!-- Announcement marquee -->
     <div class="announcement" role="region" aria-label="Company announcements">
         <div class="marquee">
             <div class="marquee-track" id="marqueeTrack">
-                <span class="marquee-item"><span class="dot"></span> Dermatologically Tested & Approved</span>
+                <span class="marquee-item"><span class="dot"></span> Dermatologically Tested &amp; Approved</span>
                 <span class="marquee-item"><span class="dot"></span> Made in India with Love And Glory</span>
                 <span class="marquee-item"><span class="dot"></span> Strong Distribution Network</span>
                 <span class="marquee-item"><span class="dot"></span> 17 States Covered</span>
                 <span class="marquee-item"><span class="dot"></span> Building a Healthier, Stronger India Together</span>
-                <!-- Duplicate for seamless loop -->
-                <span class="marquee-item" aria-hidden="true"><span class="dot"></span> Dermatologically Tested & Approved</span>
+                <span class="marquee-item" aria-hidden="true"><span class="dot"></span> Dermatologically Tested &amp; Approved</span>
                 <span class="marquee-item" aria-hidden="true"><span class="dot"></span> Made in India with Love And Glory</span>
                 <span class="marquee-item" aria-hidden="true"><span class="dot"></span> Strong Distribution Network</span>
                 <span class="marquee-item" aria-hidden="true"><span class="dot"></span> 17 States Covered</span>
@@ -48,384 +70,520 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </div>
     </div>
 
-    <!-- Premium Sticky Header -->
+    <!-- Sticky header -->
     <header class="sticky-header" id="navbar">
         <div class="header-content">
             <div class="logo">
-                <img src="https://res.cloudinary.com/dp4yririh/image/upload/v1782967649/fairford/site/m5d8pmtzdjr4dcgctvuc.png" alt="Fair Ford Logo" style="width: 50px; height: 50px; object-fit: contain;">
-                <!-- <div class="logo-icon">F</div> -->
+                <img src="https://res.cloudinary.com/dp4yririh/image/upload/v1782967649/fairford/site/m5d8pmtzdjr4dcgctvuc.png"
+                     alt="Fair Ford Pharmaceuticals" width="50" height="50">
                 <div class="logo-text">
                     <a href="index.html"><div class="logo-name">Fair Ford</div></a>
                     <div class="logo-tagline">Pharmaceuticals</div>
                 </div>
             </div>
 
-            <!-- Desktop Navigation -->
-            <nav class="nav-desktop">
+            <nav class="nav-desktop" aria-label="Primary">
                 <ul class="nav-links">
                     <li><a href="#home">Home</a></li>
                     <li><a href="#how-it-works">How It Works</a></li>
-                    <li><a href="#reward-tiers">Reward Tiers</a></li>
-                    <li><a href="#benefits">Benefits</a></li>
-                    <li><a href="#contact">Contact</a></li>
+                    <li><a href="#rewards">Rewards</a></li>
+                    <li><a href="#reward-tiers">Tiers</a></li>
+                    <li><a href="#calculator">What Can I Earn?</a></li>
+                    <li><a href="#scheme">Scheme</a></li>
+                    <li><a href="#contact">Support</a></li>
                 </ul>
             </nav>
 
-            <!-- Mobile Hamburger -->
-            <button class="hamburger" id="hamburger" aria-label="Menu">
-                <span></span>
-                <span></span>
-                <span></span>
+            <button class="hamburger" id="hamburger" aria-label="Menu" aria-expanded="false" aria-controls="navMobile">
+                <span></span><span></span><span></span>
             </button>
         </div>
 
-        <!-- Mobile Navigation -->
-        <nav class="nav-mobile" id="navMobile">
+        <nav class="nav-mobile" id="navMobile" aria-label="Mobile">
             <ul class="nav-links-mobile">
                 <li><a href="#home">Home</a></li>
                 <li><a href="#how-it-works">How It Works</a></li>
-                <li><a href="#reward-tiers">Reward Tiers</a></li>
-                <li><a href="#benefits">Benefits</a></li>
-                <li><a href="#contact">Contact</a></li>
+                <li><a href="#rewards">Rewards</a></li>
+                <li><a href="#reward-tiers">Tiers</a></li>
+                <li><a href="#journey">Your Journey</a></li>
+                <li><a href="#calculator">What Can I Earn?</a></li>
+                <li><a href="#benefits">Why Join</a></li>
+                <li><a href="#scheme">Scheme</a></li>
+                <li><a href="#contact">Support</a></li>
             </ul>
         </nav>
     </header>
 
-    <!-- Premium Hero Section -->
-    <section class="hero" id="home">
-        <div class="hero-background">
-            <div class="hero-gradient"></div>
-            <div class="hero-particles">
-                <div class="particle"></div>
-                <div class="particle"></div>
-                <div class="particle"></div>
-                <div class="particle"></div>
-                <div class="particle"></div>
-            </div>
+    <main>
+    <!-- ==========================================================
+         1 · HERO — the supplied UPHAAR artwork, edge to edge
+         ========================================================== -->
+    <section class="uh-hero" id="home">
+        <img class="uh-hero__art"
+             src="https://res.cloudinary.com/dp4yririh/image/upload/v1787382423/ChatGPT_Image_Aug_22_2026_12_35_39_PM_bxx1fl.png"
+             width="1536" height="1024" fetchpriority="high" decoding="async"
+             alt="UPHAAR 3.0 — Rewarding your trust, celebrating your growth. Celebrate success, unlock exclusive rewards, experience luxury. Buy Fair Ford products, earn points and unlock premium gifts and exciting travel experiences.">
+
+        <!-- The buttons inside the artwork are painted, not clickable.
+             These are the working pair, in the brand's own styling. -->
+        <div class="uh-hero__actions">
+            <a class="uh-btn uh-btn--solid" href="#rewards">
+                Explore Rewards <span aria-hidden="true">&rarr;</span>
+            </a>
+            <button type="button" class="uh-btn uh-btn--outline" data-download>
+                Download Brochure <span aria-hidden="true">&darr;</span>
+            </button>
         </div>
-
-        <div class="hero-content">
-            <div class="hero-top-accent"></div>
-            
-            <h1 class="hero-title">Uphar Ki Bahar 3.0</h1>
-            <p class="hero-subtitle">Celebrate Success. Unlock Exclusive Rewards. Experience Luxury.</p>
-            
-            <div class="hero-description">
-                <p>Simply stock more products and earn premium appliances, travel experiences, and unforgettable gifts.</p>
-            </div>
-
-            <div class="hero-buttons">
-                <button class="btn btn-primary" id="exploreBtn">Explore Rewards</button>
-                <button class="btn btn-secondary" id="downloadBtn">Download Brochure</button>
-            </div>
-
-            <div class="hero-scroll-hint">
-                <span>Scroll to explore</span>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M12 5v14M19 18l-7 7-7-7"></path>
-                </svg>
-            </div>
-        </div>
-
-        <!-- SVG Gift Icons Floating -->
-        <div class="hero-floating-gift gift-1"></div>
-        <div class="hero-floating-gift gift-2"></div>
-        <div class="hero-floating-gift gift-3"></div>
     </section>
 
-    <!-- How It Works Section -->
-    <section class="how-it-works" id="how-it-works">
-        <div class="section-header">
-            <h2>How Uphar Ki Bahar Works</h2>
-            <p class="section-subtitle">Four simple steps to unlock your rewards</p>
-        </div>
-
-        <div class="steps-container">
-            <div class="step-card" data-step="1">
-                <div class="step-icon">
-                    <svg viewBox="0 0 64 64" fill="none">
-                        <rect x="8" y="12" width="48" height="40" rx="4" stroke="currentColor" stroke-width="2"/>
-                        <path d="M20 12V6h24v6" stroke="currentColor" stroke-width="2"/>
-                        <circle cx="32" cy="32" r="8" fill="currentColor" opacity="0.3"/>
-                    </svg>
-                </div>
-                <h3>Buy Products</h3>
-                <p>Purchase Fair Ford Pharma products from authorized stockists</p>
-                <div class="step-decoration"></div>
+    <!-- ==========================================================
+         2 · TRUST / STATISTICS STRIP
+         ========================================================== -->
+    <section class="uh-stats" aria-label="Programme at a glance">
+        <div class="uh-shell uh-stats__grid">
+            <div class="uh-stat uh-rise">
+                <p class="uh-stat__num"><span data-count="17">17</span></p>
+                <p class="uh-stat__label">States Covered</p>
             </div>
-
-            <div class="step-connector">
-                <svg viewBox="0 0 40 2" fill="none">
-                    <line x1="0" y1="1" x2="40" y2="1" stroke="url(#goldGradient)" stroke-width="2"/>
-                    <defs>
-                        <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                            <stop offset="0%" style="stop-color:var(--color-gold);stop-opacity:1" />
-                            <stop offset="100%" style="stop-color:var(--color-gold);stop-opacity:0.3" />
-                        </linearGradient>
-                    </defs>
-                </svg>
+            <div class="uh-stat uh-rise" style="--d:80ms">
+                <p class="uh-stat__num"><span data-count="13">13</span></p>
+                <p class="uh-stat__label">Reward Slabs</p>
             </div>
-
-            <div class="step-card" data-step="2">
-                <div class="step-icon">
-                    <svg viewBox="0 0 64 64" fill="none">
-                        <circle cx="32" cy="28" r="16" stroke="currentColor" stroke-width="2"/>
-                        <path d="M32 20v16M24 28h16" stroke="currentColor" stroke-width="2"/>
-                        <path d="M42 44c0 4-5 8-10 8s-10-4-10-8" stroke="currentColor" stroke-width="2"/>
-                    </svg>
-                </div>
-                <h3>Accumulate Points</h3>
-                <p>Every box purchased adds to your total annual count</p>
-                <div class="step-decoration"></div>
+            <div class="uh-stat uh-rise" style="--d:160ms">
+                <p class="uh-stat__num"><span data-count="4">4</span></p>
+                <p class="uh-stat__label">Reward Tiers</p>
             </div>
-
-            <div class="step-connector">
-                <svg viewBox="0 0 40 2" fill="none">
-                    <line x1="0" y1="1" x2="40" y2="1" stroke="url(#goldGradient2)" stroke-width="2"/>
-                    <defs>
-                        <linearGradient id="goldGradient2" x1="0%" y1="0%" x2="100%" y2="0%">
-                            <stop offset="0%" style="stop-color:var(--color-gold);stop-opacity:0.3" />
-                            <stop offset="100%" style="stop-color:var(--color-gold);stop-opacity:1" />
-                        </linearGradient>
-                    </defs>
-                </svg>
-            </div>
-
-            <div class="step-card" data-step="3">
-                <div class="step-icon">
-                    <svg viewBox="0 0 64 64" fill="none">
-                        <path d="M32 8L40 24H48L35 34L40 50L32 40L24 50L29 34L16 24H24L32 8Z" stroke="currentColor" stroke-width="2"/>
-                    </svg>
-                </div>
-                <h3>Unlock Rewards</h3>
-                <p>Reach milestone tiers to claim exciting gift rewards</p>
-                <div class="step-decoration"></div>
-            </div>
-
-            <div class="step-connector">
-                <svg viewBox="0 0 40 2" fill="none">
-                    <line x1="0" y1="1" x2="40" y2="1" stroke="url(#goldGradient)" stroke-width="2"/>
-                    <defs>
-                        <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                            <stop offset="0%" style="stop-color:var(--color-gold);stop-opacity:1" />
-                            <stop offset="100%" style="stop-color:var(--color-gold);stop-opacity:0.3" />
-                        </linearGradient>
-                    </defs>
-                </svg>
-            </div>
-
-            <div class="step-card" data-step="4">
-                <div class="step-icon">
-                    <svg viewBox="0 0 64 64" fill="none">
-                        <path d="M20 32L28 40L44 20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <circle cx="32" cy="32" r="24" stroke="currentColor" stroke-width="2"/>
-                    </svg>
-                </div>
-                <h3>Claim Your Gift</h3>
-                <p>Submit simple form & receive rewards within 30 days</p>
-                <div class="step-decoration"></div>
+            <div class="uh-stat uh-rise" style="--d:240ms">
+                <p class="uh-stat__num"><span data-count="30">30</span><small>days</small></p>
+                <p class="uh-stat__label">Claim to Delivery</p>
             </div>
         </div>
     </section>
 
-    <!-- Retailer Scheme Section -->
-    <section class="retailer-scheme" id="reward-tiers">
-        <div class="section-header">
-            <h2><svg class="section-title-icon" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2 15.09 8.26 22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14l-5-4.87 6.91-1.01L12 2z"/></svg> Retailer Scheme</h2>
-            <p class="section-subtitle">Retailer Box Scheme 2026-27 — stock more boxes and unlock premium gifts, absolutely free.</p>
-        </div>
-        <div class="scheme-grid" id="schemeGrid">
-            <!-- Cards injected by uphaar.js -->
+    <!-- ==========================================================
+         3 · HOW IT WORKS
+         ========================================================== -->
+    <section class="uh-section uh-how" id="how-it-works">
+        <div class="uh-shell">
+            <header class="uh-head uh-rise">
+                <p class="uh-eyebrow">The Programme</p>
+                <h2>How UPHAAR Works</h2>
+                <p class="uh-head__sub">Four steps between your next order and your next reward.</p>
+            </header>
+
+            <ol class="uh-steps">
+                <span class="uh-steps__line" aria-hidden="true"><i></i></span>
+
+                <li class="uh-step uh-rise">
+                    <span class="uh-step__num">01</span>
+                    <span class="uh-step__ico" aria-hidden="true">
+                        <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.1"
+                             stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M8 12h8l6 30h26"/><path d="M22 34h26l4-16H18"/>
+                            <circle cx="26" cy="52" r="4"/><circle cx="44" cy="52" r="4"/>
+                        </svg>
+                    </span>
+                    <h3>Buy Products</h3>
+                    <p>Purchase Fair Ford products from your distributor.</p>
+                </li>
+
+                <li class="uh-step uh-rise" style="--d:100ms">
+                    <span class="uh-step__num">02</span>
+                    <span class="uh-step__ico" aria-hidden="true">
+                        <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.1"
+                             stroke-linecap="round" stroke-linejoin="round">
+                            <ellipse cx="32" cy="20" rx="16" ry="6"/>
+                            <path d="M16 20v10c0 3.3 7.2 6 16 6s16-2.7 16-6V20"/>
+                            <path d="M16 30v10c0 3.3 7.2 6 16 6s16-2.7 16-6V30"/>
+                            <path d="M16 40v6c0 3.3 7.2 6 16 6s16-2.7 16-6v-6"/>
+                        </svg>
+                    </span>
+                    <h3>Accumulate Points</h3>
+                    <p>Earn points through eligible purchases.</p>
+                </li>
+
+                <li class="uh-step uh-rise" style="--d:200ms">
+                    <span class="uh-step__num">03</span>
+                    <span class="uh-step__ico" aria-hidden="true">
+                        <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.1"
+                             stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="12" y="26" width="40" height="8" rx="2"/><path d="M32 26v30"/>
+                            <path d="M48 34v18a4 4 0 0 1-4 4H20a4 4 0 0 1-4-4V34"/>
+                            <path d="M22 26a6 6 0 0 1 0-12c8 0 10 12 10 12"/>
+                            <path d="M42 26a6 6 0 0 0 0-12c-8 0-10 12-10 12"/>
+                        </svg>
+                    </span>
+                    <h3>Unlock Rewards</h3>
+                    <p>Reach reward milestones and unlock premium gifts or travel experiences.</p>
+                </li>
+
+                <li class="uh-step uh-rise" style="--d:300ms">
+                    <span class="uh-step__num">04</span>
+                    <span class="uh-step__ico" aria-hidden="true">
+                        <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.1"
+                             stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 34V18a4 4 0 0 1 8 0v14"/><path d="M28 32V14a4 4 0 0 1 8 0v18"/>
+                            <path d="M36 32V18a4 4 0 0 1 8 0v20"/>
+                            <path d="M44 30a4 4 0 0 1 8 0v10a18 18 0 0 1-18 18h-4a14 14 0 0 1-14-14V34"/>
+                        </svg>
+                    </span>
+                    <h3>Claim Your Gift</h3>
+                    <p>Submit your claim and receive your reward.</p>
+                </li>
+            </ol>
         </div>
     </section>
 
-    <!-- Scheme Details Modal -->
-    <div class="scheme-modal" id="schemeModal" aria-hidden="true">
-        <div class="scheme-modal-box" role="dialog" aria-modal="true" aria-labelledby="schemeModalTitle">
-            <button class="scheme-modal-close" id="schemeModalClose" aria-label="Close">&times;</button>
-            <div class="scheme-modal-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="#002C5F" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13"/><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/><path d="M7.5 8a2.5 2.5 0 0 1 0-5C11 3 12 8 12 8"/><path d="M16.5 8a2.5 2.5 0 0 0 0-5C13 3 12 8 12 8"/></svg></div>
-            <h3 id="schemeModalTitle">Scheme Details</h3>
-            <div class="scheme-modal-body" id="schemeModalBody"></div>
+    <!-- ==========================================================
+         4 · REWARDS YOU CAN UNLOCK
+         ========================================================== -->
+    <section class="uh-section uh-rewards" id="rewards">
+        <div class="uh-shell">
+            <header class="uh-head uh-head--row uh-rise">
+                <div>
+                    <p class="uh-eyebrow">The Collection</p>
+                    <h2>Rewards You Can Unlock</h2>
+                    <p class="uh-head__sub">Every reward in the 2026&ndash;27 Retailer Box Scheme, highest slab first.</p>
+                </div>
+                <div class="uh-rw__nav">
+                    <button type="button" class="uh-arrow" id="uhRwPrev" aria-label="Previous rewards">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
+                             stroke-linecap="round" stroke-linejoin="round"><path d="m14.5 5-7 7 7 7"/></svg>
+                    </button>
+                    <button type="button" class="uh-arrow" id="uhRwNext" aria-label="More rewards">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
+                             stroke-linecap="round" stroke-linejoin="round"><path d="m9.5 5 7 7-7 7"/></svg>
+                    </button>
+                </div>
+            </header>
+        </div>
+
+        <!-- Full-bleed track so cards run to the edge as they scroll. -->
+        <div class="uh-rw__track" id="uhRewardTrack" tabindex="0"
+             role="region" aria-label="Reward collection, scrollable"></div>
+    </section>
+
+    <!-- ==========================================================
+         5 · REWARD TIERS
+         ========================================================== -->
+    <section class="uh-section uh-tiers" id="reward-tiers">
+        <div class="uh-shell">
+            <header class="uh-head uh-rise">
+                <p class="uh-eyebrow">Progression</p>
+                <h2>Reward Tiers</h2>
+                <p class="uh-head__sub">Bronze to Platinum &mdash; the further you go, the bigger the reward.</p>
+            </header>
+            <div class="uh-tier__grid" id="uhTierGrid"></div>
+        </div>
+    </section>
+
+    <!-- ==========================================================
+         6 · YOUR JOURNEY TO THE NEXT REWARD
+         ========================================================== -->
+    <section class="uh-section uh-journey" id="journey">
+        <div class="uh-shell uh-journey__grid">
+            <div class="uh-journey__copy uh-rise">
+                <p class="uh-eyebrow">Your Progress</p>
+                <h2>Your Journey to the Next Reward</h2>
+                <p class="uh-journey__count"><span id="uhJourneyCount">1,850</span> <small>Boxes Collected</small></p>
+                <p class="uh-journey__away" id="uhJourneyAway"></p>
+                <div class="uh-journey__target" id="uhJourneyTarget"></div>
+                <p class="uh-journey__note">
+                    Figures shown are a demonstration. Once your retailer account is linked, this
+                    updates from your own purchase record.
+                </p>
+            </div>
+
+            <div class="uh-journey__meter uh-rise" style="--d:120ms">
+                <svg class="uh-ring" viewBox="0 0 120 120" aria-hidden="true">
+                    <circle class="uh-ring__bg" cx="60" cy="60" r="54"/>
+                    <circle class="uh-ring__fg" cx="60" cy="60" r="54" id="uhRing"/>
+                </svg>
+                <div class="uh-ring__mid">
+                    <span class="uh-ring__pct" id="uhRingPct">0%</span>
+                    <span class="uh-ring__cap">Complete</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==========================================================
+         7 · WHAT CAN I EARN?
+         ========================================================== -->
+    <section class="uh-section uh-calc" id="calculator">
+        <div class="uh-shell">
+            <header class="uh-head uh-rise">
+                <p class="uh-eyebrow">Reward Estimator</p>
+                <h2>What Can I Earn?</h2>
+                <p class="uh-head__sub">Enter your eligible boxes to see the reward you qualify for.</p>
+            </header>
+
+            <div class="uh-calc__box uh-rise">
+                <div class="uh-calc__in">
+                    <label for="uhCalcInput">Boxes Purchased</label>
+                    <input type="number" id="uhCalcInput" min="0" step="1" value="160"
+                           inputmode="numeric" autocomplete="off">
+                    <div class="uh-calc__presets">
+                        <button type="button" data-calc-preset="25">25</button>
+                        <button type="button" data-calc-preset="80">80</button>
+                        <button type="button" data-calc-preset="160">160</button>
+                        <button type="button" data-calc-preset="325">325</button>
+                    </div>
+                </div>
+                <div class="uh-calc__out" id="uhCalcOut" aria-live="polite"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==========================================================
+         8 · WHY JOIN UPHAAR?
+         ========================================================== -->
+    <section class="uh-section uh-why" id="benefits">
+        <div class="uh-shell">
+            <header class="uh-head uh-rise">
+                <p class="uh-eyebrow">The Case for Joining</p>
+                <h2>Why Join UPHAAR?</h2>
+            </header>
+
+            <div class="uh-why__grid">
+                <article class="uh-why__card uh-rise">
+                    <span class="uh-why__ico" aria-hidden="true">
+                        <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.1"
+                             stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="12" y="26" width="40" height="8" rx="2"/><path d="M32 26v30"/>
+                            <path d="M48 34v18a4 4 0 0 1-4 4H20a4 4 0 0 1-4-4V34"/>
+                            <path d="M22 26a6 6 0 0 1 0-12c8 0 10 12 10 12"/>
+                            <path d="M42 26a6 6 0 0 0 0-12c-8 0-10 12-10 12"/>
+                        </svg>
+                    </span>
+                    <h3>Instant Rewards</h3>
+                    <p>Exciting gifts available at eligible reward levels &mdash; from your third box onward.</p>
+                </article>
+
+                <article class="uh-why__card uh-rise" style="--d:100ms">
+                    <span class="uh-why__ico" aria-hidden="true">
+                        <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.1"
+                             stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="16" y="12" width="32" height="42" rx="4"/>
+                            <path d="M22 20h20M22 28h20"/><circle cx="32" cy="42" r="7"/><path d="M22 58h20"/>
+                        </svg>
+                    </span>
+                    <h3>Annual Bonuses</h3>
+                    <p>Additional premium benefits for continued participation across the scheme year.</p>
+                </article>
+
+                <article class="uh-why__card uh-rise" style="--d:200ms">
+                    <span class="uh-why__ico" aria-hidden="true">
+                        <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.1"
+                             stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="6" y="20" width="30" height="24" rx="3"/>
+                            <path d="M36 28h10l8 8v8H36z"/><circle cx="18" cy="48" r="4"/><circle cx="44" cy="48" r="4"/>
+                        </svg>
+                    </span>
+                    <h3>Easy Claims</h3>
+                    <p>A simple claim form and convenient delivery, typically within 30 days.</p>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==========================================================
+         9 · RETAILER SUCCESS
+         ========================================================== -->
+    <section class="uh-success">
+        <div class="uh-shell uh-success__inner uh-rise">
+            <p class="uh-eyebrow uh-eyebrow--light">Our Partners</p>
+            <h2>Your Growth Deserves to Be Rewarded.</h2>
+            <p class="uh-success__lede">
+                Your trust inspires us. Your success drives us. Together, we grow stronger.
+            </p>
+            <p class="uh-success__sig">&mdash; Fair Ford Pharmaceuticals</p>
+        </div>
+    </section>
+
+    <!-- ==========================================================
+         10 · SCHEME / BROCHURE
+         ========================================================== -->
+    <section class="uh-section uh-scheme" id="scheme">
+        <div class="uh-shell">
+            <header class="uh-head uh-rise">
+                <p class="uh-eyebrow">The Detail</p>
+                <h2>Scheme &amp; Brochure</h2>
+                <p class="uh-head__sub">Retailer Box Scheme 2026&ndash;27, in full.</p>
+            </header>
+
+            <div class="uh-scheme__cta uh-rise">
+                <div>
+                    <h3>Uphar Ki Bahar 3.0 &mdash; Official Brochure</h3>
+                    <p>Every slab, reward option and condition, exactly as issued.</p>
+                </div>
+                <div class="uh-scheme__btns">
+                    <button type="button" class="uh-btn uh-btn--solid" data-download>
+                        Download Brochure <span aria-hidden="true">&darr;</span>
+                    </button>
+                    <button type="button" class="uh-btn uh-btn--ghost" data-pdf>View PDF</button>
+                </div>
+            </div>
+
+            <div class="uh-table__wrap uh-rise">
+                <table class="uh-table">
+                    <caption>Retailer Box Scheme 2026&ndash;27 &mdash; all 13 slabs. Choose any one option per slab.</caption>
+                    <thead>
+                        <tr>
+                            <th scope="col">Boxes</th>
+                            <th scope="col">Tier</th>
+                            <th scope="col">Reward</th>
+                            <th scope="col">Alternative</th>
+                            <th scope="col">Dermazest option</th>
+                        </tr>
+                    </thead>
+                    <tbody id="uhTableBody"></tbody>
+                </table>
+            </div>
+
+            <div class="uh-acc uh-rise">
+                <div class="uh-acc__item">
+                    <button type="button" class="uh-acc__head" aria-expanded="false">
+                        <span>Eligibility</span><i aria-hidden="true"></i>
+                    </button>
+                    <div class="uh-acc__panel">
+                        <div class="uh-acc__in">
+                            <p>Open to retailers and chemists purchasing eligible Fair Ford Pharmaceuticals
+                               products through an authorised distributor or stockist.</p>
+                            <p>Box counts accumulate across the scheme year. Rewards are issued against the
+                               highest slab reached.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="uh-acc__item">
+                    <button type="button" class="uh-acc__head" aria-expanded="false">
+                        <span>Validity &amp; territory</span><i aria-hidden="true"></i>
+                    </button>
+                    <div class="uh-acc__panel">
+                        <div class="uh-acc__in">
+                            <p><strong>Valid till 31 March 2027.</strong></p>
+                            <p>Applicable in Punjab, Himachal Pradesh, Jammu &amp; Kashmir, Haryana,
+                               Rajasthan, Gujarat, Madhya Pradesh and Chhattisgarh.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="uh-acc__item">
+                    <button type="button" class="uh-acc__head" aria-expanded="false">
+                        <span>Choosing your reward</span><i aria-hidden="true"></i>
+                    </button>
+                    <div class="uh-acc__panel">
+                        <div class="uh-acc__in">
+                            <p>At each slab you may choose <strong>any one</strong> of the options listed &mdash;
+                               the headline reward, the stated alternative where offered, or the
+                               Dermazest 6 quantity for that slab.</p>
+                            <p>Options cannot be combined or split across slabs.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="uh-acc__item">
+                    <button type="button" class="uh-acc__head" aria-expanded="false">
+                        <span>Terms &amp; conditions</span><i aria-hidden="true"></i>
+                    </button>
+                    <div class="uh-acc__panel">
+                        <div class="uh-acc__in">
+                            <p>The annual scheme is applicable. Gift illustrations on this page are
+                               representative; the actual product supplied may differ in model or finish.</p>
+                            <p>Rewards are typically delivered within 30 days of a verified claim.</p>
+                            <p>Full terms and conditions apply as per the official brochure, which prevails
+                               in the event of any discrepancy with this page.</p>
+                            <p><button type="button" class="uh-link" data-pdf>Open the brochure (PDF)</button></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==========================================================
+         11 · REWARD SUPPORT
+         ========================================================== -->
+    <section class="uh-section uh-support" id="contact">
+        <div class="uh-shell">
+            <header class="uh-head uh-rise">
+                <p class="uh-eyebrow">We Can Help</p>
+                <h2>Need Help Claiming Your Reward?</h2>
+            </header>
+
+            <div class="uh-support__grid">
+                <button type="button" class="uh-support__card uh-rise" data-act="wa">
+                    <span class="uh-support__ico" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.67-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.076 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347"/></svg>
+                    </span>
+                    <span class="uh-support__txt">
+                        <strong>WhatsApp Support</strong>
+                        <em>Fastest for claim queries</em>
+                    </span>
+                </button>
+
+                <button type="button" class="uh-support__card uh-rise" style="--d:100ms" data-act="call">
+                    <span class="uh-support__ico" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                             stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                    </span>
+                    <span class="uh-support__txt">
+                        <strong>Call Reward Team</strong>
+                        <em>9958584228</em>
+                    </span>
+                </button>
+
+                <button type="button" class="uh-support__card uh-rise" style="--d:200ms" data-act="mail">
+                    <span class="uh-support__ico" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                             stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 6-10 7L2 6"/></svg>
+                    </span>
+                    <span class="uh-support__txt">
+                        <strong>Claim Assistance</strong>
+                        <em>info@fairfordpharma.com</em>
+                    </span>
+                </button>
+            </div>
+
+            <div class="uh-support__meta uh-rise">
+                <div>
+                    <span>Working hours</span>
+                    <p>Mon &ndash; Sat &middot; 9:30 AM &ndash; 6:30 PM</p>
+                </div>
+                <div>
+                    <span>Office</span>
+                    <p>Fair Ford Tower, Gali No-07, Main Road, Anangpur Village,
+                       Opposite Mount Kailash Factory, Faridabad &ndash; 121003 (Haryana)
+                       <button type="button" class="uh-link" data-act="map">View map</button></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==========================================================
+         12 · FINAL CTA
+         ========================================================== -->
+    <section class="uh-final">
+        <div class="uh-shell uh-final__inner uh-rise">
+            <h2>Start Your Reward Journey Today</h2>
+            <p>Buy. Earn. Unlock. Celebrate with UPHAAR 3.0.</p>
+            <div class="uh-final__btns">
+                <a class="uh-btn uh-btn--gold" href="#contact">Join UPHAAR Now <span aria-hidden="true">&rarr;</span></a>
+                <button type="button" class="uh-btn uh-btn--onDark" data-download>Download Brochure</button>
+            </div>
+        </div>
+    </section>
+    </main>
+
+    <!-- Slab detail modal -->
+    <div class="uh-modal" id="uhModal" aria-hidden="true">
+        <div class="uh-modal__box" role="dialog" aria-modal="true" aria-labelledby="uhModalTitle">
+            <button class="uh-modal__close" id="uhModalClose" aria-label="Close">&times;</button>
+            <h3 id="uhModalTitle">Reward details</h3>
+            <div class="uh-modal__body" id="uhModalBody"></div>
         </div>
     </div>
-
-    <!-- Benefits Section -->
-    <section class="benefits" id="benefits">
-        <div class="section-header">
-            <h2>Why Join Uphar Ki Bahar 3.0?</h2>
-            <p class="section-subtitle">Experience exclusive benefits designed for our valued partners</p>
-        </div>
-
-        <div class="benefits-grid">
-            <div class="benefit-card" data-benefit="1">
-                <div class="benefit-icon">
-                    <svg viewBox="0 0 64 64" fill="none">
-                        <rect x="12" y="20" width="40" height="32" rx="4" stroke="currentColor" stroke-width="2"/>
-                        <path d="M20 20V12c0-2.2 1.8-4 4-4h16c2.2 0 4 1.8 4 4v8" stroke="currentColor" stroke-width="2"/>
-                        <path d="M32 36v8" stroke="currentColor" stroke-width="2"/>
-                        <circle cx="32" cy="36" r="3" fill="currentColor"/>
-                    </svg>
-                </div>
-                <h3>Instant Rewards</h3>
-                <p>Get free products and exclusive offers with every box purchase</p>
-            </div>
-
-            <div class="benefit-card" data-benefit="2">
-                <div class="benefit-icon">
-                    <svg viewBox="0 0 64 64" fill="none">
-                        <path d="M32 8L40 28H60L44 40L52 60L32 48L12 60L20 40L4 28H24L32 8Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-                    </svg>
-                </div>
-                <h3>Annual Bonuses</h3>
-                <p>Unlock premium appliances and unforgettable travel experiences</p>
-            </div>
-
-            <!-- <div class="benefit-card" data-benefit="3">
-                <div class="benefit-icon">
-                    <svg viewBox="0 0 64 64" fill="none">
-                        <path d="M24 32L32 40L56 16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <circle cx="32" cy="32" r="24" stroke="currentColor" stroke-width="2"/>
-                    </svg>
-                </div>
-                <h3>Flexible Choices</h3>
-                <p>Choose from multiple reward options at each tier level</p>
-            </div> -->
-
-            <div class="benefit-card" data-benefit="4">
-                <div class="benefit-icon">
-                    <svg viewBox="0 0 64 64" fill="none">
-                        <path d="M16 24H48L44 52H20L16 24Z" stroke="currentColor" stroke-width="2"/>
-                        <path d="M24 24V16C24 12.7 26.7 10 30 10H34C37.3 10 40 12.7 40 16V24" stroke="currentColor" stroke-width="2"/>
-                        <path d="M28 36v12M36 36v12" stroke="currentColor" stroke-width="2"/>
-                    </svg>
-                </div>
-                <h3>Easy Claims</h3>
-                <p>Simple form-based gift claim process with 30-day delivery</p>
-            </div>
-
-            <!-- <div class="benefit-card" data-benefit="5">
-                <div class="benefit-icon">
-                    <svg viewBox="0 0 64 64" fill="none">
-                        <circle cx="32" cy="32" r="20" stroke="currentColor" stroke-width="2"/>
-                        <path d="M32 18V32L42 42" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                    </svg>
-                </div>
-                <h3>Loyalty Tiers</h3>
-                <p>Higher purchases unlock increasingly premium reward options</p>
-            </div> -->
-
-            <!-- <div class="benefit-card" data-benefit="6">
-                <div class="benefit-icon">
-                    <svg viewBox="0 0 64 64" fill="none">
-                        <circle cx="32" cy="20" r="8" stroke="currentColor" stroke-width="2"/>
-                        <path d="M20 32H44C45.1 32 46 32.9 46 34V48C46 49.1 45.1 50 44 50H20C18.9 50 18 49.1 18 48V34C18 32.9 18.9 32 20 32Z" stroke="currentColor" stroke-width="2"/>
-                        <path d="M32 38v6M28 41h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                    </svg>
-                </div>
-                <h3>24/7 Support</h3>
-                <p>Dedicated team always available for scheme queries and assistance</p>
-            </div> -->
-        </div>
-    </section>
-
-    <!-- Contact Section -->
-    <section class="contact" id="contact">
-        <div class="contact-container">
-            <div class="contact-header">
-                <h2>Get In Touch</h2>
-                <p>We're here to help and answer any questions you might have</p>
-            </div>
-
-            <div class="contact-grid">
-                <!-- Contact Info Cards -->
-                <div class="contact-info-grid">
-                    <div class="contact-info-card">
-                        <div class="contact-info-icon">
-                            <svg viewBox="0 0 64 64" fill="none">
-                                <path d="M16 20C16 14.5 20.5 10 26 10H38C43.5 10 48 14.5 48 20V44C48 49.5 43.5 54 38 54H26C20.5 54 16 49.5 16 44V20Z" stroke="currentColor" stroke-width="2"/>
-                                <path d="M32 46V48" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                                <circle cx="32" cy="18" r="2" fill="currentColor"/>
-                            </svg>
-                        </div>
-                        <h3>Call Us</h3>
-                        <p class="contact-detail">8595939723</p>
-                        <button class="contact-btn btn-call">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
-                            </svg>
-                            Call Now
-                        </button>
-                    </div>
-
-                    <div class="contact-info-card">
-                        <div class="contact-info-icon">
-                            <svg viewBox="0 0 64 64" fill="none">
-                                <path d="M12 16L32 28L52 16" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-                                <rect x="12" y="16" width="40" height="32" rx="2" stroke="currentColor" stroke-width="2"/>
-                            </svg>
-                        </div>
-                        <h3>Email Us</h3>
-                        <p class="contact-detail"><a href="mailto:info@fairfordpharma.com">info@fairfordpharma.com</a></p>
-                        <button class="contact-btn btn-email">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-                                <path d="M22 6l-10 7L2 6"></path>
-                            </svg>
-                            Email Us
-                        </button>
-                    </div>
-
-                    <div class="contact-info-card">
-                        <div class="contact-info-icon">
-                            <svg viewBox="0 0 64 64" fill="none">
-                                <path d="M32 12C22 12 14 20 14 30C14 40 32 54 32 54S50 40 50 30C50 20 42 12 32 12Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-                                <circle cx="32" cy="30" r="5" stroke="currentColor" stroke-width="2"/>
-                            </svg>
-                        </div>
-                        <h3>Office Address</h3>
-                        <p class="contact-detail">Fair Ford Tower, Gali No-07, Main Road, Anangpur Village, Opposite Mount Kailash Factory, Faridabad- 121003 (Haryana)</p>
-                        <button class="contact-btn btn-location">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                                <circle cx="12" cy="10" r="3"></circle>
-                            </svg>
-                            View Map
-                        </button>
-                    </div>
-
-                    <div class="contact-info-card">
-                        <div class="contact-info-icon">
-                            <svg viewBox="0 0 64 64" fill="none">
-                                <circle cx="32" cy="32" r="20" stroke="currentColor" stroke-width="2"/>
-                                <path d="M32 18V32L42 42" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </div>
-                        <h3>Working Hours</h3>
-                        <p class="contact-detail">Mon - sat: 9:30AM - 6:30PM</p>
-                        <button class="contact-btn btn-whatsapp">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.67-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.076 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421-7.403h-.004a9.87 9.87 0 00-4.782 1.276c-1.314.734-2.431 1.733-3.225 2.949-.794 1.216-1.22 2.584-1.234 3.996 0 3.455 2.049 6.459 5.301 7.978h.003c1.396.743 2.908 1.13 4.474 1.13 3.772 0 7.019-2.278 8.5-5.594.403-.923.626-1.91.626-2.94 0-3.454-2.049-6.458-5.302-7.977a9.87 9.87 0 00-4.361-.818z"/>
-                            </svg>
-                            WhatsApp
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- CTA Section -->
-    <section class="cta-premium">
-        <div class="cta-content">
-            <h2>Start Your Reward Journey Today</h2>
-            <p>Join thousands of retailers and doctors across 17 states earning premium rewards</p>
-            <div class="cta-buttons">
-                <button class="btn btn-primary" id="ctaJoinBtn">Join Now</button>
-                <button class="btn btn-secondary" id="ctaContactBtn">Contact Us</button>
-            </div>
-        </div>
-        <div class="cta-background-accent"></div>
-    </section>
 
     <!-- Footer -->
     <footer class="footer">
@@ -439,15 +597,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 <ul>
                     <li><a href="#home">Home</a></li>
                     <li><a href="#how-it-works">How It Works</a></li>
-                    <li><a href="#benefits">Benefits</a></li>
-                    <li><a href="#contact">Contact</a></li>
+                    <li><a href="#rewards">Rewards</a></li>
+                    <li><a href="#scheme">Scheme</a></li>
+                    <li><a href="#contact">Support</a></li>
                 </ul>
             </div>
             <div class="footer-section">
                 <h4>Legal</h4>
                 <ul>
                     <li><a href="#privacy">Privacy Policy</a></li>
-                    <li><a href="#terms">Terms & Conditions</a></li>
+                    <li><a href="#terms">Terms &amp; Conditions</a></li>
                     <li><a href="#disclaimer">Disclaimer</a></li>
                 </ul>
             </div>
@@ -455,21 +614,19 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 <h4>Follow Us</h4>
                 <div class="social-links">
                     <a href="#facebook" class="social-icon" aria-label="Facebook">f</a>
-                    <a href="#twitter" class="social-icon" aria-label="Twitter">𝕏</a>
+                    <a href="#twitter" class="social-icon" aria-label="Twitter">&#120143;</a>
                     <a href="#linkedin" class="social-icon" aria-label="LinkedIn">in</a>
                 </div>
             </div>
         </div>
         <div class="footer-bottom">
             <p>&copy; 2024-27 Uphar Ki Bahar 3.0. All rights reserved. | Fair Ford Pharmaceuticals Pvt. Ltd.</p>
-            <p>Valid in Punjab, Himachal Pradesh, Jammu & Kashmir, Haryana, Rajasthan, Gujarat, Madhya Pradesh & Chhattisgarh</p>
+            <p>Valid in Punjab, Himachal Pradesh, Jammu &amp; Kashmir, Haryana, Rajasthan, Gujarat, Madhya Pradesh &amp; Chhattisgarh</p>
         </div>
     </footer>
 
-    <!-- Scroll Progress Bar -->
     <div class="scroll-progress" id="scrollProgress"></div>
 
-    <!-- Back to Top Button -->
     <button class="back-to-top" id="backToTop" aria-label="Back to top">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M12 19V5M5 12l7-7 7 7"></path>

@@ -6,14 +6,11 @@
     <meta name="description" content="Payment confirmation for your Fair Ford Pharmaceuticals order." />
   <meta name="robots" content="noindex" />
   <title>Payment Successful — Fair Ford Pharmaceuticals</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <style>
     :root { --brand:#0F4C81; --green:#16A34A; --ink:#111827; --muted:#6B7280; --line:#E5E7EB; }
     * { box-sizing:border-box; margin:0; padding:0; }
     body {
-      font-family:'Inter',system-ui,sans-serif; background:#F3F6FA; color:var(--ink);
+      font-family:var(--ff-font-body, 'Inter', system-ui, sans-serif); background:#F3F6FA; color:var(--ink);
       min-height:100vh; display:grid; place-items:center; padding:24px;
     }
     .card {
@@ -46,6 +43,11 @@
     .btn-ghost:hover { background:#e2e9f2; }
     .note { margin-top:20px; font-size:.78rem; color:var(--muted); line-height:1.6; }
   </style>
+  <!-- Page loader (see css/loader.css + js/loader.js). Not deferred:
+       the overlay must exist before first paint. -->
+    <link rel="stylesheet" href="/frontend/css/typography.css">
+  <link rel="stylesheet" href="/frontend/css/loader.css" />
+  <script src="/frontend/js/loader.js"></script>
 </head>
 <body>
   <main class="card">

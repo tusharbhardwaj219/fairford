@@ -156,27 +156,37 @@ function globalSearch(q) {
 /* ══════════════════════════════════════════
    STATE PERFORMANCE (presentational)
 ══════════════════════════════════════════ */
-const states = [
-  { name: 'Maharashtra', gmv: '₹38.2L', pct: 75.8 },
-  { name: 'Karnataka',   gmv: '₹29.5L', pct: 62.4 },
-  { name: 'Delhi',       gmv: '₹22.1L', pct: 52.0 },
-  { name: 'Tamil Nadu',  gmv: '₹18.7L', pct: 42.5 },
-  { name: 'Gujarat',     gmv: '₹15.3L', pct: 32.0 },
-];
+/* Real state-wise GMV, resolved through each order's retailer shop address and
+   supplied by GET /api/superadmin/analytics.
+
+   This was a hardcoded five-state table (Maharashtra ₹38.2L, Karnataka ₹29.5L,
+   Delhi ₹22.1L, Tamil Nadu ₹18.7L, Gujarat ₹15.3L) marked "presentational" in
+   a comment — but it rendered as a live performance panel with no indication
+   the figures were invented. Bars are now relative to the strongest state;
+   there is no revenue target in the data model to measure against. */
+let states = [];
 
 function renderStatePerf() {
-  [document.getElementById('state-perf'), document.getElementById('analytics-states')].forEach(el => {
+  const targets = [document.getElementById('state-perf'), document.getElementById('analytics-states')];
+  targets.forEach(el => {
     if (!el) return;
-    el.innerHTML = '';
-    states.forEach(s => {
-      el.innerHTML += `<div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
-        <div style="width:110px;font-size:13px;font-weight:500">${s.name}</div>
+    if (!states.length) {
+      el.innerHTML = '<div class="chart-empty" style="min-height:80px">No order data yet — state performance appears once orders are placed.</div>';
+      return;
+    }
+    el.innerHTML = states.map(s => `
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+        <div style="width:110px;font-size:13px;font-weight:500">${escapeHtml(s.name)}</div>
         <div style="flex:1"><div class="prog-wrap"><div class="prog-bar" style="width:${s.pct}%"></div></div></div>
         <div style="font-size:13px;font-weight:500;width:52px;text-align:right">${s.pct}%</div>
-        <div style="font-size:12px;color:var(--text-2);width:60px;text-align:right">${s.gmv}</div>
-      </div>`;
-    });
+        <div style="font-size:12px;color:var(--text-2);width:74px;text-align:right">₹${Number(s.gmv).toLocaleString('en-IN')}</div>
+      </div>`).join('');
   });
+}
+
+function escapeHtml(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c =>
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
 
 /* ══════════════════════════════════════════
@@ -658,7 +668,7 @@ function openProductModal() {
   document.getElementById('productFormTitle').textContent = 'Add New Product';
   document.getElementById('submitBtn').textContent = 'Add Product';
   document.getElementById('productId').value = '';
-  resetProductImagePreview();
+  pigReset();
   modal.classList.add('active');
 }
 
@@ -666,44 +676,321 @@ function closeProductModal() {
   document.getElementById('productModal')?.classList.remove('active');
 }
 
-/* ── Product image preview helpers ── */
-function setProductImagePreview(src) {
-  const box = document.getElementById('prodImagePreview');
-  if (!box) return;
-  box.innerHTML = src
-    ? `<img src="${src}" alt="Product image preview">`
-    : '<span class="prod-image-placeholder">No image selected</span>';
-  const clearBtn = document.getElementById('productImageClear');
-  if (clearBtn) clearBtn.style.display = src ? '' : 'none';
+/* ══════════ PRODUCT IMAGE GALLERY MANAGER ══════════
+   Owns the 4-slot #pigGrid in the Add/Edit Product modal.
+   PIG_SLOTS[i] = null                                   (empty)
+              | { kind:'existing', url, public_id }      (already on the product)
+              | { kind:'new', file, dataUrl, lowRes }    (freshly chosen, not yet saved)
+   Slot 0 is always the primary image. Deleting / reordering compacts the array
+   so there are never holes and slot 0 stays primary. On save the array is turned
+   into an `imagesPlan` the backend reconciles (see resolveGallery there). */
+var PIG_SLOTS = [null, null, null, null];
+var PIG_MAX = 4;
+var _pigTargetSlot = -1;   // slot awaiting a file from the shared picker
+var _pigDragFrom = -1;
+
+var PIG_CAPTIONS = ['Main product image', 'Back / alternate view', 'Side / product view', 'Additional product image'];
+var PIG_ALLOWED = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
+
+function pigReset() { PIG_SLOTS = [null, null, null, null]; _pigTargetSlot = -1; pigSetProductName(''); pigRender(); }
+
+function pigSetProductName(name) {
+  var box = document.getElementById('pigProduct');
+  var el = document.getElementById('pigProductName');
+  if (!box || !el) return;
+  if (name) { el.textContent = name; box.hidden = false; } else { box.hidden = true; }
 }
 
-function resetProductImagePreview() {
-  setProductImagePreview('');
-  const input = document.getElementById('productImageInput');
-  if (input) input.value = '';
+/* Load an existing product's ordered gallery (from getProduct → images[]). */
+function pigLoad(images) {
+  PIG_SLOTS = [null, null, null, null];
+  (images || []).slice(0, PIG_MAX).forEach(function (img, i) {
+    if (img && img.url) PIG_SLOTS[i] = { kind: 'existing', url: img.url, public_id: img.public_id || '' };
+  });
+  pigRender();
 }
+
+function pigCompact() {
+  PIG_SLOTS = PIG_SLOTS.filter(Boolean).slice(0, PIG_MAX);
+  while (PIG_SLOTS.length < PIG_MAX) PIG_SLOTS.push(null);
+}
+
+function pigCount() { return PIG_SLOTS.filter(Boolean).length; }
+
+var PIG_ICONS = {
+  plus:  '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
+  eye:   '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>',
+  star:  '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.9 6.26L21.6 9.27l-4.8 4.68 1.13 6.6L12 17.77 6.07 20.55l1.13-6.6-4.8-4.68 6.7-1.01z"/></svg>',
+  swap:  '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>',
+  trash: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>',
+  warn:  '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h16.9a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>',
+  check: '<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>'
+};
+
+function pigRender() {
+  var grid = document.getElementById('pigGrid');
+  if (!grid) return;
+  var anyLowRes = false;
+  var html = '';
+  for (var i = 0; i < PIG_MAX; i++) {
+    var slot = PIG_SLOTS[i];
+    var isPrimary = i === 0;
+    var cap = PIG_CAPTIONS[i];
+    var body;
+    if (!slot) {
+      body =
+        '<button type="button" class="pig-drop" data-pig-add="' + i + '">' +
+          '<span class="pig-drop-plus">' + PIG_ICONS.plus + '</span>' +
+          '<span class="pig-drop-main">Upload image</span>' +
+          '<span class="pig-drop-sub">JPG · PNG · WEBP</span>' +
+          '<span class="pig-drop-sub">Drag &amp; drop or click</span>' +
+        '</button>';
+    } else {
+      var src = slot.kind === 'new' ? slot.dataUrl : slot.url;
+      if (slot.lowRes) anyLowRes = true;
+      body =
+        '<div class="pig-preview">' +
+          '<img src="' + src + '" alt="' + esc(cap) + '">' +
+          (slot.kind === 'new' ? '<span class="pig-preview-badge">' + PIG_ICONS.check + ' New</span>' : '') +
+          '<div class="pig-actions">' +
+            '<button type="button" class="pig-act pig-act--view" title="Preview" data-pig-view="' + i + '">' + PIG_ICONS.eye + '</button>' +
+            (isPrimary ? '' : '<button type="button" class="pig-act pig-act--star" title="Set as primary" data-pig-primary="' + i + '">' + PIG_ICONS.star + '</button>') +
+            '<button type="button" class="pig-act pig-act--swap" title="Replace" data-pig-replace="' + i + '">' + PIG_ICONS.swap + '</button>' +
+            '<button type="button" class="pig-act pig-act--del" title="Delete" data-pig-del="' + i + '">' + PIG_ICONS.trash + '</button>' +
+          '</div>' +
+          '<div class="pig-uploading"><span class="pig-spin"></span><span>Uploading…</span></div>' +
+        '</div>';
+    }
+    html +=
+      '<div class="pig-slot ' + (isPrimary ? 'pig-slot--primary ' : '') + (slot ? 'pig-filled' : '') + '"' +
+        ' data-pig-slot="' + i + '"' + (slot ? ' draggable="true"' : '') + '>' +
+        (isPrimary ? '<span class="pig-badge">' + PIG_ICONS.check + ' Primary</span>' : '') +
+        body +
+        '<div class="pig-slot-cap">' + esc(cap) + (isPrimary ? ' *' : ' <span style="color:var(--text-3)">· optional</span>') + '</div>' +
+      '</div>';
+  }
+  grid.innerHTML = html;
+
+  var cnt = document.getElementById('pigCount');
+  if (cnt) cnt.textContent = pigCount() + ' / ' + PIG_MAX;
+
+  // low-res warning strip
+  var warn = document.getElementById('pigWarn');
+  if (anyLowRes) {
+    if (!warn) {
+      warn = document.createElement('div');
+      warn.id = 'pigWarn'; warn.className = 'pig-warn';
+      warn.innerHTML = PIG_ICONS.warn + '<div><b>Low image quality.</b> One or more images are small and may appear blurry on the product page. Upload higher-resolution images (1000×1000px or larger) for the best presentation.</div>';
+      grid.parentNode.insertBefore(warn, grid.nextSibling);
+    }
+  } else if (warn) { warn.remove(); }
+}
+
+/* ── file intake ── */
+function pigOpenPicker(slotIndex) {
+  _pigTargetSlot = slotIndex;
+  var input = document.getElementById('pigFileInput');
+  if (input) { input.value = ''; input.click(); }
+}
+
+function pigValidateFile(file) {
+  if (!file) return 'No file selected.';
+  var type = (file.type || '').toLowerCase();
+  var okType = PIG_ALLOWED.indexOf(type) >= 0 || /\.(png|jpe?g|webp)$/i.test(file.name || '');
+  if (!okType) return 'Unsupported image format. Use JPG, PNG or WEBP.';
+  if (file.size > 5 * 1024 * 1024) return 'File size is too large. Maximum is 5 MB per image.';
+  return '';
+}
+
+function pigAcceptFile(slotIndex, file) {
+  var err = pigValidateFile(file);
+  if (err) { toast(err, 'error'); return; }
+  var reader = new FileReader();
+  reader.onload = function (ev) {
+    var dataUrl = ev.target.result;
+    // Detect low resolution (non-blocking warning only).
+    var probe = new Image();
+    probe.onload = function () {
+      var lowRes = Math.min(probe.naturalWidth, probe.naturalHeight) < 600;
+      PIG_SLOTS[slotIndex] = { kind: 'new', file: file, dataUrl: dataUrl, lowRes: lowRes };
+      pigCompact();
+      pigRender();
+    };
+    probe.onerror = function () {
+      PIG_SLOTS[slotIndex] = { kind: 'new', file: file, dataUrl: dataUrl, lowRes: false };
+      pigCompact(); pigRender();
+    };
+    probe.src = dataUrl;
+  };
+  reader.readAsDataURL(file);
+}
+
+function pigSetPrimary(i) {
+  if (i <= 0 || !PIG_SLOTS[i]) return;
+  var s = PIG_SLOTS.splice(i, 1)[0];
+  PIG_SLOTS.unshift(s);
+  pigCompact();
+  pigRender();
+  toast('Primary image updated');
+}
+
+function pigDelete(i) {
+  var wasPrimary = i === 0;
+  var others = PIG_SLOTS.filter(Boolean).length;
+  pigConfirmDelete(wasPrimary && others > 1, function () {
+    PIG_SLOTS[i] = null;
+    pigCompact();
+    pigRender();
+    if (wasPrimary && PIG_SLOTS[0]) toast('Primary image removed — ' + PIG_CAPTIONS[0].toLowerCase() + ' is now the first remaining image');
+    else toast('Image removed');
+  });
+}
+
+/* reorder via drag between slots */
+function pigMove(from, to) {
+  if (from === to || from < 0 || to < 0) return;
+  var arr = PIG_SLOTS.filter(Boolean);
+  if (from >= arr.length) return;
+  var item = arr.splice(from, 1)[0];
+  arr.splice(Math.min(to, arr.length), 0, item);
+  PIG_SLOTS = arr.concat([null, null, null, null]).slice(0, PIG_MAX);
+  pigRender();
+}
+
+/* delegated events for the grid */
+document.addEventListener('click', function (e) {
+  var add = e.target.closest && e.target.closest('[data-pig-add]');
+  if (add) { pigOpenPicker(Number(add.getAttribute('data-pig-add'))); return; }
+  var rep = e.target.closest && e.target.closest('[data-pig-replace]');
+  if (rep) { pigOpenPicker(Number(rep.getAttribute('data-pig-replace'))); return; }
+  var del = e.target.closest && e.target.closest('[data-pig-del]');
+  if (del) { pigDelete(Number(del.getAttribute('data-pig-del'))); return; }
+  var pri = e.target.closest && e.target.closest('[data-pig-primary]');
+  if (pri) { pigSetPrimary(Number(pri.getAttribute('data-pig-primary'))); return; }
+  var view = e.target.closest && e.target.closest('[data-pig-view]');
+  if (view) { var s = PIG_SLOTS[Number(view.getAttribute('data-pig-view'))]; if (s) pigPreview(s.kind === 'new' ? s.dataUrl : s.url); return; }
+});
 
 document.addEventListener('change', function (e) {
-  if (e.target && e.target.id === 'productImageInput') {
-    const file = e.target.files && e.target.files[0];
-    if (!file) { setProductImagePreview(''); return; }
-    if (file.size > 5 * 1024 * 1024) {
-      toast('Image is larger than 5 MB', 'error');
-      e.target.value = '';
-      setProductImagePreview('');
-      return;
-    }
-    const reader = new FileReader();
-    reader.onload = function (ev) { setProductImagePreview(ev.target.result); };
-    reader.readAsDataURL(file);
+  if (e.target && e.target.id === 'pigFileInput') {
+    var file = e.target.files && e.target.files[0];
+    if (file && _pigTargetSlot >= 0) pigAcceptFile(_pigTargetSlot, file);
+    _pigTargetSlot = -1;
+    e.target.value = '';
   }
 });
 
-document.addEventListener('click', function (e) {
-  if (e.target && e.target.id === 'productImageClear') {
-    resetProductImagePreview();
-  }
+/* drag & drop: files from the OS onto an empty slot, and reordering between slots */
+document.addEventListener('dragstart', function (e) {
+  var slot = e.target.closest && e.target.closest('.pig-slot.pig-filled');
+  if (!slot) return;
+  _pigDragFrom = filledIndexOf(Number(slot.getAttribute('data-pig-slot')));
+  slot.classList.add('pig-drag-src');
+  if (e.dataTransfer) e.dataTransfer.effectAllowed = 'move';
 });
+document.addEventListener('dragend', function () {
+  _pigDragFrom = -1;
+  document.querySelectorAll('.pig-slot').forEach(function (s) { s.classList.remove('pig-drag-src', 'pig-dragover'); });
+});
+document.addEventListener('dragover', function (e) {
+  var slot = e.target.closest && e.target.closest('.pig-slot');
+  if (!slot) return;
+  e.preventDefault();
+  slot.classList.add('pig-dragover');
+});
+document.addEventListener('dragleave', function (e) {
+  var slot = e.target.closest && e.target.closest('.pig-slot');
+  if (slot) slot.classList.remove('pig-dragover');
+});
+document.addEventListener('drop', function (e) {
+  var slot = e.target.closest && e.target.closest('.pig-slot');
+  if (!slot) return;
+  e.preventDefault();
+  slot.classList.remove('pig-dragover');
+  var slotIndex = Number(slot.getAttribute('data-pig-slot'));
+  // Dropped OS files → upload into the first free slot (or the targeted one).
+  if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length) {
+    var target = PIG_SLOTS[slotIndex] ? firstFreeSlot() : slotIndex;
+    if (target >= 0) pigAcceptFile(target, e.dataTransfer.files[0]);
+    return;
+  }
+  // Reorder within the grid.
+  if (_pigDragFrom >= 0) { pigMove(_pigDragFrom, filledIndexOf(slotIndex)); _pigDragFrom = -1; }
+});
+function firstFreeSlot() { for (var i = 0; i < PIG_MAX; i++) if (!PIG_SLOTS[i]) return i; return -1; }
+function filledIndexOf(slotIndex) {
+  // slotIndex is a visual index; with compaction it equals the filled index,
+  // but clamp to the number of filled slots for safety.
+  var filled = PIG_SLOTS.filter(Boolean).length;
+  return Math.min(slotIndex, Math.max(0, filled - 1));
+}
+
+/* ── confirm + preview overlays ── */
+function pigEnsureOverlays() {
+  if (!document.getElementById('pigConfirm')) {
+    var c = document.createElement('div');
+    c.className = 'pig-modal'; c.id = 'pigConfirm';
+    c.innerHTML =
+      '<div class="pig-modal-card">' +
+        '<div class="pig-modal-ico">' + PIG_ICONS.trash + '</div>' +
+        '<h3 id="pigConfirmTitle">Delete product image?</h3>' +
+        '<p id="pigConfirmBody">Are you sure you want to remove this image? This cannot be undone once you save the product.</p>' +
+        '<div class="pig-modal-actions">' +
+          '<button type="button" class="btn btn-ghost" id="pigConfirmCancel">Cancel</button>' +
+          '<button type="button" class="btn btn-danger" id="pigConfirmOk">Delete image</button>' +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(c);
+    c.addEventListener('click', function (e) { if (e.target === c) pigCloseConfirm(); });
+    document.getElementById('pigConfirmCancel').addEventListener('click', pigCloseConfirm);
+  }
+  if (!document.getElementById('pigLightbox')) {
+    var lb = document.createElement('div');
+    lb.className = 'pig-lightbox'; lb.id = 'pigLightbox';
+    lb.innerHTML = '<button type="button" class="pig-lightbox-close" aria-label="Close">×</button><img id="pigLightboxImg" alt="Product image preview">';
+    document.body.appendChild(lb);
+    lb.addEventListener('click', function () { lb.classList.remove('on'); });
+  }
+}
+var _pigConfirmCb = null;
+function pigConfirmDelete(isPrimary, cb) {
+  pigEnsureOverlays();
+  _pigConfirmCb = cb;
+  var body = document.getElementById('pigConfirmBody');
+  body.textContent = isPrimary
+    ? 'This is the primary image. If you remove it, the next image becomes the new primary. Continue?'
+    : 'Are you sure you want to remove this image? This cannot be undone once you save the product.';
+  var ok = document.getElementById('pigConfirmOk');
+  ok.onclick = function () { pigCloseConfirm(); if (_pigConfirmCb) _pigConfirmCb(); _pigConfirmCb = null; };
+  document.getElementById('pigConfirm').classList.add('on');
+}
+function pigCloseConfirm() { var c = document.getElementById('pigConfirm'); if (c) c.classList.remove('on'); }
+function pigPreview(src) {
+  pigEnsureOverlays();
+  document.getElementById('pigLightboxImg').src = src;
+  document.getElementById('pigLightbox').classList.add('on');
+}
+
+/* Build the multipart body for save: text payload + imagesPlan + new files. */
+function pigBuildFormData(payload) {
+  var fd = new FormData();
+  Object.keys(payload).forEach(function (k) {
+    if (payload[k] !== null && payload[k] !== undefined) fd.append(k, payload[k]);
+  });
+  var plan = [];
+  var fileIdx = 0;
+  PIG_SLOTS.filter(Boolean).slice(0, PIG_MAX).forEach(function (slot) {
+    if (slot.kind === 'existing') {
+      plan.push({ keep: slot.public_id });
+    } else if (slot.kind === 'new') {
+      var field = 'image_' + (fileIdx++);
+      fd.append(field, slot.file);
+      plan.push({ file: field });
+    }
+  });
+  fd.append('imagesPlan', JSON.stringify(plan));
+  return fd;
+}
 
 async function editProduct(id) {
   try {
@@ -724,12 +1011,10 @@ async function editProduct(id) {
     document.getElementById('productId').value = id;
     document.getElementById('productFormTitle').textContent = 'Edit Product';
     document.getElementById('submitBtn').textContent = 'Update Product';
-    // Clear any selected file, then show the existing image (if any) as the
-    // preview. Picking a new file in the input replaces it; leaving the input
-    // empty keeps the existing image untouched server-side.
-    var fileInput = document.getElementById('productImageInput');
-    if (fileInput) fileInput.value = '';
-    setProductImagePreview(product.imageUrl || '');
+    // Load the product's existing gallery into the 4-slot manager. Kept images
+    // stay untouched server-side unless the admin removes/replaces them.
+    pigSetProductName(product.name || '');
+    pigLoad(product.images || (product.imageUrl ? [{ url: product.imageUrl }] : []));
     document.getElementById('productModal').classList.add('active');
   } catch (e) { toast('Failed to load product', 'error'); }
 }
@@ -758,56 +1043,84 @@ async function saveProduct() {
     return;
   }
 
-  // Use multipart only when a file is attached; otherwise JSON is fine.
-  // Multer leaves req.body alone for JSON requests, so the backend handles both.
-  const fileInput = document.getElementById('productImageInput');
-  const file = fileInput && fileInput.files && fileInput.files[0];
+  // The primary product image is required when creating a new product.
+  if (!productId && pigCount() === 0) {
+    toast('Please add at least the primary product image', 'error');
+    return;
+  }
+
   const url = productId ? `/products/${productId}` : '/products';
   const method = productId ? 'PUT' : 'POST';
 
   const submitBtn = document.getElementById('submitBtn');
   const origBtnText = submitBtn.textContent;
   submitBtn.disabled = true;
-  submitBtn.textContent = productId ? 'Updating…' : 'Adding…';
+
+  // Always multipart: the backend reads `imagesPlan` (+ image_N files) to
+  // reconcile the whole gallery. New files may be large, so send via XHR to
+  // show a real upload-progress bar (fetch can't report upload progress).
+  const fd = pigBuildFormData(payload);
+  const hasNewFiles = PIG_SLOTS.filter(Boolean).some(s => s.kind === 'new');
+  submitBtn.textContent = hasNewFiles ? 'Uploading…' : (productId ? 'Updating…' : 'Adding…');
+
+  const progress = pigProgressEl();
+  if (hasNewFiles && progress) { progress.wrap.classList.add('on'); progress.bar.style.width = '0%'; }
 
   try {
-    if (file) {
-      const fd = new FormData();
-      Object.keys(payload).forEach(k => {
-        if (payload[k] !== null && payload[k] !== undefined) fd.append(k, payload[k]);
-      });
-      fd.append('image', file);
-      // apiFetch sets Content-Type: application/json by default — pass FormData
-      // directly via fetch so the browser sets the multipart boundary itself.
-      const token = localStorage.getItem('ff_token');
-      const res = await fetch(API_BASE + url, {
-        method,
-        headers: token ? { Authorization: 'Bearer ' + token } : {},
-        body: fd,
-      });
-      if (res.status === 401 || res.status === 403) {
-        localStorage.removeItem('ff_token');
-        localStorage.removeItem('ff_user');
-        window.location.replace('/admin.html');
-        return;
-      }
-      if (!res.ok) {
-        const body = await res.json().catch(() => ({}));
-        throw new Error(body.error || body.message || ('HTTP ' + res.status));
-      }
-    } else {
-      await apiFetch(url, { method, body: JSON.stringify(payload) });
-    }
+    await pigXhrSave(API_BASE + url, method, fd, function (pct) {
+      if (progress) progress.bar.style.width = pct + '%';
+    });
     toast(productId ? 'Product updated successfully' : 'Product added successfully');
     closeProductModal();
     allProducts = [];
     await loadProducts();
   } catch (e) {
-    toast(e.message, 'error');
+    if (e && e.unauth) {
+      localStorage.removeItem('ff_token'); localStorage.removeItem('ff_user');
+      window.location.replace('/admin.html'); return;
+    }
+    toast((e && e.message) || 'Save failed', 'error');
   } finally {
     submitBtn.disabled = false;
     submitBtn.textContent = origBtnText;
+    if (progress) { progress.wrap.classList.remove('on'); progress.bar.style.width = '0%'; }
   }
+}
+
+/* Aggregate save-progress bar under the gallery grid (created lazily). */
+function pigProgressEl() {
+  var grid = document.getElementById('pigGrid');
+  if (!grid) return null;
+  var wrap = document.getElementById('pigProgress');
+  if (!wrap) {
+    wrap = document.createElement('div');
+    wrap.id = 'pigProgress'; wrap.className = 'pig-progress';
+    wrap.innerHTML = '<div class="pig-progress-bar"></div>';
+    grid.parentNode.insertBefore(wrap, grid.nextSibling);
+  }
+  return { wrap: wrap, bar: wrap.querySelector('.pig-progress-bar') };
+}
+
+/* XHR multipart upload with progress. Resolves on 2xx, rejects otherwise. */
+function pigXhrSave(fullUrl, method, formData, onProgress) {
+  return new Promise(function (resolve, reject) {
+    var xhr = new XMLHttpRequest();
+    xhr.open(method, fullUrl);
+    var token = localStorage.getItem('ff_token');
+    if (token) xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+    if (xhr.upload && onProgress) {
+      xhr.upload.onprogress = function (e) { if (e.lengthComputable) onProgress(Math.round((e.loaded / e.total) * 100)); };
+    }
+    xhr.onload = function () {
+      if (xhr.status === 401 || xhr.status === 403) { reject({ unauth: true }); return; }
+      if (xhr.status >= 200 && xhr.status < 300) { if (onProgress) onProgress(100); resolve(); return; }
+      var msg = 'HTTP ' + xhr.status;
+      try { var b = JSON.parse(xhr.responseText || '{}'); msg = b.error || b.message || msg; } catch (_) {}
+      reject(new Error(msg));
+    };
+    xhr.onerror = function () { reject(new Error('Network error during upload')); };
+    xhr.send(formData);
+  });
 }
 
 async function deleteProduct(id) {
@@ -888,7 +1201,7 @@ async function loadWallet() {
       const { badge, label, btn } = settlementUI(d);
       tbody.innerHTML += `<tr>
         <td><div style="display:flex;align-items:center;gap:8px"><div class="avatar ${cc}">${esc(ini)}</div>${esc(d.distributor) || '—'}</div></td>
-        <td style="font-family:'DM Mono',monospace;font-size:12px">${esc(d.invoice_no)}</td>
+        <td style="font-family:var(--ff-font-mono, ui-monospace, Menlo, monospace);font-size:12px">${esc(d.invoice_no)}</td>
         <td style="font-weight:500">${esc(d.amount)}</td>
         <td>${esc(d.due_date)}</td>
         <td><span class="badge ${badge}">${label}</span></td>
@@ -1177,14 +1490,19 @@ async function deleteMapping(id) {
 /* ══════════════════════════════════════════
    REPORTS EXPORT
 ══════════════════════════════════════════ */
-function exportReport(type) {
+async function exportReport(type) {
   const config = {
+    // Was a fixed table of invented monthly GMV and "target" figures — it
+    // downloaded as a CSV indistinguishable from a real report. Now built from
+    // the same real aggregation the charts use. There is no target anywhere in
+    // the data model, so that column is gone rather than fabricated.
     gmv: {
-      rows: [
-        ['Month','GMV (₹L)','Target (₹L)'],
-        ['Dec 2025','85','90'],['Jan 2026','92','90'],['Feb 2026','78','90'],
-        ['Mar 2026','104','110'],['Apr 2026','122','110'],['May 2026','156','150'],
-      ],
+      rows: () => {
+        const m = (window.SA_ANALYTICS && window.SA_ANALYTICS.months) || [];
+        const rows = [['Month','GMV (INR)','Orders']];
+        m.forEach(r => rows.push([r.label, r.gmv, r.orders]));
+        return rows;
+      },
       file: 'gmv-report.csv',
       label: 'GMV report',
     },
@@ -1198,8 +1516,16 @@ function exportReport(type) {
       file: 'user-acquisition.csv',
       label: 'User acquisition report',
     },
+    // Was a header row and nothing else — the button downloaded an empty file.
+    // There is no in-page cache for wallet rows, so fetch on demand.
     settlement: {
-      rows: [['Distributor','Invoice','Amount','Due Date','Status']],
+      rows: async () => {
+        const rows = [['Distributor','Invoice','Amount','Due Date','Status']];
+        const data = await apiFetch('/wallet');
+        (Array.isArray(data) ? data : []).forEach(r =>
+          rows.push([r.distributor, r.invoice_no, r.amount, r.due_date, r.status]));
+        return rows;
+      },
       file: 'settlement-report.csv',
       label: 'Settlement report',
     },
@@ -1212,19 +1538,29 @@ function exportReport(type) {
       file: 'inventory-report.csv',
       label: 'Inventory report',
     },
+    // Also header-only before. Redemption/target counters do not exist on the
+    // Scheme model, so those columns are dropped rather than filled with zeros
+    // that would read as real performance data.
     schemes: {
-      rows: () => {
-        const rows = [['Scheme','Type','Category','Channel','Status','Redemptions','Target','Start','End']];
+      rows: async () => {
+        const rows = [['Scheme','Type','Category','Channel','Status','Start','End']];
+        const data = await apiFetch('/schemes');
+        (Array.isArray(data) ? data : []).forEach(s =>
+          rows.push([s.name, s.type, s.category, s.channel, s.status, s.start_date, s.end_date]));
         return rows;
       },
       file: 'scheme-performance.csv',
       label: 'Scheme performance report',
     },
     states: {
-      rows: [
-        ['State','GMV','Performance %'],
-        ...states.map(s => [s.name, s.gmv, s.pct + '%']),
-      ],
+      // `states` is now loaded from the analytics endpoint, so this reads real
+      // figures — but it must be a function, or it would capture the empty
+      // array at module-evaluation time, before the fetch resolves.
+      rows: () => {
+        const rows = [['State','GMV (INR)','Share of top state %']];
+        states.forEach(s => rows.push([s.name, s.gmv, s.pct + '%']));
+        return rows;
+      },
       file: 'state-report.csv',
       label: 'State-wise report',
     },
@@ -1232,9 +1568,19 @@ function exportReport(type) {
 
   const exp = config[type];
   if (!exp) return;
-  const rows = typeof exp.rows === 'function' ? exp.rows() : exp.rows;
-  downloadCSV(rows, exp.file);
-  toast(`${exp.label} downloaded`);
+  try {
+    // Some builders now fetch, so await regardless — await on a plain array is
+    // a no-op.
+    const rows = await (typeof exp.rows === 'function' ? exp.rows() : exp.rows);
+    if (!rows || rows.length <= 1) {
+      toast(`No data available for the ${exp.label.toLowerCase()}`, 'error');
+      return;
+    }
+    downloadCSV(rows, exp.file);
+    toast(`${exp.label} downloaded`);
+  } catch (e) {
+    toast(`Could not build the ${exp.label.toLowerCase()}`, 'error');
+  }
 }
 
 /* ══════════════════════════════════════════
@@ -1249,8 +1595,12 @@ function saveSettings(e) {
     gst_number: form.querySelector('[name=setting-gst]')?.value,
     timezone: form.querySelector('[name=setting-timezone]')?.value,
   };
+  // There is no settings endpoint on the API, so this only ever reached
+  // localStorage — one browser, one admin, no effect on the platform. The old
+  // message ("Settings saved successfully") implied a system-wide change, which
+  // matters when the fields include the platform GST number.
   localStorage.setItem('fairford_settings', JSON.stringify(settings));
-  toast('Settings saved successfully');
+  toast('Saved to this browser only — not yet applied platform-wide', 'error');
 }
 
 function loadSettings() {
@@ -1286,72 +1636,207 @@ function toggleNotification(el) {
 /* ══════════════════════════════════════════
    CHARTS
 ══════════════════════════════════════════ */
-window.addEventListener('load', () => {
+/* Charts run on REAL order data from GET /api/superadmin/analytics.
+
+   They previously ran on hardcoded arrays: monthly GMV of [85,92,78,104,122,156]
+   in lakh, a fixed [90,90,90,110,110,150] "target" line, and a fixed category
+   split. Against the actual book — 19 orders totalling ~41k — those figures
+   overstated the business by roughly two orders of magnitude, on the screen the
+   company's own management reads. The "Export" buttons wrote them to CSV too.
+
+   There is no target/forecast anywhere in the data model, so the target series
+   is gone rather than invented. Where a chart has too little data to be
+   meaningful, an explicit message replaces it instead of a padded trend. */
+
+window.SA_ANALYTICS = null;
+
+function saChartEmpty(canvas, msg) {
+  if (!canvas || !canvas.parentNode) return;
+  const note = document.createElement('div');
+  note.className = 'chart-empty';
+  note.textContent = msg;
+  canvas.parentNode.replaceChild(note, canvas);
+}
+
+function saInr(n) {
+  return '₹' + Number(n || 0).toLocaleString('en-IN');
+}
+
+async function initAnalyticsCharts() {
+  let a;
+  try {
+    a = await apiFetch('/analytics');
+  } catch (e) {
+    // apiFetch redirects on 401/403; anything else leaves the charts unbuilt
+    // rather than falling back to invented numbers.
+    ['gmvChart', 'revChart', 'catDonut'].forEach(id =>
+      saChartEmpty(document.getElementById(id), 'Analytics could not be loaded.'));
+    return;
+  }
+  window.SA_ANALYTICS = a;
+
+  // State panel shares this payload rather than making a second request.
+  states = (a && a.states) || [];
+  if (typeof renderStatePerf === 'function') renderStatePerf();
+
+  const months = (a && a.months) || [];
+  const cats   = (a && a.categories) || [];
+  const labels = months.map(m => m.label);
+  const gmv    = months.map(m => m.gmv);
+
+  const axisMoney = {
+    grid: { color: '#F0EFF8' },
+    ticks: { color: '#A09BBF', font: { size: 11 }, callback: v => '₹' + Number(v).toLocaleString('en-IN') },
+  };
+
+  // ── Dashboard: GMV by month ────────────────────────────────────────────────
   const gmvCtx = document.getElementById('gmvChart');
   if (gmvCtx) {
-    new Chart(gmvCtx, {
-      type: 'bar',
-      data: {
-        labels: ['Dec','Jan','Feb','Mar','Apr','May'],
-        datasets: [{ label: 'GMV (₹L)', data: [85,92,78,104,122,156], backgroundColor: '#5B3EE8', borderRadius: 6, borderSkipped: false }],
-      },
-      options: {
-        responsive: true, maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: {
-          x: { grid: { display: false }, ticks: { color: '#A09BBF', font: { size: 11 } } },
-          y: { grid: { color: '#F0EFF8' }, ticks: { color: '#A09BBF', font: { size: 11 }, callback: v => v + 'L' } },
+    if (!months.length) {
+      saChartEmpty(gmvCtx, 'No orders yet — GMV will appear here once orders are placed.');
+    } else {
+      new Chart(gmvCtx, {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [{ label: 'GMV', data: gmv, backgroundColor: '#5B3EE8', borderRadius: 6, borderSkipped: false }],
         },
-      },
-    });
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: { callbacks: { label: c => saInr(c.parsed.y) } },
+          },
+          scales: {
+            x: { grid: { display: false }, ticks: { color: '#A09BBF', font: { size: 11 } } },
+            y: axisMoney,
+          },
+        },
+      });
+    }
   }
 
-  const wdCtx = document.getElementById('walletDonut');
-  if (wdCtx) {
-    new Chart(wdCtx, {
-      type: 'doughnut',
-      data: {
-        labels: ['Settled','Escrow','Pending'],
-        datasets: [{ data: [74,16,10], backgroundColor: ['#0FA86A','#5B3EE8','#E24B4A'], borderWidth: 0, hoverOffset: 4 }],
-      },
-      options: { cutout: '72%', plugins: { legend: { display: false } }, maintainAspectRatio: false },
-    });
-  }
-
+  // ── Analytics: revenue trend ───────────────────────────────────────────────
   const revCtx = document.getElementById('revChart');
   if (revCtx) {
-    new Chart(revCtx, {
-      type: 'line',
-      data: {
-        labels: ['Dec','Jan','Feb','Mar','Apr','May'],
-        datasets: [
-          { label: 'Revenue', data: [85,92,78,104,122,156], borderColor: '#5B3EE8', backgroundColor: 'rgba(91,62,232,.08)', fill: true, tension: .4, pointRadius: 4, pointBackgroundColor: '#5B3EE8' },
-          { label: 'Target', data: [90,90,90,110,110,150], borderColor: '#0FA86A', borderDash: [4,3], fill: false, tension: .4, pointRadius: 0 },
-        ],
-      },
-      options: {
-        responsive: true, maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: {
-          x: { grid: { display: false }, ticks: { color: '#A09BBF', font: { size: 11 } } },
-          y: { grid: { color: '#F0EFF8' }, ticks: { color: '#A09BBF', font: { size: 11 }, callback: v => v + 'L' } },
+    if (months.length < 2) {
+      saChartEmpty(revCtx, months.length
+        ? 'Only one month of order data so far — a trend needs at least two.'
+        : 'No orders yet — the revenue trend will appear once orders are placed.');
+    } else {
+      new Chart(revCtx, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [
+            { label: 'Revenue', data: gmv, borderColor: '#5B3EE8', backgroundColor: 'rgba(91,62,232,.08)', fill: true, tension: .4, pointRadius: 4, pointBackgroundColor: '#5B3EE8' },
+          ],
         },
-      },
-    });
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: { callbacks: { label: c => saInr(c.parsed.y) } },
+          },
+          scales: {
+            x: { grid: { display: false }, ticks: { color: '#A09BBF', font: { size: 11 } } },
+            y: axisMoney,
+          },
+        },
+      });
+    }
   }
 
+  // ── Analytics: revenue by category ─────────────────────────────────────────
   const catCtx = document.getElementById('catDonut');
   if (catCtx) {
-    new Chart(catCtx, {
-      type: 'doughnut',
-      data: {
-        labels: ['Antibiotics','Cardiac','Vitamins','Analgesics','Others'],
-        datasets: [{ data: [34,22,18,14,12], backgroundColor: ['#5B3EE8','#0FA86A','#D97B0A','#E24B4A','#A09BBF'], borderWidth: 0 }],
-      },
-      options: { cutout: '68%', plugins: { legend: { display: false } }, maintainAspectRatio: false },
-    });
+    if (!cats.length) {
+      saChartEmpty(catCtx, 'No order lines yet.');
+    } else {
+      new Chart(catCtx, {
+        type: 'doughnut',
+        data: {
+          labels: cats.map(c => c.label),
+          datasets: [{
+            data: cats.map(c => c.value),
+            backgroundColor: ['#5B3EE8', '#0FA86A', '#D97B0A', '#E24B4A', '#A09BBF', '#7C6FF0'],
+            borderWidth: 0,
+          }],
+        },
+        options: {
+          cutout: '68%', maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: { callbacks: { label: c => c.label + ': ' + saInr(c.parsed) } },
+          },
+        },
+      });
+    }
   }
-});
+}
+
+/* Wallet settlement split — real counts from GET /api/superadmin/wallet, which
+   derives each order's settlement state from its payment/dispatch status. The
+   donut and its legend were previously fixed at 74/16/10 percent. */
+async function initWalletDonut() {
+  const ctx = document.getElementById('walletDonut');
+  if (!ctx) return;
+
+  let rows;
+  try {
+    rows = await apiFetch('/wallet');
+  } catch (e) {
+    saChartEmpty(ctx, 'Unavailable');
+    return;
+  }
+  if (!Array.isArray(rows) || !rows.length) {
+    saChartEmpty(ctx, 'No orders yet');
+    ['wdSettled', 'wdTransit', 'wdPending'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = '0%';
+    });
+    return;
+  }
+
+  // settlementStatus() yields: settled | due_today | overdue | pending.
+  // due_today/overdue both mean "dispatched or delivered, not yet paid".
+  const buckets = { settled: 0, transit: 0, pending: 0 };
+  rows.forEach(r => {
+    if (r.status === 'settled') buckets.settled++;
+    else if (r.status === 'due_today' || r.status === 'overdue') buckets.transit++;
+    else buckets.pending++;
+  });
+
+  const total = rows.length;
+  const pct = n => Math.round((n / total) * 100) + '%';
+  const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+  set('wdSettled', pct(buckets.settled));
+  set('wdTransit', pct(buckets.transit));
+  set('wdPending', pct(buckets.pending));
+
+  new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Settled', 'In transit', 'Pending'],
+      datasets: [{
+        data: [buckets.settled, buckets.transit, buckets.pending],
+        backgroundColor: ['#0FA86A', '#5B3EE8', '#E24B4A'],
+        borderWidth: 0, hoverOffset: 4,
+      }],
+    },
+    options: {
+      cutout: '68%', maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: c => `${c.label}: ${c.parsed} order${c.parsed === 1 ? '' : 's'}` } },
+      },
+    },
+  });
+}
+
+window.addEventListener('load', initAnalyticsCharts);
+window.addEventListener('load', initWalletDonut);
+
 
 /* ══════════════════════════════════════════
    DISTRIBUTOR PROFILE
@@ -1425,11 +1910,11 @@ async function openDistributorProfile(id) {
         <div class="profile-grid">
           <div>
             <div class="profile-field-label">GSTIN</div>
-            <div class="profile-field-val" style="font-family:'DM Mono',monospace;font-size:12px">${d.gstin || '—'}</div>
+            <div class="profile-field-val" style="font-family:var(--ff-font-mono, ui-monospace, Menlo, monospace);font-size:12px">${d.gstin || '—'}</div>
           </div>
           <div>
             <div class="profile-field-label">Drug License No.</div>
-            <div class="profile-field-val" style="font-family:'DM Mono',monospace;font-size:12px">${d.license_no || '—'}</div>
+            <div class="profile-field-val" style="font-family:var(--ff-font-mono, ui-monospace, Menlo, monospace);font-size:12px">${d.license_no || '—'}</div>
           </div>
           <div>
             <div class="profile-field-label">Member Since</div>
@@ -1557,7 +2042,7 @@ async function openRetailerProfile(id) {
           </div>
           <div style="grid-column:1/-1">
             <div class="profile-field-label">GSTIN</div>
-            <div class="profile-field-val" style="font-family:'DM Mono',monospace;font-size:12px">${esc(r.gstin || '—')}</div>
+            <div class="profile-field-val" style="font-family:var(--ff-font-mono, ui-monospace, Menlo, monospace);font-size:12px">${esc(r.gstin || '—')}</div>
           </div>
         </div>
       </div>
@@ -1733,7 +2218,7 @@ async function openDealerDocs(id) {
           <div><div class="profile-field-label">Mobile</div><div class="profile-field-val">${esc(r.phone || '—')}</div></div>
           <div><div class="profile-field-label">Registration Date</div><div class="profile-field-val">${esc(r.registeredAt || '—')}</div></div>
           <div><div class="profile-field-label">Dealer Status</div><div class="profile-field-val">${esc(statusLabel)}</div></div>
-          <div><div class="profile-field-label">GSTIN</div><div class="profile-field-val" style="font-family:'DM Mono',monospace;font-size:12px">${esc(r.gstNumber || '—')}</div></div>
+          <div><div class="profile-field-label">GSTIN</div><div class="profile-field-val" style="font-family:var(--ff-font-mono, ui-monospace, Menlo, monospace);font-size:12px">${esc(r.gstNumber || '—')}</div></div>
           <div style="grid-column:1/-1"><div class="profile-field-label">Address</div><div class="profile-field-val">${esc(r.address || '—')}</div></div>
         </div>
       </div>

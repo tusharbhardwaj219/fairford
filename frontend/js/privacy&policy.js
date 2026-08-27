@@ -34,15 +34,25 @@
   updateScrollProgress();
   updateBackToTop();
 
-  // ── Reveal Animation ──
+  // ── Reveal Animation (Web Animations API) ──
+  // Cards are visible by default (see .reveal in privacy&policy.css); this only
+  // plays an entrance as each card scrolls into view. Using WAAPI rather than a
+  // CSS class toggle keeps content robust — if JS/observer never runs, the text
+  // is already shown — and renders in transition-freezing preview engines.
   var reveals = document.querySelectorAll('.reveal');
   if ('IntersectionObserver' in window && reveals.length) {
     var revealObserver = new IntersectionObserver(function (entries) {
       entries.forEach(function (entry) {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('active');
-          revealObserver.unobserve(entry.target);
+        if (!entry.isIntersecting) return;
+        var el = entry.target;
+        if (el.animate) {
+          el.animate(
+            [ { opacity: 0, transform: 'translateY(28px)' },
+              { opacity: 1, transform: 'none' } ],
+            { duration: 620, easing: 'cubic-bezier(0.22, 1, 0.36, 1)', fill: 'both' }
+          );
         }
+        revealObserver.unobserve(el);
       });
     }, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' });
 

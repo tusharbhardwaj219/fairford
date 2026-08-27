@@ -45,17 +45,17 @@
     'border-color:rgba(34,197,94,.2);}',
 
     /* text */
-    '.lc-title{font-family:"Plus Jakarta Sans","Inter",system-ui,sans-serif;',
+    '.lc-title{font-family:var(--ff-font-heading, Manrope, system-ui, sans-serif);',
     'font-size:1.5rem;font-weight:700;color:#0f172a;margin:0 0 12px;',
     'letter-spacing:-.3px;transition:color .3s;}',
     '.lc-title--ok{color:#15803d;}',
-    '.lc-desc{font-family:"Inter",system-ui,sans-serif;font-size:.9rem;',
+    '.lc-desc{font-family:var(--ff-font-body, Inter, system-ui, sans-serif);font-size:.9rem;',
     'color:#64748b;line-height:1.65;margin:0 0 32px;}',
 
     /* action buttons row */
     '.lc-actions{display:flex;gap:12px;}',
     '.lc-btn{flex:1;height:50px;border-radius:12px;',
-    'font-family:"Plus Jakarta Sans","Inter",system-ui,sans-serif;',
+    'font-family:var(--ff-font-heading, Manrope, system-ui, sans-serif);',
     'font-size:.95rem;font-weight:600;letter-spacing:.1px;',
     'cursor:pointer;border:none;',
     'display:inline-flex;align-items:center;justify-content:center;gap:8px;',

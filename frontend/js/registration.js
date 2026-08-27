@@ -1,401 +1,219 @@
-const API_AUTH = '/api/auth';
+/* =====================================================================
+   registration.js — Fair Ford Pharmaceuticals · Retailer registration
+   6-step KYC wizard (multipart) on the shared portal design system.
+   Retailer-only signup (role='ret'); the backend maps businessName→
+   shopName and address→shopAddress. Auto-logs in on success (account
+   stays KYC-pending until an admin approves it).
+   ===================================================================== */
+'use strict';
 
-let currentStep  = 1;
-let selectedRole = '';
+var $ = function (id) { return document.getElementById(id); };
+function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (m) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]; }); }
+function toast(msg) { var t = $('rgToast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toast._t); toast._t = setTimeout(function () { t.classList.remove('show'); }, 3600); }
 
-// Registration document files chosen by the dealer, keyed by the backend field
-// name the signup API expects. Populated by handleUpload(), sent by submitForm().
-const uploadedDocs = {};
+$('rgYear').textContent = new Date().getFullYear();
 
-// Maps each upload zone in the form to its backend document field name.
-const UPLOAD_ZONE_FIELD = {
-  uz1: 'drugLicense',
-  uz2: 'gstCertificate',
-  uz3: 'panCard',
-  uz4: 'cancelledCheque',
-};
+/* if already signed in, no need to register */
+(function checkSession() {
+  var token = localStorage.getItem('ff_token'), raw = localStorage.getItem('ff_user'), user = null;
+  try { user = JSON.parse(raw); } catch (e) {}
+  if (token && user && user.role) {
+    var dest = user.role === 'ret' ? 'retailer.html' : (user.role === 'dist' ? 'distributor.html' : (user.role === 'admin' || user.role === 'superadmin') ? 'superadmin.html' : 'index.html');
+    window.location.replace(dest);
+  }
+})();
 
-const roleLabels = {
-  dist: 'Distributor / Stockist',
-  ret:  'Retailer / Chemist',
-  hosp: 'Hospital / Institution',
-  mfr:  'Manufacturer'
-};
+/* ================= VALIDATION ================= */
+var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+var PHONE_RE = /^[6-9]\d{9}$/;
+var PW_RE = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{12,}$/;
 
-// Map UI role codes to backend role values (must match authController.modelForRole)
-const roleMap = {
-  dist: 'dist',
-  ret:  'ret',
-  hosp: 'ret',   // hospital uses retailer pricing tier
-  mfr:  'dist'   // manufacturer uses distributor pricing tier
-};
+function fieldErr(input, msg) { var f = input.closest('.pf-field'); if (!f) return false; f.classList.add('is-invalid'); f.classList.remove('is-valid'); var e = f.querySelector('.pf-err'); if (e) e.textContent = msg; return false; }
+function fieldOk(input) { var f = input.closest('.pf-field'); if (!f) return true; f.classList.remove('is-invalid'); f.classList.add('is-valid'); return true; }
 
-// ── Navigation ────────────────────────────────────────────────────────────────
+function showErr(msg) { $('regErrText').textContent = msg; $('regErr').classList.add('is-on'); try { $('regErr').scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } catch (e) {} }
+function hideErr() { $('regErr').classList.remove('is-on'); }
 
-function selectRole(el, role) {
-  document.querySelectorAll('.role-card').forEach(c => c.classList.remove('active'));
-  el.classList.add('active');
-  selectedRole = role;
-  document.getElementById('roleError').style.display = 'none';
+/* ================= PASSWORD show/hide + strength ================= */
+document.addEventListener('click', function (e) {
+  var t = e.target.closest('[data-toggle]');
+  if (!t) return;
+  var inp = $(t.getAttribute('data-toggle'));
+  if (!inp) return;
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+  t.setAttribute('aria-label', inp.type === 'password' ? 'Show password' : 'Hide password');
+});
+
+function pwScore(v) {
+  var s = 0;
+  if (v.length >= 12) s++;
+  if (/[a-z]/.test(v) && /[A-Z]/.test(v)) s++;
+  if (/\d/.test(v)) s++;
+  if (/[@$!%*?&]/.test(v)) s++;
+  return s;
 }
+(function wirePwMeter() {
+  var pass = $('rgPass');
+  if (!pass) return;
+  pass.addEventListener('input', function () {
+    var bars = document.querySelectorAll('#regForm .pf-pw-bar');
+    var s = pwScore(pass.value);
+    bars.forEach(function (b, i) { b.className = 'pf-pw-bar' + (i < s ? ' on-' + s : ''); });
+    var lbl = $('rgPassLabel');
+    if (pass.value) lbl.textContent = ['Very weak', 'Weak', 'Fair', 'Good', 'Strong'][s] + ' — needs 12+ chars, upper, lower, number & symbol';
+    else lbl.textContent = 'Min 12 characters · upper, lower, number & symbol (@$!%*?&)';
+  });
+})();
+
+/* ================= KYC DROPZONES ================= */
+var KYC_DOCS = [
+  { key: 'drugLicense', label: 'Drug licence', req: true },
+  { key: 'gstCertificate', label: 'GST certificate', req: true },
+  { key: 'panCard', label: 'PAN card', req: false },
+  { key: 'cancelledCheque', label: 'Cancelled cheque', req: false }
+];
+var KYC_FILES = {};
+
+(function buildKyc() {
+  var host = $('kycDrops');
+  if (!host) return;
+  host.innerHTML = KYC_DOCS.map(function (d) {
+    return '<div class="pf-field"><label>' + esc(d.label) + (d.req ? '<span class="pf-req">*</span>' : ' <span class="pf-optional">(optional)</span>') + '</label>' +
+      '<label class="pf-drop" data-doc="' + d.key + '">' +
+        '<span class="pf-drop-ico"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5M12 3v12"/></svg></span>' +
+        '<span class="pf-drop-body"><b>Upload ' + esc(d.label.toLowerCase()) + '</b><span data-name="' + d.key + '">JPG, PNG or PDF · up to 5 MB</span></span>' +
+        '<input type="file" accept="image/png,image/jpeg,image/jpg,image/webp,application/pdf" data-file="' + d.key + '">' +
+      '</label><span class="pf-err" role="alert"></span></div>';
+  }).join('');
+})();
+
+document.addEventListener('change', function (e) {
+  var inp = e.target.closest('[data-file]');
+  if (!inp) return;
+  var key = inp.getAttribute('data-file');
+  var file = inp.files && inp.files[0];
+  var drop = inp.closest('.pf-drop');
+  var nameEl = drop.querySelector('[data-name="' + key + '"]');
+  if (!file) { delete KYC_FILES[key]; drop.classList.remove('has-file'); nameEl.textContent = 'JPG, PNG or PDF · up to 5 MB'; return; }
+  var okType = /\.(png|jpe?g|webp|pdf)$/i.test(file.name) || /^(image\/(png|jpe?g|webp)|application\/pdf)$/.test(file.type);
+  if (!okType) { drop.classList.add('is-invalid'); drop.parentNode.querySelector('.pf-err').textContent = 'Use JPG, PNG or PDF'; delete KYC_FILES[key]; return; }
+  if (file.size > 5 * 1024 * 1024) { drop.classList.add('is-invalid'); drop.parentNode.querySelector('.pf-err').textContent = 'File exceeds 5 MB'; delete KYC_FILES[key]; return; }
+  drop.classList.remove('is-invalid'); drop.classList.add('has-file');
+  drop.parentNode.querySelector('.pf-err').textContent = '';
+  nameEl.textContent = file.name;
+  KYC_FILES[key] = file;
+});
+
+/* ================= WIZARD ================= */
+var STEP = 1, LAST = 6;
 
 function gotoStep(n) {
-  document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
-  document.getElementById('step' + n).classList.add('active');
-  currentStep = n;
-  updateSidebar(n);
-  updateProgress(n);
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-function goNext(from) {
-  if (from === 1 && !selectedRole) {
-    document.getElementById('roleError').style.display = 'block';
-    return;
-  }
-  // Validate step 2 before advancing
-  if (from === 2 && !validateStep2()) return;
-  // Validate step 3 before advancing
-  if (from === 3 && !validateStep3()) return;
-  // Validate step 4 before advancing
-  if (from === 4 && !validateStep4()) return;
-  if (from === 5) return;
-  gotoStep(from + 1);
-  if (from + 1 === 5) populateReview();
-}
-
-function goBack(from) {
-  if (from <= 1) return;
-  gotoStep(from - 1);
-}
-
-function updateProgress(step) {
-  document.getElementById('progressBar').style.width = (step / 5 * 100) + '%';
-}
-
-function updateSidebar(step) {
-  for (let i = 1; i <= 5; i++) {
-    const el  = document.getElementById('sl-' + i);
-    const num = el.querySelector('.step-num');
-    el.classList.remove('active', 'done', 'upcoming');
-    if (i < step)  { el.classList.add('done');    num.textContent = '✓'; }
-    if (i === step){ el.classList.add('active');   num.textContent = i;  }
-    if (i > step)  { el.classList.add('upcoming'); num.textContent = i;  }
-  }
-}
-
-// ── Field helpers ─────────────────────────────────────────────────────────────
-
-function v(id) {
-  const el = document.getElementById(id);
-  return el ? el.value.trim() : '';
-}
-
-function fieldErr(id, msg) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  el.style.borderColor = '#ef4444';
-  let hint = el.parentElement.parentElement.querySelector('.field-hint');
-  if (!hint) {
-    hint = document.createElement('div');
-    hint.className = 'field-hint';
-    hint.style.color = '#ef4444';
-    el.parentElement.parentElement.appendChild(hint);
-  }
-  hint.textContent = msg;
-  hint.style.color = '#ef4444';
-}
-
-function clearErr(id) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  el.style.borderColor = '';
-  const hint = el.parentElement.parentElement.querySelector('.field-hint');
-  if (hint) hint.style.color = '';
-}
-
-// ── Step validators ───────────────────────────────────────────────────────────
-
-function validateStep2() {
-  let ok = true;
-  const required = [
-    ['bizName',    'Business name is required'],
-    ['ownerName',  'Owner name is required'],
-    ['bizEmail',   'Email is required'],
-    ['bizMobile',  'Mobile number is required'],
-    ['bizState',   'State is required'],
-    ['bizCity',    'City is required'],
-    ['bizPin',     'PIN code is required'],
-    ['bizAddress', 'Address is required']
-  ];
-  required.forEach(function ([id, msg]) {
-    if (!v(id)) { fieldErr(id, msg); ok = false; }
-    else clearErr(id);
+  STEP = n;
+  document.querySelectorAll('#regForm .pf-wstep').forEach(function (s) { s.classList.toggle('is-on', Number(s.getAttribute('data-wstep')) === n); });
+  document.querySelectorAll('#wSteps .pf-step').forEach(function (s) {
+    var d = Number(s.getAttribute('data-step'));
+    s.classList.toggle('active', d === n);
+    s.classList.toggle('done', d < n);
   });
+  var card = document.querySelector('.pf-auth-panel'); if (card) card.scrollTo({ top: 0, behavior: 'smooth' });
+  try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) {}
+}
 
-  // Email format
-  const email = v('bizEmail');
-  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    fieldErr('bizEmail', 'Please enter a valid email address'); ok = false;
+function validateStep(n) {
+  var ok = true, first = null;
+  function chk(id, test, msg) { var el = $(id); if (!test(el.value.trim())) { ok = fieldErr(el, msg); if (!first) first = el; } else fieldOk(el); }
+  if (n === 1) {
+    chk('rgName', function (v) { return v.length >= 2; }, 'Enter your name');
+    chk('rgPhone', function (v) { return PHONE_RE.test(v); }, 'Valid 10-digit mobile (starts 6–9)');
+    chk('rgEmail', function (v) { return EMAIL_RE.test(v); }, 'Enter a valid email');
+    chk('rgPass', function (v) { return PW_RE.test(v); }, 'Min 12 chars incl. upper, lower, number & symbol');
+    var c = $('rgConfirm'); if (c.value !== $('rgPass').value || !c.value) { ok = fieldErr(c, 'Passwords do not match'); if (!first) first = c; } else fieldOk(c);
+  } else if (n === 2) {
+    chk('rgShop', function (v) { return v.length >= 2; }, 'Enter your shop / pharmacy name');
+  } else if (n === 3) {
+    chk('rgGst', function (v) { return v.length >= 10; }, 'Enter your GST number');
+    chk('rgLicence', function (v) { return v.length >= 3; }, 'Enter your drug licence number');
+  } else if (n === 4) {
+    chk('rgAddress', function (v) { return v.length >= 3; }, 'Enter your street address');
+    chk('rgCity', function (v) { return !!v; }, 'City required');
+    chk('rgState', function (v) { return !!v; }, 'State required');
+    chk('rgPincode', function (v) { return /^[1-9]\d{5}$/.test(v); }, '6-digit PIN');
+  } else if (n === 5) {
+    KYC_DOCS.forEach(function (d) {
+      if (!d.req) return;
+      var drop = document.querySelector('.pf-drop[data-doc="' + d.key + '"]');
+      if (!KYC_FILES[d.key]) { drop.classList.add('is-invalid'); drop.parentNode.querySelector('.pf-err').textContent = 'Please upload your ' + d.label.toLowerCase(); ok = false; if (!first) first = drop; }
+    });
   }
-  // Mobile — 10 digits
-  const mobile = v('bizMobile').replace(/\D/g, '');
-  if (mobile && !/^[6-9]\d{9}$/.test(mobile)) {
-    fieldErr('bizMobile', 'Enter a valid 10-digit Indian mobile number'); ok = false;
-  }
-  // Pincode — 6 digits
-  const pin = v('bizPin');
-  if (pin && !/^[1-9][0-9]{5}$/.test(pin)) {
-    fieldErr('bizPin', 'Enter a valid 6-digit PIN code'); ok = false;
-  }
-  // GST — optional but validate if provided
-  const gst = v('bizGst');
-  if (gst && !/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/.test(gst.toUpperCase())) {
-    fieldErr('bizGst', 'Enter a valid 15-character GST number'); ok = false;
-  }
-
+  if (!ok && first && first.focus) first.focus();
   return ok;
 }
 
-function validateStep3() {
-  let ok = true;
-  [['dlNum', 'Drug license number is required'],
-   ['panNum', 'PAN number is required']].forEach(function ([id, msg]) {
-    if (!v(id)) { fieldErr(id, msg); ok = false; }
-    else clearErr(id);
-  });
-  const pan = v('panNum');
-  if (pan && !/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/i.test(pan)) {
-    fieldErr('panNum', 'Enter a valid 10-character PAN (e.g. ABCDE1234F)'); ok = false;
-  }
-  return ok;
-}
+document.addEventListener('click', function (e) {
+  var next = e.target.closest('[data-next]');
+  if (next) { hideErr(); if (validateStep(Number(next.getAttribute('data-next')))) { if (STEP === 5) buildReview(); gotoStep(STEP + 1); } return; }
+  var prev = e.target.closest('[data-prev]');
+  if (prev) { hideErr(); gotoStep(STEP - 1); return; }
+});
 
-function validateStep4() {
-  let ok = true;
-  const pw1 = document.getElementById('pw1') ? document.getElementById('pw1').value : '';
-  const pw2 = document.getElementById('pw2') ? document.getElementById('pw2').value : '';
+/* live-clear field errors as the user types */
+document.addEventListener('input', function (e) {
+  var f = e.target.closest && e.target.closest('.pf-field.is-invalid');
+  if (f) f.classList.remove('is-invalid');
+});
 
-  if (!pw1 || pw1.length < 12) {
-    fieldErr('pw1', 'Password must be at least 12 characters'); ok = false;
-  } else if (!/[A-Z]/.test(pw1)) {
-    fieldErr('pw1', 'Password must contain at least one uppercase letter'); ok = false;
-  } else if (!/[a-z]/.test(pw1)) {
-    fieldErr('pw1', 'Password must contain at least one lowercase letter'); ok = false;
-  } else if (!/[0-9]/.test(pw1)) {
-    fieldErr('pw1', 'Password must contain at least one number'); ok = false;
-  } else if (!/[@$!%*?&]/.test(pw1)) {
-    fieldErr('pw1', 'Password must contain at least one special character (@$!%*?&)'); ok = false;
-  } else {
-    clearErr('pw1');
-  }
-
-  if (pw1 && pw2 && pw1 !== pw2) {
-    fieldErr('pw2', 'Passwords do not match'); ok = false;
-  } else if (pw2) clearErr('pw2');
-
-  return ok;
-}
-
-// ── Review step ───────────────────────────────────────────────────────────────
-
-function populateReview() {
-  document.getElementById('rv-role').textContent      = roleLabels[selectedRole] || '—';
-  document.getElementById('rv-bizName').textContent   = v('bizName');
-  document.getElementById('rv-ownerName').textContent = v('ownerName');
-  document.getElementById('rv-bizEmail').textContent  = v('bizEmail');
-  document.getElementById('rv-bizMobile').textContent = v('bizMobile');
-  document.getElementById('rv-bizState').textContent  = v('bizState');
-  document.getElementById('rv-bizCity').textContent   = v('bizCity');
-  document.getElementById('rv-bizGst').textContent    = v('bizGst') || 'Not provided';
-  document.getElementById('rv-bizPin').textContent    = v('bizPin');
-  document.getElementById('rv-dlNum').textContent     = v('dlNum');
-  document.getElementById('rv-dlExpiry').textContent  = v('dlExpiry') || 'Not provided';
-  document.getElementById('rv-panNum').textContent    = v('panNum');
-  document.getElementById('rv-accName').textContent   = v('accName') || 'Not provided';
-  document.getElementById('rv-ifsc').textContent      = v('ifsc')    || 'Not provided';
-  document.getElementById('rv-bankName').textContent  = v('bankName')|| 'Not provided';
-}
-
-// ── Submit ────────────────────────────────────────────────────────────────────
-
-async function submitForm() {
-  if (!document.getElementById('chk1').checked || !document.getElementById('chk2').checked) {
-    alert('Please agree to the Terms of Service and confirm document validity to proceed.');
-    return;
-  }
-
-  const password = document.getElementById('pw1') ? document.getElementById('pw1').value : '';
-  const mobile   = v('bizMobile').replace(/\D/g, '');
-
-  const payload = {
-    name:              v('ownerName'),
-    email:             v('bizEmail'),
-    mobile:            mobile,
-    password:          password,
-    confirmPassword:   document.getElementById('pw2') ? document.getElementById('pw2').value : password,
-    role:              roleMap[selectedRole] || 'ret',
-    businessName:      v('bizName'),
-    drugLicenseNumber: v('dlNum'),
-    gstNumber:         v('bizGst') || undefined,
-    panNumber:         v('panNum'),
-    state:             v('bizState'),
-    city:              v('bizCity'),
-    address:           v('bizAddress'),
-    pincode:           v('bizPin')
-  };
-
-  // Final validation
-  const required = ['name', 'email', 'mobile', 'password', 'businessName',
-                    'drugLicenseNumber', 'panNumber', 'state', 'city', 'address', 'pincode'];
-  const missing  = required.filter(k => !payload[k]);
-  if (missing.length) {
-    alert('Please complete all required fields: ' + missing.join(', '));
-    return;
-  }
-
-  // Mandatory registration documents (Cancelled Cheque is optional in the form).
-  const requiredDocs = [
-    ['drugLicense',    'Drug License (Both Parts)'],
-    ['gstCertificate', 'GST Certificate'],
-    ['panCard',        'PAN Card Copy'],
+function buildReview() {
+  var rows = [
+    ['Name', $('rgName').value], ['Email', $('rgEmail').value], ['Mobile', $('rgPhone').value],
+    ['Shop', $('rgShop').value], ['GST', $('rgGst').value.toUpperCase()], ['Drug licence', $('rgLicence').value],
+    ['PAN', $('rgPan').value.toUpperCase()],
+    ['Shop address', [$('rgAddress').value, $('rgCity').value, $('rgState').value, $('rgPincode').value].filter(Boolean).join(', ')],
+    ['Documents', Object.keys(KYC_FILES).length + ' uploaded']
   ];
-  const missingDocs = requiredDocs.filter(([k]) => !uploadedDocs[k]).map(([, label]) => label);
-  if (missingDocs.length) {
-    alert('Please upload the required documents: ' + missingDocs.join(', '));
-    return;
-  }
-
-  const btn = document.getElementById('submitBtn');
-  btn.textContent = 'Submitting…';
-  btn.disabled    = true;
-  btn.style.opacity = '0.7';
-
-  try {
-    // Multipart form-data so the four Cloudinary document files ride along with
-    // the text fields. NOTE: do not set Content-Type manually — the browser adds
-    // the correct multipart boundary automatically.
-    const fd = new FormData();
-    Object.keys(payload).forEach(k => {
-      if (payload[k] !== undefined && payload[k] !== null) fd.append(k, payload[k]);
-    });
-    Object.keys(uploadedDocs).forEach(field => {
-      if (uploadedDocs[field]) fd.append(field, uploadedDocs[field]);
-    });
-
-    const res  = await fetch(`${API_AUTH}/signup`, {
-      method:  'POST',
-      credentials: 'include',
-      body:    fd
-    });
-    const data = await res.json();
-
-    if (!data.success) {
-      btn.textContent  = '🚀  Submit Application';
-      btn.disabled     = false;
-      btn.style.opacity = '1';
-      alert(data.message || 'Registration failed. Please try again.');
-      return;
-    }
-
-    // Store token so user is automatically logged in
-    localStorage.setItem('ff_token', data.token);
-    localStorage.setItem('ff_user',  JSON.stringify(Object.assign({}, data.user, { role: payload.role })));
-
-    // Show success screen
-    document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
-    document.getElementById('progressBar').style.width = '100%';
-    const screen = document.getElementById('successScreen');
-    screen.classList.add('show');
-    // Show the real account identifier (the registered email) rather than a
-    // random number that isn't stored anywhere and can't be looked up later.
-    const acctEmail = (data.user && data.user.email) || payload.email;
-    document.getElementById('successRef').textContent = 'Application submitted for: ' + acctEmail;
-    for (let i = 1; i <= 5; i++) {
-      const el = document.getElementById('sl-' + i);
-      el.className = 'step-item done';
-      el.querySelector('.step-num').textContent = '✓';
-    }
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-
-  } catch (err) {
-    btn.textContent  = '🚀  Submit Application';
-    btn.disabled     = false;
-    btn.style.opacity = '1';
-    alert('Could not reach the server. Is it running on port 5000?');
-  }
+  $('reviewGrid').innerHTML = rows.map(function (r) { return '<div class="pf-info-cell"><dt>' + esc(r[0]) + '</dt><dd>' + (esc(r[1]) || '—') + '</dd></div>'; }).join('');
 }
 
-// ── UI helpers ────────────────────────────────────────────────────────────────
+/* ================= SUBMIT ================= */
+$('regForm').addEventListener('submit', function (e) {
+  e.preventDefault();
+  hideErr();
+  if (!$('rgConsent').checked) { showErr('Please accept the Terms & Conditions and Privacy Policy to continue.'); return; }
+  for (var s = 1; s <= 5; s++) { if (!validateStep(s)) { gotoStep(s); return; } }
 
-function togglePw(id, btn) {
-  const inp = document.getElementById(id);
-  if (inp.type === 'password') { inp.type = 'text';     btn.textContent = 'Hide'; }
-  else                         { inp.type = 'password'; btn.textContent = 'Show'; }
-}
+  var fd = new FormData();
+  fd.append('role', 'ret');
+  fd.append('name', $('rgName').value.trim());
+  fd.append('email', $('rgEmail').value.trim());
+  fd.append('password', $('rgPass').value);
+  fd.append('confirmPassword', $('rgConfirm').value);
+  fd.append('mobile', $('rgPhone').value.trim());
+  fd.append('phone', $('rgPhone').value.trim());
+  fd.append('businessName', $('rgShop').value.trim());       // → shopName (ret)
+  fd.append('shopName', $('rgShop').value.trim());
+  fd.append('gstNumber', $('rgGst').value.trim().toUpperCase());
+  fd.append('drugLicenseNumber', $('rgLicence').value.trim());
+  fd.append('panNumber', $('rgPan').value.trim().toUpperCase());
+  fd.append('address', $('rgAddress').value.trim());          // → shopAddress (ret)
+  fd.append('city', $('rgCity').value.trim());
+  fd.append('state', $('rgState').value.trim());
+  fd.append('pincode', $('rgPincode').value.trim());
+  Object.keys(KYC_FILES).forEach(function (k) { fd.append(k, KYC_FILES[k]); });
 
-function checkStrength(val) {
-  const bars  = ['bar1','bar2','bar3','bar4'].map(id => document.getElementById(id));
-  const label = document.getElementById('pwLabel');
-  bars.forEach(b => { if (b) b.className = 'pw-bar'; });
-  if (!label) return;
-  if (!val) { label.className = 'pw-label'; label.textContent = 'Enter a password'; return; }
-  let score = 0;
-  if (val.length >= 8)          score++;
-  if (/[A-Z]/.test(val))        score++;
-  if (/[0-9]/.test(val))        score++;
-  if (/[^A-Za-z0-9]/.test(val)) score++;
-  const levels = [
-    { cls: 'weak',   txt: 'Weak',   color: 'weak-t'   },
-    { cls: 'fair',   txt: 'Fair',   color: 'fair-t'   },
-    { cls: 'good',   txt: 'Good',   color: 'good-t'   },
-    { cls: 'strong', txt: 'Strong', color: 'strong-t' }
-  ];
-  const lvl = levels[score - 1] || levels[0];
-  for (let i = 0; i < score; i++) { if (bars[i]) bars[i].classList.add(lvl.cls); }
-  label.className  = 'pw-label ' + lvl.color;
-  label.textContent = lvl.txt + ' password';
-}
-
-function sendOtp() {
-  const mob = document.getElementById('verifyMobile').value.trim();
-  if (!mob) { alert('Please enter your mobile number first.'); return; }
-  document.getElementById('otpSection').style.display = 'block';
-  const btn = document.getElementById('sendOtpBtn');
-  btn.textContent = 'Sent ✓';
-  btn.disabled    = true;
-  setTimeout(() => { btn.textContent = 'Resend OTP'; btn.disabled = false; }, 30000);
-  document.getElementById('otp0').focus();
-}
-
-function otpNext(el, idx) {
-  el.value = el.value.replace(/[^0-9]/g, '');
-  if (el.value && idx < 5) document.getElementById('otp' + (idx + 1)).focus();
-}
-
-function handleUpload(input, zoneId, valId) {
-  if (input.files && input.files[0]) {
-    const file = input.files[0];
-    // Guard: 5 MB cap (mirrors the backend multer limit) so we fail fast.
-    if (file.size > 5 * 1024 * 1024) {
-      alert('File is too large. Maximum size is 5 MB.');
-      input.value = '';
-      return;
-    }
-    const fname = file.name;
-    document.getElementById(valId).textContent = '✓ ' + fname;
-    const zone = document.getElementById(zoneId);
-    zone.style.borderColor = 'var(--emerald,#10b981)';
-    zone.style.background  = 'rgba(18,184,134,0.07)';
-    // Stash the actual file so submitForm() can upload it to Cloudinary.
-    const field = UPLOAD_ZONE_FIELD[zoneId];
-    if (field) uploadedDocs[field] = file;
-  }
-}
-
-function formatDate(el) {
-  let val = el.value.replace(/\D/g, '');
-  if (val.length >= 3) val = val.slice(0, 2) + ' / ' + val.slice(2);
-  if (val.replace(/\D/g, '').length >= 5) val = val.slice(0, 7) + ' / ' + val.replace(/\D/g, '').slice(4);
-  el.value = val.slice(0, 14);
-}
+  var btn = $('regBtn'); btn.classList.add('is-loading'); btn.disabled = true;
+  fetch('/api/auth/signup', { method: 'POST', body: fd })   // no Content-Type — browser sets multipart boundary
+    .then(function (r) { return r.json().then(function (b) { return { ok: r.ok, b: b }; }); })
+    .then(function (res) {
+      if (!res.ok || !res.b.success) {
+        showErr((res.b && res.b.message) || 'Registration failed. Please check your details and try again.');
+        return;
+      }
+      if (res.b.token) {
+        localStorage.setItem('ff_token', res.b.token);
+        localStorage.setItem('ff_user', JSON.stringify(res.b.user || { role: 'ret' }));
+      }
+      toast('Application submitted — your account is pending verification.');
+      setTimeout(function () { window.location.href = res.b.token ? 'retailer.html' : 'login&signup.html'; }, 1400);
+    })
+    .catch(function () { showErr('Could not reach the server. Please try again.'); })
+    .finally(function () { btn.classList.remove('is-loading'); btn.disabled = false; });
+});

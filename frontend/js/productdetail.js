@@ -1,1146 +1,1087 @@
 /* =====================================================================
-   productdetail.js — B2B Pharma Marketplace
-   Auth-guarded product detail page.
-   Checks JWT → redirects to login if missing → fetches from real API
-   → renders role-based pricing (never exposes the other role's price).
+   productdetail.js — Fair Ford Pharmaceuticals
+   Premium B2B product-detail experience (.pdx-* markup)
+   ---------------------------------------------------------------------
+   DATA INTEGRITY — read before adding anything here.
+   The single-product endpoint (GET /api/products/:id, optionalAuth)
+   returns: name, brand, category{categoryName}, strength, packSize,
+   dosageForm, composition[], description (long prose), mrp, stock,
+   stockStatus, minimumOrderQuantity, image{url}, images[]{url}, tags
+   (incl. "code:XXXX"), gst — and role trade prices ONLY when an approved
+   account is signed in (the server strips retailerPrice/distributorPrice
+   /gst for guests). It does NOT return reviews/ratings (all 0), MOQ tiers
+   (all 1), expiry/benefits/uses/storage (empty on every product) or
+   per-product documents/certifications. Nothing here may present those as
+   if they exist — absent data yields an honest empty state, never invented
+   values, prices, reviews, certifications or medical claims.
    ===================================================================== */
 
-const API_BASE = '/api';
-
 document.addEventListener('DOMContentLoaded', function () {
+  'use strict';
 
-  // ── 1. Auth guard ────────────────────────────────────────────────────────
+  /* ================================================================
+     0 · HELPERS
+     ================================================================ */
+  var $ = function (id) { return document.getElementById(id); };
 
-  const params    = new URLSearchParams(window.location.search);
-  const productId = params.get('id');
+  function esc(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+  function money(n) {
+    return '₹' + Number(n || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 });
+  }
+  function debounce(fn, ms) {
+    var t; return function () { var a = arguments, s = this; clearTimeout(t); t = setTimeout(function () { fn.apply(s, a); }, ms); };
+  }
+  function readJSON(k, d) { try { var v = JSON.parse(localStorage.getItem(k) || 'null'); return v == null ? d : v; } catch (e) { return d; } }
+  function writeJSON(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+  function real(v) { var s = String(v == null ? '' : v).trim(); return (!s || s === '-') ? '' : s; }
 
-  const token   = localStorage.getItem('ff_token');
-  const userRaw = localStorage.getItem('ff_user');
+  function toastMsg(m) {
+    if (typeof toast === 'function') { toast(m); return; }
+    var e = document.createElement('div');
+    e.textContent = m;
+    e.style.cssText = 'position:fixed;bottom:84px;left:50%;transform:translateX(-50%);background:#0F2B47;color:#fff;padding:11px 20px;border-radius:10px;font-size:.88rem;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,.25)';
+    document.body.appendChild(e);
+    setTimeout(function () { e.remove(); }, 2600);
+  }
 
-  // Viewing a product is open to guests — only adding to the cart requires
-  // login (gated centrally in common.js). Signed-in users get role-based trade
-  // pricing; guests see the public MRP. currentUser stays null when logged out.
-  let currentUser = null;
+  /* ================================================================
+     1 · ICONS
+     ================================================================ */
+  var I = {
+    check:  '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
+    heart:  '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 1 0-7.8 7.8l8.9 8.9 8.8-8.9a5.5 5.5 0 0 0 0-7.8z"/></svg>',
+    cart:   '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"/></svg>',
+    share:  '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5 8.6 10.5"/></svg>',
+    copy:   '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>',
+    lock:   '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>',
+    shield: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 12 2 2 4-4"/><path d="M12 3 4 6v6c0 5 8 9 8 9s8-4 8-9V6l-8-3z"/></svg>',
+    truck:  '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>',
+    doc:    '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 15h6M9 11h3"/></svg>',
+    card:   '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>',
+    pin:    '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>',
+    flask:  '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6M10 3v6l-5 10a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3L14 9V3"/><path d="M7.5 15h9"/></svg>',
+    thermo: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/></svg>',
+    factory:'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20h20V9l-6 4V9l-6 4V4H2z"/><path d="M6 20v-4M10 20v-4M14 20v-4M18 20v-4"/></svg>',
+    star:   '<svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor"><path d="M12 2l2.9 6.26L21.6 9.27l-4.8 4.68 1.13 6.6L12 17.77 6.07 20.55l1.13-6.6-4.8-4.68 6.7-1.01L12 2z"/></svg>',
+    chev:   '<svg class="pdx-acc-chevron" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>',
+    arrow:  '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>',
+    zoom:   '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3M11 8v6M8 11h6"/></svg>',
+    image:  '<svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/></svg>',
+    wa:     '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15l-1.4 5 5.2-1.4A10 10 0 1 0 12 2zm0 18a8 8 0 0 1-4.1-1.1l-.3-.2-3 .8.8-3-.2-.3A8 8 0 1 1 12 20zm4.4-6c-.2-.1-1.4-.7-1.6-.8s-.4-.1-.5.1-.6.8-.8 1-.3.2-.5.1a6.5 6.5 0 0 1-3.2-2.8c-.2-.4.2-.4.6-1.2a.4.4 0 0 0 0-.4l-.8-1.8c-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 0 0-.7.3A2.8 2.8 0 0 0 6.5 10a5 5 0 0 0 1 2.6 11 11 0 0 0 4.3 3.8c1.6.6 1.9.5 2.2.5s1.4-.6 1.6-1.1.2-1 .1-1.1z"/></svg>',
+    mail:   '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg>',
+    link:   '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>'
+  };
+
+  /* ================================================================
+     2 · AUTH + PARAMS
+     ================================================================ */
+  var params      = new URLSearchParams(window.location.search);
+  var productId   = params.get('id');
+  var productSlug = params.get('slug');
+  var token       = localStorage.getItem('ff_token');
+  var userRaw     = localStorage.getItem('ff_user');
+
+  var currentUser = null;
   if (token && userRaw) {
-    try {
-      currentUser = JSON.parse(userRaw);
-    } catch (_) {
-      localStorage.removeItem('ff_token');
-      localStorage.removeItem('ff_user');
-      currentUser = null;
-    }
+    try { currentUser = JSON.parse(userRaw); }
+    catch (e) { localStorage.removeItem('ff_token'); localStorage.removeItem('ff_user'); currentUser = null; }
   }
+  var ROLE    = (currentUser && String(currentUser.role || '').toLowerCase()) || '';
+  var IS_DIST = ROLE === 'dist';
+  var IS_ANON = !currentUser;
 
-  if (!productId) {
-    showError('No product ID specified. <a href="product.html">Browse products</a>');
+  /* ================================================================
+     3 · CHROME
+     ================================================================ */
+  if (typeof renderHeader === 'function') { $('site-header').innerHTML = renderHeader('products'); if (typeof initHeader === 'function') initHeader(); }
+  if (typeof renderFooter === 'function') { $('site-footer').innerHTML = renderFooter(); if (typeof initFooter === 'function') initFooter(); }
+
+  if (!productId && !productSlug) {
+    showState('notfound');
     return;
-  }
-
-  // ── 2. Render header / footer if helpers exist ───────────────────────────
-
-  if (typeof renderHeader === 'function') {
-    document.getElementById('site-header').innerHTML = renderHeader('products');
-    if (typeof initHeader === 'function') initHeader();
-  }
-  if (typeof renderFooter === 'function') {
-    document.getElementById('site-footer').innerHTML = renderFooter();
-    if (typeof initFooter === 'function') initFooter();
   }
 
   showSkeleton();
 
-  // ── 3. Fetch product: use API for MongoDB ObjectIDs, static data for demo IDs ─
-
-  const isMongoId = /^[0-9a-fA-F]{24}$/.test(productId);
+  /* ================================================================
+     4 · FETCH
+     ================================================================ */
+  var isMongoId = !!productSlug || /^[0-9a-fA-F]{24}$/.test(productId || '');
 
   if (!isMongoId) {
-    // Non-MongoDB ID (e.g. "med-001") — serve from static data.js catalogue
-    if (typeof getProductById !== 'function') {
-      showError('Product data unavailable. Please try again.');
-      return;
-    }
-    const sp = getProductById(productId);
-    if (!sp) {
-      showError('Product not found. <a href="product.html">Browse all products</a>');
-      return;
-    }
-    const role      = (currentUser && currentUser.role) || 'ret';
-    const userPrice = role === 'dist'
-      ? (sp.distributorPrice || sp.retailerPrice || 0)
-      : (sp.retailerPrice || 0);
-    const mrp      = sp.mrp || 0;
-    const discount = mrp > 0 ? Math.round(((mrp - userPrice) / mrp) * 100) : 0;
-
-    render({
-      _id:          sp.id,
-      productId:    sp.id,
-      name:         sp.name,
-      manufacturer: sp.brand,
-      brand:        sp.brand,
-      category:     sp.category,
-      dosageForm:   sp.dosageForm  || null,
-      strength:     sp.strength    || null,
-      packSize:     sp.packSize    || null,
-      mrp,
-      userPrice,
-      discount,
-      gst:          sp.gst         || null,
-      stock:        sp.stock       || 0,
-      minOrderQty:  sp.moq         || 1,
-      composition:  sp.composition || [],
-      uses:         sp.uses        || null,
-      description:  sp.uses        || null,
-      ratings:      sp.rating      || null,
-      expiryDate:   sp.expDate     || null,
-      images:       sp.image ? [sp.image] : (Array.isArray(sp.images) ? sp.images : []),
-      schedule:     null,
-      batchNo:      null,
-      hsn:          null
-    }, currentUser);
+    // Legacy demo id → static catalogue via data.js.
+    if (typeof getProductById !== 'function') { showState('error'); return; }
+    Promise.resolve(getProductById(productId)).then(function (sp) {
+      if (!sp) { showState('notfound'); return; }
+      render(normaliseStatic(sp));
+    });
     return;
   }
 
-  // MongoDB ObjectID path — fetch from real API. The endpoint uses optionalAuth,
-  // so guests get the product with MRP only; the token (when present) unlocks
-  // role-based trade pricing.
-  const authHeaders = { 'Content-Type': 'application/json' };
-  if (token) authHeaders['Authorization'] = `Bearer ${token}`;
+  var headers = { 'Content-Type': 'application/json' };
+  if (token) headers.Authorization = 'Bearer ' + token;
+  var endpoint = productSlug
+    ? API_BASE_URL + '/products/slug/' + encodeURIComponent(productSlug)
+    : API_BASE_URL + '/products/' + productId;
 
-  fetch(`${API_BASE}/products/${productId}`, {
-    method:  'GET',
-    headers: authHeaders
-  })
-  .then(function (res) {
-    if (res.status === 401) {
-      localStorage.removeItem('ff_token');
-      localStorage.removeItem('ff_user');
-      localStorage.setItem('ff_redirect_product', productId);
-      showSessionExpired();
-      return null;
-    }
-    if (res.status === 403) {
-      showUnauthorized();
-      return null;
-    }
-    return res.json();
-  })
-  .then(function (json) {
-    if (!json) return;
-    if (!json.success) {
-      showError(json.message || 'Unable to fetch product details. Please try again.');
-      return;
-    }
-    render(json.product, currentUser);
-  })
-  .catch(function () {
-    showError('Unable to fetch product details.<br>Please try again.');
-  });
+  fetch(endpoint, { headers: headers })
+    .then(function (res) {
+      if (res.status === 401) {
+        localStorage.removeItem('ff_token'); localStorage.removeItem('ff_user');
+        showState('session'); return null;
+      }
+      if (res.status === 404) { showState('notfound'); return null; }
+      if (res.status === 403) { showState('unavailable'); return null; }
+      if (!res.ok) { showState('error'); return null; }
+      return res.json();
+    })
+    .then(function (json) {
+      if (!json) return;
+      if (!json.success || !json.product) { showState(json && /not found/i.test(json.message || '') ? 'notfound' : 'error'); return; }
+      // Inactive / archived products are not for public sale.
+      if (json.product.status && json.product.status !== 'active') { showState('unavailable'); return; }
+      render(json.product);
+    })
+    .catch(function () { showState('error'); });
 
-  // ══════════════════════════════════════════════════════════════════════════
-  //  4. RENDER — Premium product detail UI
-  // ══════════════════════════════════════════════════════════════════════════
+  /* Map a static-catalogue product (data.js shape) to the API-ish shape. */
+  function normaliseStatic(sp) {
+    return {
+      _id: sp.id, name: sp.name, brand: sp.brand, categoryName: sp.category,
+      strength: sp.strength, packSize: sp.packSize, dosageForm: sp.dosageForm,
+      composition: sp.composition || [], description: sp.description || sp.uses || '',
+      mrp: sp.mrp, retailerPrice: sp.retailerPrice, distributorPrice: sp.distributorPrice,
+      gst: sp.gst, stock: sp.stock, stockStatus: sp.stockStatus,
+      minimumOrderQuantity: sp.moq || 1,
+      image: sp.image ? { url: sp.image } : null,
+      images: Array.isArray(sp.images) ? sp.images.map(function (u) { return typeof u === 'string' ? { url: u } : u; }) : [],
+      tags: sp.code ? ['code:' + sp.code] : []
+    };
+  }
 
-  function render(p, user) {
+  /* ================================================================
+     5 · DERIVE
+     ================================================================ */
+  function catNameOf(p) {
+    return p.categoryName
+      || (p.category && typeof p.category === 'object' ? p.category.categoryName : '')
+      || (typeof p.category === 'string' ? p.category : '') || '';
+  }
+  function galleryImages(p) {
+    var out = [];
+    (Array.isArray(p.images) ? p.images : []).forEach(function (x) {
+      var u = !x ? '' : (typeof x === 'string' ? x : (x.url || ''));
+      if (u && out.indexOf(u) < 0) out.push(u);
+    });
+    var primary = p.image ? (typeof p.image === 'string' ? p.image : (p.image.url || '')) : '';
+    if (primary && out.indexOf(primary) < 0) out.unshift(primary);
+    return out;
+  }
+  function compositionArr(p) {
+    var c = p.composition;
+    if (Array.isArray(c)) return c.filter(Boolean).map(String);
+    return c ? [String(c)] : [];
+  }
+  function compositionText(p) { return compositionArr(p).join(' + '); }
+  function productCode(p) {
+    var t = (p.tags || []).filter(function (x) { return /^code:/i.test(String(x)); })[0];
+    return t ? String(t).slice(5).trim() : '';
+  }
+  /** "Paracetamol 500mg" → {name:'Paracetamol', strength:'500mg'} */
+  function parseSalt(str) {
+    var s = String(str || '').trim();
+    var m = s.match(/^(.*?)\s*([\d.]+\s*(?:mg|mcg|g|gm|ml|iu|i\.u\.|%|w\/w|w\/v|billion|million|lac|spores?)\b.*)$/i);
+    if (m && m[1].trim()) return { name: m[1].trim(), strength: m[2].trim() };
+    return { name: s, strength: '' };
+  }
+  function stockInfo(p) {
+    var st = p.stockStatus || (Number(p.stock || 0) === 0 ? 'Out of Stock' : Number(p.stock) <= 50 ? 'Low Stock' : 'In Stock');
+    return { label: st, cls: st === 'Out of Stock' ? 'out' : st === 'Low Stock' ? 'low' : 'in', inStock: st !== 'Out of Stock' };
+  }
+
+  var CUR = null;   // current product, shared with rails/lightbox/events
+  var GAL = [];     // gallery image URLs
+  var MOQ = 1;
+
+  /* ================================================================
+     6 · RENDER
+     ================================================================ */
+  function render(p) {
+    CUR = p;
     hideSkeleton();
 
-    const role     = (user && user.role) || null;
-    const IS_DIST  = role === 'dist';
-    const IS_RET   = role === 'ret';
-    const IS_GUEST = !role;
-    const IS_ANON  = !user;
+    var cat   = catNameOf(p);
+    var code  = productCode(p);
+    var si    = stockInfo(p);
+    MOQ       = Math.max(1, Number(p.minimumOrderQuantity || p.minOrderQty || 1));
+    GAL       = galleryImages(p);
 
-    // p.category may be a populated Mongoose object — extract the display name
-    const catName = p.categoryName
-      || (p.category && typeof p.category === 'object' ? p.category.categoryName : null)
-      || (typeof p.category === 'string' ? p.category : '')
-      || '';
+    var mrp   = Number(p.mrp || 0);
+    var trade = IS_DIST ? p.distributorPrice : p.retailerPrice;   // undefined for guests
+    var price = (!IS_ANON && trade) ? Number(trade) : mrp;
+    var save  = (!IS_ANON && mrp > price && mrp > 0) ? Math.round(((mrp - price) / mrp) * 100) : 0;
 
-    const tradePrice = IS_DIST
-      ? (p.distributorPrice || p.userPrice || p.netPrice || 0)
-      : (p.retailerPrice    || p.userPrice || p.netPrice || 0);
+    applyMeta(p, cat, code);
 
-    const mrp = p.mrp || 0;
-    // Guests only ever see MRP; trade price + discount stay behind login.
-    const userPrice = IS_GUEST ? mrp : tradePrice;
-    const discount  = IS_GUEST ? 0 : (p.discount != null
-      ? p.discount
-      : (mrp > 0 ? Math.round(((mrp - userPrice) / mrp) * 100) : 0));
-
-    const stock   = p.stock || 0;
-    const inStock = stock > 0;
-    const moq     = p.minOrderQty || p.minimumOrderQuantity || 1;
-
-    document.title = 'Fair Ford — ' + (p.name || 'Product');
-
-    const root = document.getElementById('detail-root');
+    var root = $('detail-root');
     root.innerHTML =
-      buildBreadcrumb(p, catName) +
-      buildHero(p, inStock, moq, userPrice, mrp, discount, IS_DIST, IS_RET, stock, catName, IS_ANON) +
-      buildHighlights(p, inStock) +
-      buildTabs(p, IS_DIST, catName) +
-      buildReviews(p) +
-      buildFaq(p);
+      breadcrumb(p, cat) +
+      '<div class="pdx-wrap"><section class="pdx-hero">' +
+        galleryCol(p, cat, si) +
+        infoCol(p, cat, code, si, mrp, price, save) +
+      '</section></div>' +
+      trustStrip() +
+      sectionsHTML(p, cat, code, si) +
+      '<div id="pdx-rails"></div>';
 
     root.hidden = false;
 
-    // Build sticky bottom widget
-    buildStickyWidget(p, inStock, moq, userPrice, catName, IS_ANON);
-
-    wireEvents(p, inStock, moq, userPrice);
+    buildStickyBars(p, si, price, mrp);
+    wire(p, si);
+    recordRecent(p._id || p.id);
+    loadRails(p, cat);
 
     if (typeof store !== 'undefined' && store.syncCounts) store.syncCounts();
+    syncWishUI();
   }
 
-  // ── Builder: Breadcrumb ───────────────────────────────────────────────────
-
-  function buildBreadcrumb(p, catName) {
-    return `
-    <nav class="pd-bread" aria-label="Breadcrumb">
-      <a href="index.html">Home</a>
-      <span class="pd-bread-sep">›</span>
-      <a href="product.html">Products</a>
-      ${catName ? `<span class="pd-bread-sep">›</span><a href="product.html">${esc(catName)}</a>` : ''}
-      <span class="pd-bread-sep">›</span>
-      <span class="pd-bread-cur">${esc(p.name || 'Product')}</span>
-    </nav>`;
+  /* ---- breadcrumb ---- */
+  function breadcrumb(p, cat) {
+    return '<div class="pdx-wrap"><nav class="pdx-bread" aria-label="Breadcrumb">' +
+      '<a href="index.html">Home</a><span class="pdx-bread-sep">›</span>' +
+      '<a href="product.html">Products</a>' +
+      (cat ? '<span class="pdx-bread-sep">›</span><a href="product.html?category=' + encodeURIComponent(cat) + '">' + esc(cat) + '</a>' : '') +
+      '<span class="pdx-bread-sep">›</span>' +
+      '<span class="pdx-bread-cur">' + esc(p.name || 'Product') + '</span>' +
+      '</nav></div>';
   }
 
-  // ── Builder: Hero section ─────────────────────────────────────────────────
+  /* ---- gallery ---- */
+  function galleryCol(p, cat, si) {
+    var badges =
+      (si.inStock
+        ? '<span class="pdx-badge ' + (si.cls === 'low' ? 'pdx-badge--low' : 'pdx-badge--in') + '">' + I.check + (si.cls === 'low' ? 'Limited stock' : 'In stock') + '</span>'
+        : '<span class="pdx-badge pdx-badge--out">Out of stock</span>');
 
-  function buildHero(p, inStock, moq, userPrice, mrp, discount, IS_DIST, IS_RET, stock, catName, IS_ANON) {
-    // Normalise image data: API returns images as [{url, public_id}, ...]
-    // while static catalogue entries (or already-flattened sources) may pass plain URL strings.
-    // Also fall back to the singular `image` field if the gallery is empty.
-    const rawImgs = (p.images && p.images.length) ? p.images : [];
-    let imgs = rawImgs.map(function (x) {
-      if (!x) return '';
-      if (typeof x === 'string') return x;
-      return x.url || '';
-    }).filter(Boolean);
-    const primaryImgUrl = p.image ? (typeof p.image === 'string' ? p.image : (p.image.url || '')) : '';
-    if (!imgs.length && primaryImgUrl) {
-      imgs = [primaryImgUrl];
-    }
-    const hasImg  = imgs.length > 0;
-    // If the hero is showing a gallery photo that differs from the primary
-    // `image`, give the fallback a second URL to try before it gives up to a
-    // generic placeholder (see productImgFallback in common.js).
-    const heroAltSrc = (hasImg && primaryImgUrl && imgs[0] !== primaryImgUrl) ? primaryImgUrl : '';
-    const cat     = esc(catName || '');
-    const brand   = esc(p.manufacturer || p.brand || 'Pharma');
-    const ratingVal = p.rating || p.ratings || null;
-    const ratNum    = ratingVal ? Number(ratingVal).toFixed(1) : null;
+    var mainInner = GAL.length
+      ? '<img id="pdx-main-img" src="' + esc(GAL[0]) + '" alt="' + esc(p.name) + '" ' +
+        'data-cat="' + esc(cat) + '" data-fallback-class="pdx-gal-ph" onerror="productImgFallback(this)">'
+      : '<div class="pdx-gal-ph">' + (typeof productImageSVG === 'function' ? productImageSVG(cat) : I.image) +
+        '<span>Product image coming soon</span></div>';
 
-    // Thumbnail strip (max 4 thumbs)
-    const thumbsHtml = imgs.slice(0, 4).map((src, i) =>
-      `<div class="pd-thumb ${i === 0 ? 'pd-thumb-on' : ''}" data-idx="${i}" title="View image ${i+1}">
-         <img src="${esc(src)}" alt="Product image ${i+1}" loading="lazy" />
-       </div>`
-    ).join('');
-
-    const galleryHtml = `
-    <div class="pd-gal-col">
-      <div class="pd-badge-strip">
-        ${inStock ? `<span class="pd-bdg pd-bdg-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><polyline points="20 6 9 17 4 12"/></svg> In Stock</span>` : `<span class="pd-bdg pd-bdg-red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="11" height="11"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Out of Stock</span>`}
-        ${cat ? `<span class="pd-bdg pd-bdg-blue">${cat}</span>` : ''}
-        ${p.dosageForm ? `<span class="pd-bdg pd-bdg-gold">${esc(p.dosageForm)}</span>` : ''}
-        ${p.schedule   ? `<span class="pd-bdg pd-bdg-emerald">${esc(p.schedule)}</span>` : ''}
-      </div>
-
-      <div class="pd-main-img" id="pd-main-img" role="button" tabindex="0" aria-label="Zoom product image">
-        ${hasImg
-          ? `<img class="pd-main-img-el" id="pd-main-img-el" src="${esc(imgs[0])}" alt="${esc(p.name)}" data-cat="${cat}" data-fallback-class="pd-img-ph"${heroAltSrc ? ` data-alt-src="${esc(heroAltSrc)}"` : ''} onerror="productImgFallback(this)" />`
-          : `<div class="pd-img-ph">
-               <div class="pd-img-ph-icon">${categoryIcon(catName)}</div>
-               <div class="pd-img-ph-txt">${esc(p.name)}</div>
-             </div>`
-        }
-        ${hasImg ? `<div class="pd-zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="12" height="12"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg> Click to zoom</div>` : ''}
-      </div>
-
-      ${thumbsHtml ? `<div class="pd-thumbs-row" id="pd-thumbs">${thumbsHtml}</div>` : ''}
-
-      <div class="pd-gal-acts">
-        <button class="pd-gal-btn" id="pd-wish-btn" aria-label="Add to wishlist">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-          <span id="pd-wish-lbl">Wishlist</span>
-        </button>
-        <button class="pd-gal-btn" onclick="window.print()" aria-label="Print product">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-          Print
-        </button>
-        <button class="pd-gal-btn" id="pd-share-btn" aria-label="Share product">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-          Share
-        </button>
-      </div>
-    </div>`;
-
-    // Rating stars
-    const starsHtml = ratNum ? buildStars(Number(ratingVal)) : '';
-
-    // Price cards. Guests see a single MRP card (with a sign-in nudge); the
-    // struck-MRP and savings cards only make sense once a trade price is shown.
-    const IS_GUEST = !currentUser;
-    const mainLabel = IS_GUEST ? 'MRP' : (IS_DIST ? 'Distributor Price' : 'Retailer Price');
-    const mainNote  = IS_GUEST ? 'per unit • sign in for trade price' : 'per unit • COD';
-
-    const mrpBadge = (!IS_GUEST && mrp > 0) ? `
-      <div class="pd-price-card">
-        <div class="pd-price-card-label">MRP</div>
-        <div class="pd-price-card-amount pd-price-striked">₹${mrp.toLocaleString('en-IN')}</div>
-      </div>` : '';
-
-    const saveBadge = (!IS_GUEST && discount > 0) ? `
-      <div class="pd-price-card pd-price-card-accent">
-        <div class="pd-price-card-label">You Save</div>
-        <div class="pd-price-card-amount">${discount}% <span style="font-size:.9rem">off</span></div>
-        <div class="pd-price-card-note">${IS_DIST ? 'Distributor deal' : 'Retail discount'}</div>
-      </div>` : '';
-
-    const infoHtml = `
-    <div class="pd-info-col">
-      <div class="pd-chips-row">
-        <span class="pd-brand-tag">${brand}</span>
-        ${cat ? `<span class="pd-chip pd-chip-blue">${cat}</span>` : ''}
-        ${p.dosageForm ? `<span class="pd-chip pd-chip-teal">${esc(p.dosageForm)}</span>` : ''}
-      </div>
-
-      <h1 class="pd-prod-title">${esc(p.name)}</h1>
-
-      <div class="pd-metas">
-        ${p.strength   ? `<span class="pd-meta-pill">${esc(p.strength)}</span>` : ''}
-        ${p.packSize   ? `<span class="pd-meta-pill">${esc(p.packSize)}</span>` : ''}
-        ${p.gst != null ? `<span class="pd-meta-pill">GST ${p.gst}%</span>` : ''}
-        ${p.batchNo    ? `<span class="pd-meta-pill">Batch ${esc(p.batchNo)}</span>` : ''}
-        ${p.hsn        ? `<span class="pd-meta-pill">HSN ${esc(p.hsn)}</span>` : ''}
-        ${p.expiryDate ? `<span class="pd-meta-pill">Exp ${fmtDate(p.expiryDate)}</span>` : ''}
-      </div>
-
-      ${ratNum ? `
-      <div class="pd-rating-line">
-        <div class="pd-stars">${starsHtml}</div>
-        <span class="pd-rat-num">${ratNum || ''}</span>
-        <span class="pd-rat-cnt">out of 5</span>
-        <span class="pd-verif"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><polyline points="20 6 9 17 4 12"/></svg> Verified</span>
-      </div>` : ''}
-
-      <div class="pd-avail">
-        <div class="pd-avail-badge ${inStock ? 'pd-avail-green' : 'pd-avail-red'}">
-          <span class="pd-avail-dot"></span>
-          ${inStock ? `${stock.toLocaleString('en-IN')} units available` : 'Currently out of stock'}
-        </div>
-      </div>
-
-      ${(p.description || p.uses) ? `
-      <div class="pd-short-desc">${esc(p.description || p.uses)}</div>` : ''}
-
-      <div class="pd-price-section">
-        <div class="pd-price-cards-row">
-          ${IS_ANON ? `
-          <div class="pd-price-card pd-price-card-main">
-            <div class="pd-price-card-label">MRP</div>
-            <div class="pd-price-card-amount">₹${mrp.toLocaleString('en-IN')}</div>
-            <div class="pd-price-card-note">Log in to see your price</div>
-          </div>` : `
-          <div class="pd-price-card pd-price-card-main">
-            <div class="pd-price-card-label">${mainLabel}</div>
-            <div class="pd-price-card-amount">₹${userPrice.toLocaleString('en-IN')}</div>
-            <div class="pd-price-card-note">${mainNote}</div>
-          </div>
-          ${mrpBadge}
-          ${saveBadge}`}
-        </div>
-        <div class="pd-tax-note">✓ All prices inclusive of applicable taxes</div>
-      </div>
-
-      <div class="pd-purchase-card">
-        <div class="pd-qty-row">
-          <span class="pd-qty-label">Quantity</span>
-          <div class="pd-qty-wrap">
-            <div class="pd-qty-stepper">
-              <button class="pd-qty-btn" id="pd-qminus" aria-label="Decrease">−</button>
-              <input class="pd-qty-inp" type="number" id="pd-qty" value="${moq}" min="${moq}" aria-label="Quantity" />
-              <button class="pd-qty-btn" id="pd-qplus" aria-label="Increase">+</button>
-            </div>
-            <span class="pd-moq-tag">Min. ${moq} unit${moq > 1 ? 's' : ''}</span>
-          </div>
-        </div>
-
-        <div class="pd-cta-row">
-          ${IS_ANON ? `
-          <a class="pd-cta pd-cta-primary" href="login&signup.html" style="text-decoration:none">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-            Login to order
-          </a>` : `
-          <button class="pd-cta pd-cta-primary" id="pd-add-cart"
-            ${!inStock ? 'disabled' : ''}>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-            ${inStock ? 'Add to Cart' : 'Out of Stock'}
-          </button>
-          <button class="pd-cta pd-cta-dark" id="pd-buy-now"
-            ${!inStock ? 'disabled' : ''}>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-            Buy Now
-          </button>`}
-        </div>
-
-        <div class="pd-cta-row pd-cta-row-sec">
-          <button class="pd-cta pd-cta-ghost" id="pd-wish-btn2">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-            Save to Wishlist
-          </button>
-          <button class="pd-cta pd-cta-outline" onclick="window.print()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-            Print Sheet
-          </button>
-        </div>
-
-        <div class="pd-trust-strip">
-          <span class="pd-trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><polyline points="20 6 9 17 4 12"/></svg> WHO-GMP Certified</span>
-          <span class="pd-trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><polyline points="20 6 9 17 4 12"/></svg> Cash on Delivery</span>
-          <span class="pd-trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><polyline points="20 6 9 17 4 12"/></svg> Secure Ordering</span>
-          <span class="pd-trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><polyline points="20 6 9 17 4 12"/></svg> B2B Support</span>
-        </div>
-      </div>
-    </div>`;
-
-    return `<section class="pd-hero">${galleryHtml}${infoHtml}</section>`;
-  }
-
-  // ── Builder: Highlights grid ──────────────────────────────────────────────
-
-  function buildHighlights(p, inStock) {
-    const feats = [
-      {
-        bg: 'linear-gradient(135deg,#1565C0,#0F4C81)',
-        ico: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M8.5 12l2.5 2.5 5-5"/></svg>',
-        lbl: 'WHO-GMP Certified', dsc: 'Manufactured under international quality standards'
-      },
-      {
-        bg: 'linear-gradient(135deg,#0891B2,#0E7490)',
-        ico: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2.5"/><path d="M2 10h20"/></svg>',
-        lbl: 'Cash on Delivery', dsc: 'Secure COD payment for all B2B orders'
-      },
-      {
-        bg: 'linear-gradient(135deg,#7C3AED,#6D28D9)',
-        ico: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2v8l-2 4v6h10v-6l-2-4V2"/><path d="M9 2h6"/><path d="M7 14h10"/></svg>',
-        lbl: 'Quality Assured', dsc: 'Third-party lab tested for purity and potency'
-      },
-      {
-        bg: 'linear-gradient(135deg,#059669,#047857)',
-        ico: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>',
-        lbl: 'Fast Dispatch', dsc: 'Orders processed within 24 hours of confirmation'
-      },
-      {
-        bg: 'linear-gradient(135deg,#DC2626,#B91C1C)',
-        ico: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>',
-        lbl: 'Secure Platform', dsc: 'HTTPS encrypted end-to-end transactions'
-      },
-      {
-        bg: 'linear-gradient(135deg,#D97706,#B45309)',
-        ico: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>',
-        lbl: 'GST Compliant', dsc: 'All invoices GST compliant with HSN codes'
-      },
-      {
-        bg: 'linear-gradient(135deg,#0F4C81,#073B7A)',
-        ico: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>',
-        lbl: 'B2B Pricing', dsc: 'Exclusive trade pricing for registered retailers'
-      },
-      {
-        bg: inStock ? 'linear-gradient(135deg,#16A34A,#15803D)' : 'linear-gradient(135deg,#9333EA,#7E22CE)',
-        ico: inStock
-          ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>'
-          : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>',
-        lbl: inStock ? 'Ready to Ship' : 'Stock Alert',
-        dsc: inStock ? 'Available inventory ready for dispatch' : 'Sign up for restock notifications'
+    // Four thumbnail slots. Real images are clickable; the rest are labelled
+    // placeholders for photos the team will add via the admin panel.
+    var thumbs = '';
+    for (var i = 0; i < 4; i++) {
+      if (GAL[i]) {
+        thumbs += '<button type="button" class="pdx-thumb' + (i === 0 ? ' is-on' : '') + '" data-idx="' + i + '" aria-label="View image ' + (i + 1) + '">' +
+          '<span class="pdx-thumb-n">' + (i + 1) + '</span>' +
+          '<img src="' + esc(GAL[i]) + '" alt="" loading="lazy" data-cat="' + esc(cat) + '" data-fallback-class="pdx-thumb" onerror="productImgFallback(this)">' +
+        '</button>';
+      } else {
+        thumbs += '<div class="pdx-thumb pdx-thumb-empty" aria-hidden="true" title="Additional view — coming soon">' +
+          '<span class="pdx-thumb-n">' + (i + 1) + '</span>' + I.image + '</div>';
       }
-    ];
+    }
 
-    return `
-    <section class="pd-section">
-      <div class="pd-sect-hdr">
-        <div>
-          <div class="pd-sect-title">Product Highlights</div>
-          <div class="pd-sect-sub">Why choose this product</div>
-        </div>
-      </div>
-      <div class="pd-feat-grid">
-        ${feats.map(f => `
-        <div class="pd-feat-card">
-          <div class="pd-feat-ico" style="background:${f.bg}">${f.ico}</div>
-          <div>
-            <div class="pd-feat-lbl">${f.lbl}</div>
-            <div class="pd-feat-dsc">${f.dsc}</div>
-          </div>
-        </div>`).join('')}
-      </div>
-    </section>`;
+    return '<div class="pdx-gal">' +
+      '<div class="pdx-gal-stage">' +
+        '<div class="pdx-gal-badges">' + badges + '</div>' +
+        '<button type="button" class="pdx-gal-main" id="pdx-gal-main" ' + (GAL.length ? '' : 'disabled ') + 'aria-label="Zoom product image">' + mainInner + '</button>' +
+        (GAL.length ? '<span class="pdx-gal-zoom">' + I.zoom + ' Click to zoom</span>' : '') +
+      '</div>' +
+      '<div class="pdx-thumbs" id="pdx-thumbs">' + thumbs + '</div>' +
+      '<div class="pdx-gal-acts">' +
+        '<button type="button" class="pdx-gal-act" id="pdx-wish" aria-pressed="false">' + I.heart + '<span id="pdx-wish-lbl">Save</span></button>' +
+        '<div class="pdx-share-wrap">' +
+          '<button type="button" class="pdx-gal-act" id="pdx-share" aria-haspopup="true" aria-expanded="false">' + I.share + 'Share</button>' +
+          '<div class="pdx-share-menu" id="pdx-share-menu" hidden>' +
+            '<button type="button" class="pdx-share-item" data-share="copy">' + I.link + 'Copy link</button>' +
+            '<a class="pdx-share-item" id="pdx-share-wa" target="_blank" rel="noopener">' + I.wa + 'WhatsApp</a>' +
+            '<a class="pdx-share-item" id="pdx-share-mail">' + I.mail + 'Email</a>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
   }
 
-  // ── Builder: Tabs ─────────────────────────────────────────────────────────
+  /* ---- info + purchase ---- */
+  function infoCol(p, cat, code, si, mrp, price, save) {
+    var comp = compositionText(p);
+    var badges = [];
+    badges.push('<span class="pdx-badge pdx-badge--verified">' + I.shield + 'Verified product</span>');
+    if (cat) badges.push('<span class="pdx-badge pdx-badge--cat">' + esc(cat) + '</span>');
+    if (real(p.dosageForm)) badges.push('<span class="pdx-badge pdx-badge--form">' + esc(p.dosageForm) + '</span>');
 
-  function buildTabs(p, IS_DIST, catName) {
-    const tabs = [
-      { id: 'overview',     lbl: 'Overview',       content: buildTabOverview(p)          },
-      { id: 'composition',  lbl: 'Composition',    content: buildTabComposition(p)       },
-      { id: 'specs',        lbl: 'Specifications', content: buildTabSpecs(p, catName)    },
-      { id: 'storage',      lbl: 'Storage',        content: buildTabStorage(p)           },
-      { id: 'safety',       lbl: 'Safety',         content: buildTabSafety(p)            }
-    ];
+    var facts = [];
+    if (real(p.packSize)) facts.push(['Packing', p.packSize]);
+    if (real(p.strength)) facts.push(['Strength', p.strength]);
+    if (cat) facts.push(['Category', cat]);
+    if (real(p.dosageForm)) facts.push(['Form', p.dosageForm]);
 
-    const navBtns = tabs.map((t, i) =>
-      `<button class="pd-tab-btn ${i === 0 ? 'pd-tab-on' : ''}" data-tab="${t.id}" aria-selected="${i === 0}">${t.lbl}</button>`
-    ).join('');
-
-    const panes = tabs.map((t, i) =>
-      `<div class="pd-tab-pane ${i === 0 ? 'pd-pane-on' : ''}" id="pd-pane-${t.id}" role="tabpanel" aria-label="${t.lbl}">${t.content}</div>`
-    ).join('');
-
-    return `
-    <section class="pd-section pd-tabs-section">
-      <nav class="pd-tabs-nav" role="tablist" aria-label="Product information tabs">${navBtns}</nav>
-      <div class="pd-tabs-body">${panes}</div>
-    </section>`;
+    return '<div class="pdx-info">' +
+      '<div class="pdx-badges">' + badges.join('') + '</div>' +
+      '<h1 class="pdx-title">' + esc(p.name) + '</h1>' +
+      '<div class="pdx-brandrow"><span class="pdx-brand">Marketed by <b>' + esc(p.brand || 'Fair Ford Pharma') + '</b></span></div>' +
+      (comp
+        ? '<div class="pdx-comp-line"><b>Composition:</b> ' + esc(comp) + '</div>'
+        : '<div class="pdx-comp-line pdx-comp-line--none">Composition not listed for this product</div>') +
+      (facts.length ? '<div class="pdx-facts">' + facts.map(function (f) {
+        return '<dl class="pdx-fact"><dt>' + esc(f[0]) + '</dt><dd>' + esc(f[1]) + '</dd></dl>';
+      }).join('') + '</div>' : '') +
+      metaRow(p, code) +
+      buyPanel(p, si, mrp, price, save) +
+      dispatchNote() +
+    '</div>';
   }
 
-  // Turn the catalogue description — "Product introduction … / Uses of X … /
-  // How to use X …" — into clean sections: intro paragraphs, a bulleted Uses
-  // list, and a Directions paragraph. Falls back to a single paragraph for any
-  // product whose description isn't in this structured format.
-  function renderStructuredDescription(desc) {
-    const lines = String(desc).split(/\r?\n/).map(l => l.trim()).filter(Boolean);
-    const isStructured = lines.some(l => /^(product introduction|uses of |how to use |directions)/i.test(l));
-    if (!isStructured) return `<p class="pd-tab-p">${esc(String(desc).trim())}</p>`;
+  function metaRow(p, code) {
+    var reviewed = Number(p.reviewCount || 0) > 0 && Number(p.rating || 0) > 0;
+    var ratingHTML = reviewed
+      ? '<span class="pdx-rate"><span class="pdx-rate-stars">' + starGlyphs(Number(p.rating)) + '</span> <b>' + Number(p.rating).toFixed(1) + '</b> · ' + p.reviewCount + ' review' + (p.reviewCount === 1 ? '' : 's') + '</span>'
+      : '<span class="pdx-rate"><span class="pdx-rate-stars">☆☆☆☆☆</span> <span class="pdx-rate-none">No reviews yet</span></span>';
+    return '<div class="pdx-metarow">' +
+      (code ? '<span class="pdx-sku">SKU <b id="pdx-code">' + esc(code) + '</b>' +
+        '<button type="button" class="pdx-copy" id="pdx-copy" data-code="' + esc(code) + '" aria-label="Copy product code">' + I.copy + '</button></span>' : '') +
+      ratingHTML +
+    '</div>';
+  }
 
-    const sections = [];
-    let cur = { type: 'intro', title: 'Product Description', items: [] };
-    const flush = () => { if (cur.items.length) sections.push(cur); };
-    lines.forEach(line => {
-      if (/^product introduction$/i.test(line)) { flush(); cur = { type: 'intro', title: 'Product Description', items: [] }; }
-      else if (/^uses of\b/i.test(line))        { flush(); cur = { type: 'uses', title: 'Uses & Benefits', items: [] }; }
-      else if (/^(how to use|directions for use|how to take|directions)\b/i.test(line)) { flush(); cur = { type: 'howto', title: 'Directions for Use', items: [] }; }
+  function buyPanel(p, si, mrp, price, save) {
+    var priceBlock;
+    if (IS_ANON) {
+      priceBlock = '<div class="pdx-price-locked">' +
+        '<div class="pdx-price-mrp-wrap">' +
+          '<div class="pdx-price-mrp-label">MRP</div>' +
+          '<div class="pdx-price-mrp-val">' + money(mrp) + '</div>' +
+          '<div class="pdx-price-lock-note">' + I.lock + 'Log in to view your trade price</div>' +
+        '</div>' +
+      '</div>';
+    } else {
+      priceBlock = '<div class="pdx-price-live">' +
+        '<div class="pdx-price-main-wrap">' +
+          '<div class="pdx-price-role">' + (IS_DIST ? 'Distributor price' : 'Your trade price') + '</div>' +
+          '<div class="pdx-price-main">' + money(price) + '</div>' +
+        '</div>' +
+        (mrp > price ? '<span class="pdx-price-strike">MRP ' + money(mrp) + '</span>' : '') +
+        (save > 0 ? '<span class="pdx-price-save">' + save + '% off MRP</span>' : '') +
+      '</div>' +
+      '<div class="pdx-price-tax">' + (p.gst != null ? 'Exclusive of <b>' + p.gst + '% GST</b> · ' : '') + 'Cash on delivery &amp; online payment</div>';
+    }
+
+    var stockV = si.inStock
+      ? '<span class="pdx-meta-v pdx-v-' + si.cls + '"><span class="pdx-stock-dot pdx-stock-dot--' + si.cls + '"></span>' + esc(si.label) + '</span>'
+      : '<span class="pdx-meta-v pdx-v-out"><span class="pdx-stock-dot pdx-stock-dot--out"></span>Out of stock</span>';
+
+    var actions;
+    if (IS_ANON) {
+      actions =
+        '<div class="pdx-cta-primary-row">' +
+          '<a class="pdx-btn pdx-btn-primary pdx-btn-lg" href="login&signup.html">' + I.lock + 'Log in to order</a>' +
+        '</div>' +
+        '<div class="pdx-cta-secondary-row">' +
+          '<a class="pdx-btn pdx-btn-ghost" href="registration.html">Register your business</a>' +
+          '<a class="pdx-btn pdx-btn-ghost" href="' + quoteHref(p) + '">Request wholesale price</a>' +
+        '</div>';
+    } else if (!si.inStock) {
+      actions =
+        '<div class="pdx-cta-primary-row">' +
+          '<button type="button" class="pdx-btn pdx-btn-lg" disabled>Out of stock</button>' +
+        '</div>' +
+        '<div class="pdx-cta-secondary-row">' +
+          '<button type="button" class="pdx-btn pdx-btn-ghost" id="pdx-wish2">' + I.heart + 'Save to wishlist</button>' +
+          '<a class="pdx-btn pdx-btn-ghost" href="' + quoteHref(p) + '">Request bulk quote</a>' +
+        '</div>';
+    } else {
+      actions =
+        '<div class="pdx-qtyrow">' +
+          '<span class="pdx-qty-label">Quantity</span>' +
+          '<div style="display:flex;align-items:center;gap:12px">' +
+            qtyHTML('pdx-qty', MOQ) +
+            (MOQ > 1 ? '<span class="pdx-qty-multiple">Multiples of ' + MOQ + '</span>' : '') +
+          '</div>' +
+        '</div>' +
+        '<div class="pdx-cta-primary-row">' +
+          '<button type="button" class="pdx-btn pdx-btn-primary pdx-btn-lg" id="pdx-add">' + I.cart + 'Add to cart</button>' +
+          '<a class="pdx-btn pdx-btn-dark pdx-btn-lg" href="' + quoteHref(p) + '">Request bulk quote</a>' +
+        '</div>' +
+        '<div class="pdx-cta-secondary-row">' +
+          '<button type="button" class="pdx-btn pdx-btn-ghost" id="pdx-wish2">' + I.heart + 'Save to wishlist</button>' +
+          '<button type="button" class="pdx-btn pdx-btn-ghost" id="pdx-share2">' + I.share + 'Share</button>' +
+        '</div>';
+    }
+
+    return '<div class="pdx-buy">' +
+      '<div class="pdx-buy-price">' + priceBlock + '</div>' +
+      '<div class="pdx-buy-meta">' +
+        '<div><span class="pdx-meta-k">Min. order</span><span class="pdx-meta-v">' + MOQ + ' unit' + (MOQ > 1 ? 's' : '') + '</span></div>' +
+        '<div><span class="pdx-meta-k">Availability</span>' + stockV + '</div>' +
+        (Number(p.stock) > 0 ? '<div><span class="pdx-meta-k">In stock</span><span class="pdx-meta-v">' + Number(p.stock).toLocaleString('en-IN') + ' units</span></div>' : '') +
+      '</div>' +
+      '<div class="pdx-buy-actions">' + actions + '</div>' +
+      '<div class="pdx-buy-trust">' +
+        '<span>' + I.check + 'WHO-GMP certified</span>' +
+        '<span>' + I.check + 'GST invoice</span>' +
+        '<span>' + I.check + 'Secure B2B ordering</span>' +
+        '<span>' + I.check + 'Nearest-stockist dispatch</span>' +
+      '</div>' +
+    '</div>';
+  }
+
+  function qtyHTML(id, moq) {
+    return '<div class="pdx-qty" data-qty="' + id + '">' +
+      '<button type="button" data-step="-1" aria-label="Decrease quantity">−</button>' +
+      '<input type="number" id="' + id + '" value="' + moq + '" min="' + moq + '" step="' + moq + '" inputmode="numeric" aria-label="Quantity">' +
+      '<button type="button" data-step="1" aria-label="Increase quantity">+</button>' +
+    '</div>';
+  }
+
+  function dispatchNote() {
+    return '<div class="pdx-dispatch">' + I.truck +
+      '<div><b>Routed to your nearest serviceable stockist.</b> Each order is matched by your shop\'s pincode and city, then fulfilled and dispatched from the closest distributor — shorter transit, fewer handovers.</div>' +
+    '</div>';
+  }
+
+  function quoteHref(p) {
+    var q = new URLSearchParams();
+    q.set('enquiry', 'bulk-quote');
+    q.set('product', p.name || '');
+    var code = productCode(p);
+    if (code) q.set('code', code);
+    return 'contactus.html?' + q.toString();
+  }
+
+  /* ---- trust strip ---- */
+  function trustStrip() {
+    var items = [
+      [I.shield, 'WHO-GMP', 'Certified manufacturing'],
+      [I.check,  'Verified supply', 'Genuine Fair Ford stock'],
+      [I.doc,    'GST invoice', 'Correct rate per item'],
+      [I.card,   'Secure ordering', 'COD &amp; online payment'],
+      [I.pin,    'Pan-India', 'Nationwide distribution']
+    ];
+    return '<div class="pdx-wrap"><div class="pdx-trustbar">' + items.map(function (it) {
+      return '<div class="pdx-trust-cell">' + it[0] + '<div><b>' + it[1] + '</b><span>' + it[2] + '</span></div></div>';
+    }).join('') + '</div></div>';
+  }
+
+  /* ---- stacked info sections (accordions on mobile) ---- */
+  function accordion(title, bodyHTML, open) {
+    return '<details class="pdx-acc"' + (open ? ' open' : '') + '>' +
+      '<summary>' + esc(title) + I.chev + '</summary>' +
+      '<div class="pdx-acc-body">' + bodyHTML + '</div>' +
+    '</details>';
+  }
+
+  function sectionsHTML(p, cat, code, si) {
+    var blocks = [];
+
+    // Specifications — real fields only.
+    var specRows = [
+      ['Product name', p.name],
+      ['Composition', compositionText(p)],
+      ['Category', cat],
+      ['Dosage form', real(p.dosageForm)],
+      ['Pack size', real(p.packSize)],
+      ['Strength', real(p.strength)],
+      ['Product code', code],
+      ['GST rate', p.gst != null ? p.gst + '%' : ''],
+      ['Minimum order', MOQ + (MOQ > 1 ? ' units' : ' unit')],
+      ['Availability', si.label]
+    ].filter(function (r) { return r[1]; });
+    blocks.push(accordion('Product specifications',
+      '<div class="pdx-spec-grid">' + specRows.map(function (r) {
+        return '<div class="pdx-spec-cell"><dt>' + esc(r[0]) + '</dt><dd>' + esc(String(r[1])) + '</dd></div>';
+      }).join('') + '</div>', true));
+
+    // Composition breakdown.
+    var salts = compositionArr(p);
+    if (salts.length) {
+      blocks.push(accordion('Composition',
+        '<div class="pdx-comp-grid">' + salts.map(function (s, i) {
+          var ps = parseSalt(s);
+          return '<div class="pdx-comp-card">' +
+            '<span class="pdx-comp-idx">' + (i + 1) + '</span>' +
+            '<div class="pdx-comp-body"><div class="pdx-comp-name">' + esc(ps.name) + '</div>' +
+            (ps.strength ? '<div class="pdx-comp-strength">' + esc(ps.strength) + '</div>' : '') + '</div>' +
+          '</div>';
+        }).join('') + '</div>' +
+        '<p class="pdx-comp-foot">' + I.flask + 'Active ingredients as declared on the product pack. Dispense per a registered practitioner\'s advice.</p>', true));
+    }
+
+    // Description — structured from the catalogue prose.
+    if (real(p.description)) {
+      blocks.push(accordion('Product description', renderDescription(p.description), true));
+    }
+
+    // Storage & handling — general guidance, clearly labelled (no per-product
+    // storage data exists on the catalogue).
+    blocks.push(accordion('Storage & handling',
+      '<div class="pdx-mini-grid">' +
+        miniCard(I.thermo, 'Temperature', 'Store below 25°C') +
+        miniCard(I.flask, 'Environment', 'Cool, dry place') +
+        miniCard(I.shield, 'Access', 'Keep away from children') +
+      '</div>' +
+      '<div class="pdx-note">' + warnIco() + '<div>General guidance only — always follow the storage instructions printed on the product pack and the enclosed insert. Improper storage can affect potency and safety.</div></div>', false));
+
+    // Manufacturer & quality.
+    blocks.push(accordion('Manufacturer & quality',
+      '<div class="pdx-mfr">' +
+        '<div class="pdx-mfr-card"><div class="pdx-mini-ico">' + I.factory + '</div><h4 class="pdx-mfr-h">Marketed by</h4><p class="pdx-mfr-p">' + esc(p.brand || 'Fair Ford Pharma') + '</p></div>' +
+        '<div class="pdx-mfr-card"><div class="pdx-mini-ico">' + I.shield + '</div><h4 class="pdx-mfr-h">Quality standard</h4><p class="pdx-mfr-p">Manufactured under WHO-GMP certified standards with multi-stage quality control before dispatch.</p></div>' +
+        '<div class="pdx-mfr-card"><div class="pdx-mini-ico">' + I.doc + '</div><h4 class="pdx-mfr-h">Compliance</h4><p class="pdx-mfr-p">GST-compliant invoicing with HSN details on every order.</p></div>' +
+      '</div>', false));
+
+    // Documentation — no per-product COA is stored, so offer a real request
+    // route instead of empty document boxes.
+    blocks.push(accordion('Documents',
+      '<div class="pdx-doc">' +
+        '<div class="pdx-doc-ico">' + I.doc + '</div>' +
+        '<div class="pdx-doc-body"><b>Need a COA or product information sheet?</b><span>Certificates of Analysis and documentation are shared on request for verified B2B buyers.</span></div>' +
+        '<a class="pdx-btn pdx-btn-ghost" href="' + esc(quoteHref(p).replace('bulk-quote', 'documentation')) + '">Request documents</a>' +
+      '</div>', false));
+
+    // Reviews — no review system exists.
+    var reviewed = Number(p.reviewCount || 0) > 0;
+    var reviewsBody = reviewed
+      ? '<p class="pdx-desc-p">' + Number(p.rating || 0).toFixed(1) + ' out of 5 · ' + p.reviewCount + ' verified review' + (p.reviewCount === 1 ? '' : 's') + '</p>'
+      : '<div class="pdx-reviews-empty"><div class="pdx-re-ico">' + I.star + '</div>' +
+        '<h3>No reviews yet</h3>' +
+        '<p>Verified reviews from Fair Ford\'s B2B buyers will appear here once this product has been ordered and rated.</p></div>';
+    blocks.push(accordion('Reviews', reviewsBody, true));
+
+    return '<div class="pdx-wrap"><div class="pdx-info-sections">' + blocks.join('') + '</div></div>';
+  }
+
+  function miniCard(ico, k, v) {
+    return '<div class="pdx-mini-card"><div class="pdx-mini-ico">' + ico + '</div><div class="pdx-mini-k">' + esc(k) + '</div><div class="pdx-mini-v">' + esc(v) + '</div></div>';
+  }
+  function warnIco() {
+    return '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h16.9a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>';
+  }
+
+  /* Structured catalogue description → intro / uses list / directions. */
+  function renderDescription(desc) {
+    var lines = String(desc).split(/\r?\n/).map(function (l) { return l.trim(); }).filter(Boolean);
+    var structured = lines.some(function (l) { return /^(product introduction|uses of |how to use |directions)/i.test(l); });
+    if (!structured) {
+      return '<div class="pdx-desc-block">' + lines.map(function (l) { return '<p class="pdx-desc-p">' + esc(l) + '</p>'; }).join('') + '</div>';
+    }
+    var sections = [], cur = { type: 'intro', title: 'Overview', items: [] };
+    function flush() { if (cur.items.length) sections.push(cur); }
+    lines.forEach(function (line) {
+      if (/^product introduction$/i.test(line)) { flush(); cur = { type: 'intro', title: 'Overview', items: [] }; }
+      else if (/^uses of\b/i.test(line)) { flush(); cur = { type: 'uses', title: 'Uses & benefits', items: [] }; }
+      else if (/^(how to use|directions for use|how to take|directions)\b/i.test(line)) { flush(); cur = { type: 'howto', title: 'Directions for use', items: [] }; }
       else cur.items.push(line);
     });
     flush();
-
-    return sections.map(s => {
+    return sections.map(function (s) {
       if (s.type === 'uses') {
-        return `<div class="pd-desc-block"><h3 class="pd-tab-h">${s.title}</h3>` +
-               `<ul class="pd-desc-list">${s.items.map(i => `<li>${esc(i)}</li>`).join('')}</ul></div>`;
+        return '<div class="pdx-desc-block"><h3 class="pdx-desc-h">' + s.title + '</h3><ul class="pdx-desc-list">' +
+          s.items.map(function (i) { return '<li>' + esc(i) + '</li>'; }).join('') + '</ul></div>';
       }
-      return `<div class="pd-desc-block"><h3 class="pd-tab-h">${s.title}</h3>` +
-             s.items.map(i => `<p class="pd-tab-p">${esc(i)}</p>`).join('') + `</div>`;
+      return '<div class="pdx-desc-block"><h3 class="pdx-desc-h">' + s.title + '</h3>' +
+        s.items.map(function (i) { return '<p class="pdx-desc-p">' + esc(i) + '</p>'; }).join('') + '</div>';
     }).join('');
   }
 
-  function buildTabOverview(p) {
-    if (!p.description && !p.uses) {
-      return `<div class="pd-empty-tab"><svg viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.5" stroke-linecap="round" width="36" height="36"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>No overview available for this product.</div>`;
-    }
-    return `
-    <div class="pd-tab-inner">
-      ${p.description ? renderStructuredDescription(p.description) : ''}
-      ${p.uses ? `
-      <div class="pd-desc-block">
-        <h3 class="pd-tab-h">Uses &amp; Indications</h3>
-        <p class="pd-tab-p">${esc(p.uses)}</p>
-      </div>` : ''}
-    </div>`;
+  function starGlyphs(r) {
+    var full = Math.round(r);
+    return '★★★★★'.slice(0, full) + '☆☆☆☆☆'.slice(0, 5 - full);
   }
 
-  function buildTabComposition(p) {
-    if (!p.composition) {
-      return `<div class="pd-empty-tab"><svg viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.5" stroke-linecap="round" width="36" height="36"><path d="M9 2v8l-2 4v6h10v-6l-2-4V2"/><path d="M9 2h6"/><path d="M7 14h10"/></svg>Composition information not available.</div>`;
-    }
-    const items = Array.isArray(p.composition) ? p.composition : [p.composition];
-    if (!items.length) {
-      return `<div class="pd-empty-tab"><svg viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.5" stroke-linecap="round" width="36" height="36"><path d="M9 2v8l-2 4v6h10v-6l-2-4V2"/><path d="M9 2h6"/><path d="M7 14h10"/></svg>Composition information not available.</div>`;
-    }
-    return `
-    <div class="pd-tab-inner">
-      <h3 class="pd-tab-h">Active Ingredients</h3>
-      <div class="pd-comp-list">
-        ${items.map((c, i) => `
-        <div class="pd-comp-row">
-          <div class="pd-comp-n">${i + 1}</div>
-          <span class="pd-comp-name">${esc(String(c))}</span>
-        </div>`).join('')}
-      </div>
-    </div>`;
+  /* ---- per-product <head> metadata ---- */
+  function applyMeta(p, cat, code) {
+    var name = p.name || 'Product';
+    document.title = 'Fair Ford — ' + name;
+    var comp = compositionText(p);
+    var bits = [real(p.strength), real(p.packSize), real(p.dosageForm), comp].filter(Boolean);
+    var desc = (name + (cat ? ' — ' + cat : '') + '. ' + (bits.length ? bits.join(' · ') + '. ' : '') +
+      'Available for B2B order from Fair Ford Pharmaceuticals.').slice(0, 300);
+    function set(sel, v) { var el = document.querySelector(sel); if (el && v) el.setAttribute('content', v); }
+    set('#meta-desc', desc); set('#og-title', name + ' — Fair Ford Pharmaceuticals'); set('#og-desc', desc);
+    if (GAL[0]) set('#og-image', GAL[0]);
+    var canon = $('canonical-link'), pid = p.id || p._id;
+    if (canon && pid) canon.setAttribute('href', 'https://www.fairfordpharma.com/productdetail.html?id=' + encodeURIComponent(pid));
   }
 
-  function buildTabSpecs(p, catName) {
-    const rows = [
-      ['Category',      catName || null],
-      ['Manufacturer',  p.manufacturer || p.brand],
-      ['Pack Size',     p.packSize],
-      ['Strength',      p.strength],
-      ['Dosage Form',   p.dosageForm],
-      ['Schedule',      p.schedule],
-      ['Batch No.',     p.batchNo],
-      ['HSN Code',      p.hsn],
-      ['GST Rate',      p.gst != null ? p.gst + '%' : null],
-      ['Expiry Date',   p.expiryDate ? fmtDate(p.expiryDate) : null]
-    ].filter(r => r[1]);
+  /* ================================================================
+     7 · STICKY BARS  (reliable show/hide — no transition dependency)
+     ================================================================ */
+  function buildStickyBars(p, si, price, mrp) {
+    ['pdx-topbar', 'pdx-mbar'].forEach(function (id) { var e = $(id); if (e) e.remove(); });
+    // Append the fixed bars INSIDE the .pdx element (not <body>) so the
+    // page's --sticky / --card / --line tokens cascade to them. .pdx has no
+    // transform/filter, so position:fixed still anchors to the viewport.
+    var host = document.querySelector('main.pdx') || document.body;
 
-    if (!rows.length) {
-      return `<div class="pd-empty-tab"><svg viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.5" stroke-linecap="round" width="36" height="36"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>Specifications not available.</div>`;
-    }
-    return `
-    <div class="pd-tab-inner">
-      <h3 class="pd-tab-h">Technical Specifications</h3>
-      <table class="pd-spec-tbl">
-        <tbody>
-          ${rows.map(r => `<tr><th>${r[0]}</th><td>${esc(String(r[1]))}</td></tr>`).join('')}
-        </tbody>
-      </table>
-    </div>`;
+    var thumb = GAL[0]
+      ? '<img src="' + esc(GAL[0]) + '" alt="" data-cat="' + esc(catNameOf(p)) + '" data-fallback-class="pdx-topbar-thumb" onerror="productImgFallback(this)">'
+      : (typeof productImageSVG === 'function' ? productImageSVG(catNameOf(p)) : '');
+    var shownPrice = IS_ANON ? mrp : price;
+    var priceLbl = IS_ANON ? 'MRP' : (IS_DIST ? 'Distributor' : 'Trade price');
+
+    // desktop top bar
+    var top = document.createElement('div');
+    top.className = 'pdx-topbar'; top.id = 'pdx-topbar';
+    top.innerHTML = '<div class="pdx-topbar-inner">' +
+      '<div class="pdx-topbar-thumb">' + thumb + '</div>' +
+      '<div class="pdx-topbar-info">' +
+        '<div class="pdx-topbar-name">' + esc(p.name) + '</div>' +
+        '<div class="pdx-topbar-meta">' +
+          (real(p.packSize) ? '<span>' + esc(p.packSize) + '</span>' : '') +
+          '<span class="pdx-v-' + si.cls + '">' + esc(si.label) + '</span>' +
+          '<span><b>' + money(shownPrice) + '</b> ' + priceLbl + '</span>' +
+        '</div>' +
+      '</div>' +
+      '<div class="pdx-topbar-actions">' +
+        (IS_ANON
+          ? '<a class="pdx-btn pdx-btn-primary" href="login&signup.html">' + I.lock + 'Log in to order</a>'
+          : (si.inStock
+            ? qtyHTML('pdx-tq', MOQ) + '<button type="button" class="pdx-btn pdx-btn-primary" id="pdx-top-add">' + I.cart + 'Add to cart</button>'
+            : '<button type="button" class="pdx-btn" disabled>Out of stock</button>')) +
+      '</div>' +
+    '</div>';
+    host.appendChild(top);
+
+    // mobile bottom bar
+    var mbar = document.createElement('div');
+    mbar.className = 'pdx-mbar'; mbar.id = 'pdx-mbar';
+    mbar.innerHTML =
+      '<div class="pdx-mbar-price"><b>' + money(shownPrice) + '</b><span>' + priceLbl + (IS_ANON ? ' · sign in for trade price' : '') + '</span></div>' +
+      '<button type="button" class="pdx-mbar-wish" id="pdx-mbar-wish" aria-label="Save to wishlist">' + I.heart + '</button>' +
+      (IS_ANON
+        ? '<a class="pdx-btn pdx-btn-primary pdx-mbar-cart" href="login&signup.html">' + I.lock + 'Log in</a>'
+        : (si.inStock
+          ? '<button type="button" class="pdx-btn pdx-btn-primary pdx-mbar-cart" id="pdx-mbar-add">' + I.cart + 'Add to cart</button>'
+          : '<button type="button" class="pdx-btn pdx-mbar-cart" disabled>Out of stock</button>'));
+    host.appendChild(mbar);
+    document.body.classList.add('pdx-mbar-space');
   }
 
-  function buildTabStorage(p) {
-    const cards = [
-      {
-        bg: 'linear-gradient(135deg,#EF4444,#DC2626)',
-        ico: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/></svg>',
-        lbl: 'Temperature', val: 'Below 25°C'
-      },
-      {
-        bg: 'linear-gradient(135deg,#3B82F6,#1D4ED8)',
-        ico: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>',
-        lbl: 'Humidity', val: 'Dry place'
-      },
-      {
-        bg: 'linear-gradient(135deg,#F59E0B,#D97706)',
-        ico: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>',
-        lbl: 'Light', val: 'Away from sunlight'
-      },
-      {
-        bg: 'linear-gradient(135deg,#8B5CF6,#7C3AED)',
-        ico: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>',
-        lbl: 'Access', val: 'Keep away from children'
-      }
-    ];
-    return `
-    <div class="pd-tab-inner">
-      <h3 class="pd-tab-h">Storage &amp; Handling</h3>
-      <div class="pd-storage-grid">
-        ${cards.map(c => `
-        <div class="pd-storage-card">
-          <div class="pd-storage-ico" style="background:${c.bg}">${c.ico}</div>
-          <div class="pd-storage-lbl">${c.lbl}</div>
-          <div class="pd-storage-val">${c.val}</div>
-        </div>`).join('')}
-      </div>
-      <div class="pd-warn-box" style="margin-top:20px">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16" style="display:inline-block;vertical-align:-3px;margin-right:6px;color:#D97706"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-        Store as directed on the package. Improper storage may affect potency and safety.
-      </div>
-    </div>`;
+  function toggleBar(el, on, offTransform) {
+    if (!el) return;
+    if (on) { el.style.transform = 'translateY(0)'; el.classList.add('is-on'); }
+    else { el.style.transform = ''; el.classList.remove('is-on'); }   // '' reverts to CSS off-position
   }
 
-  function buildTabSafety(p) {
-    return `
-    <div class="pd-tab-inner">
-      <h3 class="pd-tab-h">Safety Information</h3>
-      <p class="pd-tab-p" style="margin-bottom:16px">
-        This product is intended for B2B trade supply to licensed retailers and distributors only.
-        Always verify your drug license compliance before purchasing scheduled medicines.
-      </p>
-      <div class="pd-warn-box">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16" style="display:inline-block;vertical-align:-3px;margin-right:6px;color:#D97706"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-        <strong>For Professional Use Only:</strong> This pharmaceutical product must be dispensed under the supervision of a registered pharmacist. Not for direct consumer sale without appropriate prescription where required.
-      </div>
-    </div>`;
-  }
+  /* ================================================================
+     8 · WIRE EVENTS
+     ================================================================ */
+  function wire(p, si) {
+    var pid = p._id || p.id;
+    var moq = MOQ;
 
-  // ── Builder: Reviews ──────────────────────────────────────────────────────
-
-  function buildReviews(p) {
-    const rating = (p.rating || p.ratings) ? Number(p.rating || p.ratings) : 4.2;
-    const totalRev = 48;
-
-    const bars = [5,4,3,2,1].map(n => {
-      const pct = n === 5 ? 62 : n === 4 ? 22 : n === 3 ? 9 : n === 2 ? 4 : 3;
-      return `
-      <div class="pd-rbar">
-        <span class="pd-rbar-n">${n}★</span>
-        <div class="pd-rbar-track"><div class="pd-rbar-fill" style="width:${pct}%"></div></div>
-        <span class="pd-rbar-pct">${pct}%</span>
-      </div>`;
-    }).join('');
-
-    const revCards = [
-      { name: 'Apollo Pharmacy', city: 'Mumbai', rating: 5, date: 'Jun 2025', title: 'Excellent quality, prompt dispatch', body: 'Consistently reliable quality. Packaging is tamper-proof and dispatch happens within the promised window. Our go-to supplier for this product line.' },
-      { name: 'MedPlus Retail',  city: 'Pune',   rating: 4, date: 'May 2025', title: 'Good B2B pricing and support', body: 'Competitive pricing for bulk orders. Customer support team is responsive. Would appreciate slightly faster dispatch for urgent orders.' }
-    ].map(r => `
-    <div class="pd-rev-card">
-      <div class="pd-rev-head">
-        <div class="pd-rev-av">${r.name[0]}</div>
-        <div class="pd-rev-info">
-          <div class="pd-rev-name">
-            ${esc(r.name)} <span class="pd-verif-sm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="10" height="10"><polyline points="20 6 9 17 4 12"/></svg> Verified</span>
-          </div>
-          <div class="pd-rev-date">${r.city} · ${r.date}</div>
-        </div>
-        <div class="pd-stars pd-stars-sm">${buildStars(r.rating)}</div>
-      </div>
-      <div class="pd-rev-title">${esc(r.title)}</div>
-      <div class="pd-rev-body">${esc(r.body)}</div>
-      <div class="pd-rev-acts">
-        <button class="pd-rev-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg> Helpful</button>
-        <button class="pd-rev-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Comment</button>
-      </div>
-    </div>`).join('');
-
-    return `
-    <section class="pd-section">
-      <div class="pd-sect-hdr">
-        <div>
-          <div class="pd-sect-title">Customer Reviews</div>
-          <div class="pd-sect-sub">What retailers are saying</div>
-        </div>
-        <div class="pd-rat-badge">
-          <div>
-            <div class="pd-rat-big">${rating.toFixed(1)}</div>
-            <div class="pd-stars">${buildStars(rating)}</div>
-            <div class="pd-rat-total">${totalRev} reviews</div>
-          </div>
-        </div>
-      </div>
-      <div class="pd-reviews-wrap">
-        <div class="pd-rat-bars">${bars}</div>
-        <div class="pd-rev-cards">${revCards}</div>
-      </div>
-    </section>`;
-  }
-
-  // ── Builder: FAQ ──────────────────────────────────────────────────────────
-
-  function buildFaq(p) {
-    const faqs = [
-      { q: 'What is the minimum order quantity?', a: `The minimum order quantity for this product is ${(p.minOrderQty || 1)} unit(s). Orders below this quantity cannot be processed through the B2B platform.` },
-      { q: 'What payment methods are accepted?', a: 'We currently support Cash on Delivery (COD) for all B2B orders. Online payment integration is coming soon.' },
-      { q: 'How is the distributor assigned to my order?', a: 'Orders are automatically routed to the nearest serviceable distributor based on your registered shop address (pincode and city). You can update your shop address from the profile settings.' },
-      { q: 'Can I cancel or return an order?', a: 'Orders can be cancelled before dispatch. For returns, contact support within 48 hours of delivery with a valid reason. Damaged or incorrect products are eligible for replacement.' },
-      { q: 'Is the pricing exclusive of GST?', a: `All displayed prices are inclusive of applicable GST${p.gst != null ? ` (${p.gst}%)` : ''}. Your invoice will show a GST breakup for tax credit purposes.` }
-    ];
-
-    return `
-    <section class="pd-section">
-      <div class="pd-sect-hdr">
-        <div>
-          <div class="pd-sect-title">Frequently Asked Questions</div>
-          <div class="pd-sect-sub">Common questions about this product</div>
-        </div>
-      </div>
-      <div class="pd-faq-list" id="pd-faq-list">
-        ${faqs.map((f, i) => `
-        <div class="pd-faq-item" id="pd-faq-${i}">
-          <button class="pd-faq-q" data-faq="${i}" aria-expanded="false">
-            ${esc(f.q)}
-            <span class="pd-faq-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="14" height="14"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
-          </button>
-          <div class="pd-faq-a" id="pd-faq-a-${i}" style="max-height:0">
-            <p>${esc(f.a)}</p>
-          </div>
-        </div>`).join('')}
-      </div>
-    </section>`;
-  }
-
-  // ── Builder: Sticky widget ────────────────────────────────────────────────
-
-  function buildStickyWidget(p, inStock, moq, userPrice, catName, IS_ANON) {
-    const existing = document.getElementById('pd-sticky-widget');
-    if (existing) existing.remove();
-
-    // Show the real product photo in the sticky bar (same image as the hero
-    // gallery). Fall back to the category placeholder only if the product
-    // genuinely has no image on file.
-    const swRawImgs = (p.images && p.images.length) ? p.images : [];
-    let swThumbUrl = '';
-    for (let i = 0; i < swRawImgs.length; i++) {
-      const x = swRawImgs[i];
-      const u = !x ? '' : (typeof x === 'string' ? x : (x.url || ''));
-      if (u) { swThumbUrl = u; break; }
-    }
-    if (!swThumbUrl && p.image) {
-      swThumbUrl = typeof p.image === 'string' ? p.image : (p.image.url || '');
-    }
-    const swThumbHtml = swThumbUrl
-      ? `<img src="${esc(swThumbUrl)}" alt="${esc(p.name)}" data-cat="${esc(catName || '')}" data-fallback-class="pd-sw-thumb-svg" onerror="productImgFallback(this)">`
-      : categoryIcon(catName);
-
-    const swPrice = IS_ANON ? (p.mrp || 0) : userPrice;
-    const widget = document.createElement('div');
-    widget.className = 'pd-sticky-widget';
-    widget.id = 'pd-sticky-widget';
-    widget.innerHTML = `
-    <div class="pd-sw-inner">
-      <div class="pd-sw-thumb">${swThumbHtml}</div>
-      <div class="pd-sw-info">
-        <div class="pd-sw-name">${esc(p.name)}</div>
-        <div class="pd-sw-price">₹${swPrice.toLocaleString('en-IN')}${IS_ANON ? ' <span style="font-weight:500;font-size:.8em;opacity:.7">MRP</span>' : ''}</div>
-      </div>
-      ${IS_ANON ? `
-      <a class="pd-sw-cart" href="login&signup.html" style="text-decoration:none">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-        Login to order
-      </a>` : `
-      <div class="pd-sw-qty">
-        <button class="pd-sw-qbtn" id="pd-sw-minus">−</button>
-        <input class="pd-sw-qinp" type="number" id="pd-sw-qty" value="${moq}" min="${moq}" />
-        <button class="pd-sw-qbtn" id="pd-sw-plus">+</button>
-      </div>
-      <button class="pd-sw-cart" id="pd-sw-cart" ${!inStock ? 'disabled' : ''}>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-        ${inStock ? 'Add to Cart' : 'Out of Stock'}
-      </button>`}
-    </div>`;
-    document.body.appendChild(widget);
-  }
-
-  // ── Events ────────────────────────────────────────────────────────────────
-
-  function wireEvents(p, inStock, moq, userPrice) {
-    const root = document.getElementById('detail-root');
-
-    // ---- Qty stepper (main) ----
-    const qtyInp = document.getElementById('pd-qty');
-
-    el('pd-qminus').addEventListener('click', function () {
-      const v = parseInt(qtyInp.value) || moq;
-      qtyInp.value = Math.max(moq, v - moq);
-      syncStickyQty(qtyInp.value);
+    // quantity steppers (delegated: main panel, sticky top, lightbox n/a)
+    document.addEventListener('click', function (e) {
+      var step = e.target.closest('.pdx-qty [data-step]');
+      if (!step) return;
+      var input = step.parentNode.querySelector('input');
+      var min = Number(input.min) || moq;
+      var cur = Number(input.value) || min;
+      var next = cur + Number(step.getAttribute('data-step')) * moq;
+      input.value = Math.max(min, next);
+      syncQty(input.value, input.id);
     });
-    el('pd-qplus').addEventListener('click', function () {
-      const v = parseInt(qtyInp.value) || moq;
-      qtyInp.value = v + moq;
-      syncStickyQty(qtyInp.value);
-    });
-    qtyInp.addEventListener('change', function () {
-      let v = parseInt(qtyInp.value) || moq;
-      if (v < moq) v = moq;
-      qtyInp.value = v;
-      syncStickyQty(v);
-    });
-
-    // ---- Sticky qty stepper ----
-    const swQty = document.getElementById('pd-sw-qty');
-    elMaybe('pd-sw-minus', function () {
-      const v = parseInt(swQty.value) || moq;
-      swQty.value = Math.max(moq, v - moq);
-      if (qtyInp) qtyInp.value = swQty.value;
-    });
-    elMaybe('pd-sw-plus', function () {
-      const v = parseInt(swQty.value) || moq;
-      swQty.value = v + moq;
-      if (qtyInp) qtyInp.value = swQty.value;
-    });
-    if (swQty) {
-      swQty.addEventListener('change', function () {
-        let v = parseInt(swQty.value) || moq;
+    ['pdx-qty', 'pdx-tq'].forEach(function (id) {
+      var input = $(id);
+      if (input) input.addEventListener('change', function () {
+        var v = Number(input.value) || moq;
         if (v < moq) v = moq;
-        swQty.value = v;
-        if (qtyInp) qtyInp.value = v;
+        // snap to a multiple of MOQ when MOQ enforces multiples
+        if (moq > 1) v = Math.max(moq, Math.round(v / moq) * moq);
+        input.value = v; syncQty(v, id);
       });
-    }
-
-    // ---- Add to cart ----
-    const addToCart = function () {
-      if (!inStock) return;
-      const qty = parseInt(qtyInp.value) || moq;
-      if (typeof store !== 'undefined') {
-        // Guests are redirected to login by addToCart (returns false).
-        if (store.addToCart(p._id || p.productId, qty) === false) return;
-        store.syncCounts();
-      }
-      toast(qty + ' unit(s) added to cart');
-    };
-    elMaybe('pd-add-cart', addToCart);
-    elMaybe('pd-sw-cart', addToCart);
-
-    // ---- Buy now ----
-    elMaybe('pd-buy-now', function () {
-      if (!inStock) return;
-      const qty = parseInt(qtyInp.value) || moq;
-      if (typeof store !== 'undefined') {
-        if (store.addToCart(p._id || p.productId, qty) === false) return;
-        store.syncCounts();
-      }
-      toast('Proceeding to checkout…');
     });
 
-    // ---- Wishlist ----
-    const toggleWish = function () {
-      if (typeof store !== 'undefined') {
-        const on = store.toggleWish(p._id || p.productId);
-        store.syncCounts();
-        ['pd-wish-btn', 'pd-wish-btn2'].forEach(function (id) {
-          const b = document.getElementById(id);
-          if (b) b.classList.toggle('pd-wish-on', on);
-        });
-        const lbl = document.getElementById('pd-wish-lbl');
-        if (lbl) lbl.textContent = on ? 'Wishlisted' : 'Wishlist';
-        toast(on ? 'Added to wishlist' : 'Removed from wishlist');
-      }
-    };
-    elMaybe('pd-wish-btn',  toggleWish);
-    elMaybe('pd-wish-btn2', toggleWish);
+    function currentQty() {
+      var m = $('pdx-qty'); var t = $('pdx-tq');
+      var v = Number((m && m.value) || (t && t.value) || moq) || moq;
+      return Math.max(moq, v);
+    }
 
-    // ---- Share ----
-    elMaybe('pd-share-btn', function () {
-      if (navigator.share) {
-        navigator.share({ title: p.name, url: window.location.href }).catch(function(){});
-      } else {
-        navigator.clipboard.writeText(window.location.href).then(function () {
-          toast('Link copied to clipboard');
-        }).catch(function () {
-          toast('Copy the URL to share');
-        });
+    function addToCart() {
+      if (!si.inStock) return;
+      var qty = currentQty();
+      if (typeof store !== 'undefined') {
+        if (store.addToCart(pid, qty) === false) return;   // guest → redirected to login
+        store.syncCounts();
       }
+      toastMsg(qty + ' × ' + p.name + ' added to cart');
+    }
+    ['pdx-add', 'pdx-top-add', 'pdx-mbar-add'].forEach(function (id) { var b = $(id); if (b) b.addEventListener('click', addToCart); });
+
+    // wishlist (gallery button, panel button, mobile bar)
+    function toggleWish() {
+      if (typeof store === 'undefined') return;
+      var on = store.toggleWish(pid);
+      store.syncCounts();
+      syncWishUI();
+      toastMsg(on ? 'Saved to wishlist' : 'Removed from wishlist');
+    }
+    ['pdx-wish', 'pdx-wish2', 'pdx-mbar-wish'].forEach(function (id) { var b = $(id); if (b) b.addEventListener('click', toggleWish); });
+
+    // copy SKU
+    var copyBtn = $('pdx-copy');
+    if (copyBtn) copyBtn.addEventListener('click', function () {
+      var code = copyBtn.getAttribute('data-code');
+      copyText(code, function () {
+        copyBtn.classList.add('is-done');
+        copyBtn.innerHTML = I.check;
+        toastMsg('Product code copied');
+        setTimeout(function () { copyBtn.classList.remove('is-done'); copyBtn.innerHTML = I.copy; }, 1600);
+      });
     });
 
-    // ---- Image gallery ----
-    const thumbsWrap = document.getElementById('pd-thumbs');
-    const mainImgEl  = document.getElementById('pd-main-img-el');
-    if (thumbsWrap && mainImgEl && p.images && p.images.length) {
-      thumbsWrap.addEventListener('click', function (e) {
-        const thumb = e.target.closest('.pd-thumb');
-        if (!thumb) return;
-        const idx = parseInt(thumb.dataset.idx);
-        var rawImg = p.images[idx];
-        mainImgEl.src = (rawImg && typeof rawImg === 'object') ? (rawImg.url || '') : (rawImg || '');
-        thumbsWrap.querySelectorAll('.pd-thumb').forEach(function (t) {
-          t.classList.toggle('pd-thumb-on', t === thumb);
-        });
+    // share
+    wireShare(p);
+    var share2 = $('pdx-share2');
+    if (share2) share2.addEventListener('click', function () { nativeOrCopyShare(p); });
+
+    // gallery
+    wireGallery(p);
+
+    // sticky bar visibility — show once the hero leaves the viewport, hide
+    // again over the footer so it never covers it.
+    var hero = document.querySelector('.pdx-hero');
+    var footer = $('site-footer');
+    var top = $('pdx-topbar'), mbar = $('pdx-mbar');
+    var heroGone = false, footerIn = false;
+    function sync() {
+      var show = heroGone && !footerIn;
+      toggleBar(top, show);
+      toggleBar(mbar, show);
+    }
+    if (hero && 'IntersectionObserver' in window) {
+      new IntersectionObserver(function (en) { heroGone = !en[0].isIntersecting; sync(); }, { threshold: 0 }).observe(hero);
+    }
+    if (footer && 'IntersectionObserver' in window) {
+      new IntersectionObserver(function (en) { footerIn = en[0].isIntersecting; sync(); }, { threshold: 0 }).observe(footer);
+    }
+  }
+
+  function syncQty(val, fromId) {
+    ['pdx-qty', 'pdx-tq'].forEach(function (id) { if (id !== fromId) { var e = $(id); if (e) e.value = val; } });
+  }
+
+  function syncWishUI() {
+    if (typeof store === 'undefined' || !CUR) return;
+    var pid = CUR._id || CUR.id;
+    var on = store.wishlist.indexOf(String(pid)) >= 0;
+    ['pdx-wish', 'pdx-wish2', 'pdx-mbar-wish'].forEach(function (id) {
+      var b = $(id); if (!b) return;
+      b.classList.toggle('is-on', on);
+      b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+    var lbl = $('pdx-wish-lbl'); if (lbl) lbl.textContent = on ? 'Saved' : 'Save';
+    var lbl2 = $('pdx-wish2'); if (lbl2 && lbl2.lastChild) lbl2.lastChild.textContent = on ? 'Saved to wishlist' : 'Save to wishlist';
+  }
+
+  /* ---- share ---- */
+  function productURL() { return window.location.origin + '/productdetail.html?id=' + encodeURIComponent(CUR._id || CUR.id); }
+  function copyText(t, ok) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(t).then(ok).catch(function () { window.prompt('Copy:', t); });
+    } else { window.prompt('Copy:', t); }
+  }
+  function nativeOrCopyShare(p) {
+    var url = productURL();
+    if (navigator.share) { navigator.share({ title: p.name, url: url }).catch(function () {}); return; }
+    copyText(url, function () { toastMsg('Product link copied'); });
+  }
+  function wireShare(p) {
+    var btn = $('pdx-share'), menu = $('pdx-share-menu');
+    if (!btn || !menu) return;
+    var url = productURL();
+    var wa = $('pdx-share-wa'); if (wa) wa.href = 'https://wa.me/?text=' + encodeURIComponent(p.name + ' — ' + url);
+    var ml = $('pdx-share-mail'); if (ml) ml.href = 'mailto:?subject=' + encodeURIComponent(p.name + ' — Fair Ford Pharmaceuticals') + '&body=' + encodeURIComponent(url);
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var open = menu.hidden;
+      menu.hidden = !open;
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    menu.addEventListener('click', function (e) {
+      var c = e.target.closest('[data-share="copy"]');
+      if (c) { copyText(url, function () { toastMsg('Product link copied'); }); menu.hidden = true; btn.setAttribute('aria-expanded', 'false'); }
+    });
+    document.addEventListener('click', function (e) { if (!e.target.closest('.pdx-share-wrap')) { menu.hidden = true; btn.setAttribute('aria-expanded', 'false'); } });
+  }
+
+  /* ================================================================
+     9 · GALLERY + LIGHTBOX
+     ================================================================ */
+  function wireGallery(p) {
+    var thumbs = $('pdx-thumbs');
+    var main = $('pdx-main-img');
+    if (thumbs && main) {
+      thumbs.addEventListener('click', function (e) {
+        var t = e.target.closest('.pdx-thumb[data-idx]');
+        if (!t) return;
+        var idx = Number(t.getAttribute('data-idx'));
+        if (!GAL[idx]) return;
+        main.src = GAL[idx];
+        thumbs.querySelectorAll('.pdx-thumb').forEach(function (x) { x.classList.toggle('is-on', x === t); });
+        lbIndex = idx;
       });
     }
+    var stage = $('pdx-gal-main');
+    if (stage && GAL.length) stage.addEventListener('click', function () { openLightbox(currentGalIndex()); });
+  }
 
-    // ---- Lightbox ----
-    const mainImgBox = document.getElementById('pd-main-img');
-    const lb = document.getElementById('lightbox');
-    const lbInner = document.getElementById('lb-inner');
-    if (mainImgBox && lb && lbInner && p.images && p.images.length) {
-      mainImgBox.addEventListener('click', function () {
-        const src = mainImgEl ? mainImgEl.src : p.images[0];
-        const img = document.createElement('img');
-        img.src = src;
-        img.style.cssText = 'max-width:90vw;max-height:80vh;border-radius:12px;display:block;';
-        // clear previous image
-        lbInner.querySelectorAll('img').forEach(function (i) { i.remove(); });
-        lbInner.appendChild(img);
-        lb.style.display = 'flex';
-        lb.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;display:flex;align-items:center;justify-content:center;';
-      });
-      document.getElementById('lb-close').addEventListener('click', function () {
-        lb.style.display = 'none';
-      });
-      lb.addEventListener('click', function (e) {
-        if (e.target === lb) lb.style.display = 'none';
-      });
+  function currentGalIndex() {
+    var on = document.querySelector('#pdx-thumbs .pdx-thumb.is-on');
+    return on ? Number(on.getAttribute('data-idx')) || 0 : 0;
+  }
+
+  var lbIndex = 0, lbZoom = 1;
+
+  function ensureLightbox() {
+    var lb = $('pdx-lightbox');
+    if (lb) return lb;
+    lb = document.createElement('div');
+    lb.className = 'pdx-lb'; lb.id = 'pdx-lightbox';
+    lb.setAttribute('role', 'dialog'); lb.setAttribute('aria-modal', 'true'); lb.setAttribute('aria-label', 'Product image viewer');
+    lb.innerHTML =
+      '<span class="pdx-lb-count" id="pdx-lb-count"></span>' +
+      '<button type="button" class="pdx-lb-close" id="pdx-lb-close" aria-label="Close">' +
+        '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>' +
+      '<button type="button" class="pdx-lb-nav pdx-lb-prev" id="pdx-lb-prev" aria-label="Previous"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>' +
+      '<div class="pdx-lb-stage"><img class="pdx-lb-img" id="pdx-lb-img" alt=""></div>' +
+      '<button type="button" class="pdx-lb-nav pdx-lb-next" id="pdx-lb-next" aria-label="Next"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>' +
+      '<div class="pdx-lb-zoom"><button type="button" id="pdx-lb-zout" aria-label="Zoom out">−</button><button type="button" id="pdx-lb-zin" aria-label="Zoom in">+</button></div>' +
+      '<div class="pdx-lb-thumbs" id="pdx-lb-thumbs"></div>';
+    document.body.appendChild(lb);
+
+    $('pdx-lb-close').addEventListener('click', closeLightbox);
+    $('pdx-lb-prev').addEventListener('click', function () { lbGo(-1); });
+    $('pdx-lb-next').addEventListener('click', function () { lbGo(1); });
+    $('pdx-lb-zin').addEventListener('click', function () { setZoom(lbZoom + 0.4); });
+    $('pdx-lb-zout').addEventListener('click', function () { setZoom(lbZoom - 0.4); });
+    lb.addEventListener('click', function (e) { if (e.target === lb) closeLightbox(); });
+    $('pdx-lb-thumbs').addEventListener('click', function (e) {
+      var t = e.target.closest('[data-lb]'); if (!t) return; lbIndex = Number(t.getAttribute('data-lb')); paintLightbox();
+    });
+    document.addEventListener('keydown', function (e) {
+      if ($('pdx-lightbox') && $('pdx-lightbox').classList.contains('is-open')) {
+        if (e.key === 'Escape') closeLightbox();
+        else if (e.key === 'ArrowLeft') lbGo(-1);
+        else if (e.key === 'ArrowRight') lbGo(1);
+      }
+    });
+    return lb;
+  }
+
+  function openLightbox(idx) {
+    if (!GAL.length) return;
+    ensureLightbox();
+    lbIndex = idx || 0; lbZoom = 1;
+    var thumbs = GAL.map(function (u, i) {
+      return '<div class="pdx-lb-thumb" data-lb="' + i + '"><img src="' + esc(u) + '" alt=""></div>';
+    }).join('');
+    $('pdx-lb-thumbs').innerHTML = thumbs;
+    paintLightbox();
+    $('pdx-lightbox').classList.add('is-open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeLightbox() {
+    var lb = $('pdx-lightbox'); if (lb) lb.classList.remove('is-open');
+    document.body.style.overflow = '';
+  }
+  function lbGo(d) { lbIndex = (lbIndex + d + GAL.length) % GAL.length; lbZoom = 1; paintLightbox(); }
+  function setZoom(z) {
+    lbZoom = Math.max(1, Math.min(3, z));
+    var img = $('pdx-lb-img'); if (!img) return;
+    img.style.transform = 'scale(' + lbZoom + ')';
+    img.classList.toggle('is-zoomed', lbZoom > 1);
+  }
+  function paintLightbox() {
+    var img = $('pdx-lb-img'); if (!img) return;
+    lbZoom = 1; img.style.transform = ''; img.classList.remove('is-zoomed');
+    img.src = GAL[lbIndex];
+    $('pdx-lb-count').textContent = (lbIndex + 1) + ' / ' + GAL.length;
+    var prev = $('pdx-lb-prev'), next = $('pdx-lb-next');
+    if (prev) prev.style.display = GAL.length > 1 ? '' : 'none';
+    if (next) next.style.display = GAL.length > 1 ? '' : 'none';
+    document.querySelectorAll('#pdx-lb-thumbs [data-lb]').forEach(function (t) {
+      t.classList.toggle('is-on', Number(t.getAttribute('data-lb')) === lbIndex);
+    });
+    // keep the main hero + active thumb in sync
+    var main = $('pdx-main-img'); if (main) main.src = GAL[lbIndex];
+    document.querySelectorAll('#pdx-thumbs .pdx-thumb[data-idx]').forEach(function (t) {
+      t.classList.toggle('is-on', Number(t.getAttribute('data-idx')) === lbIndex);
+    });
+  }
+
+  /* ================================================================
+     10 · RAILS — related / also-like / recently viewed  (ffm cards)
+     ================================================================ */
+  function recordRecent(id) {
+    if (!id) return;
+    var list = readJSON('ff_recent', []).filter(function (x) { return x !== String(id); });
+    list.unshift(String(id));
+    writeJSON('ff_recent', list.slice(0, 12));
+  }
+
+  function priceCardHTML(pr) {
+    var mrp = Number(pr.mrp || 0);
+    var trade = IS_DIST ? pr.distributorPrice : pr.retailerPrice;
+    var price = (!IS_ANON && trade) ? Number(trade) : mrp;
+    if (IS_ANON) {
+      return '<div class="ffm-price"><div class="ffm-price-row"><span class="ffm-price-main">' + money(price).replace('.00', '') + '</span><span class="ffm-price-tag">MRP</span></div>' +
+        '<p class="ffm-price-note">Sign in for trade price</p></div>';
     }
+    var save = (mrp > price) ? Math.round(((mrp - price) / mrp) * 100) : 0;
+    return '<div class="ffm-price"><div class="ffm-price-row"><span class="ffm-price-main">' + money(price).replace('.00', '') + '</span>' +
+      (mrp > price ? '<span class="ffm-price-mrp">' + money(mrp).replace('.00', '') + '</span>' : '') +
+      (save > 0 ? '<span class="ffm-price-save">' + save + '% off</span>' : '') + '</div></div>';
+  }
 
-    // ---- Tabs ----
-    const tabsNav = document.querySelector('.pd-tabs-nav');
-    if (tabsNav) {
-      tabsNav.addEventListener('click', function (e) {
-        const btn = e.target.closest('.pd-tab-btn');
-        if (!btn) return;
-        const id = btn.dataset.tab;
-        tabsNav.querySelectorAll('.pd-tab-btn').forEach(function (b) {
-          b.classList.toggle('pd-tab-on', b === btn);
-          b.setAttribute('aria-selected', b === btn ? 'true' : 'false');
-        });
-        root.querySelectorAll('.pd-tab-pane').forEach(function (pane) {
-          pane.classList.toggle('pd-pane-on', pane.id === 'pd-pane-' + id);
-        });
-      });
-    }
+  function ffmCard(pr) {
+    var href = 'productdetail.html?id=' + encodeURIComponent(pr.id);
+    var comp = Array.isArray(pr.composition) ? pr.composition.filter(Boolean).join(' + ') : (pr.composition || '');
+    var si = { cls: pr.stockStatus === 'Out of Stock' ? 'out' : pr.stockStatus === 'Low Stock' ? 'low' : 'in', label: pr.stockStatus || 'In Stock' };
+    var media = pr.image
+      ? '<img src="' + esc(pr.image) + '" alt="' + esc(pr.name) + '" class="ffm-card-img" loading="lazy" data-cat="' + esc(pr.category) + '" data-fallback-class="ffm-card-svg" onerror="productImgFallback(this)">'
+      : '<div class="ffm-card-svg">' + (typeof productImageSVG === 'function' ? productImageSVG(pr.category) : '') + '</div>';
+    return '<article class="ffm-card">' +
+      '<div class="ffm-card-media"><a class="ffm-card-imglink" href="' + href + '">' + media + '</a></div>' +
+      '<div class="ffm-card-body">' +
+        '<div class="ffm-card-top"><span class="ffm-cat">' + esc(pr.category) + '</span>' +
+          '<span class="ffm-stock ffm-stock--' + si.cls + '"><i></i>' + esc(si.label) + '</span></div>' +
+        '<h3 class="ffm-card-name"><a href="' + href + '">' + esc(pr.name) + '</a></h3>' +
+        (comp ? '<p class="ffm-card-comp" title="' + esc(comp) + '">' + esc(comp) + '</p>' : '<p class="ffm-card-comp ffm-card-comp--none">Composition not listed</p>') +
+        (real(pr.packSize) ? '<dl class="ffm-card-specs"><div class="ffm-spec"><dt>Pack</dt><dd>' + esc(pr.packSize) + '</dd></div></dl>' : '') +
+        priceCardHTML(pr) +
+        '<div class="ffm-card-actions"><a class="ffm-card-view" href="' + href + '" style="margin-top:4px">View details ' + I.arrow + '</a></div>' +
+      '</div></article>';
+  }
 
-    // ---- FAQ accordion ----
-    const faqList = document.getElementById('pd-faq-list');
-    if (faqList) {
-      faqList.addEventListener('click', function (e) {
-        const btn = e.target.closest('.pd-faq-q');
-        if (!btn) return;
-        const idx = btn.dataset.faq;
-        const item = document.getElementById('pd-faq-' + idx);
-        const ans  = document.getElementById('pd-faq-a-' + idx);
-        if (!item || !ans) return;
-        const isOpen = item.classList.contains('pd-faq-open');
-        // close all
-        faqList.querySelectorAll('.pd-faq-item').forEach(function (it) {
-          it.classList.remove('pd-faq-open');
-          it.querySelector('.pd-faq-a').style.maxHeight = '0';
-          it.querySelector('.pd-faq-q').setAttribute('aria-expanded', 'false');
-        });
-        // open clicked if was closed
-        if (!isOpen) {
-          item.classList.add('pd-faq-open');
-          ans.style.maxHeight = ans.scrollHeight + 'px';
-          btn.setAttribute('aria-expanded', 'true');
-        }
-      });
-    }
+  function railSection(id, title, sub, items) {
+    if (!items.length) return '';
+    return '<section class="pdx-section ffm"><div class="pdx-wrap">' +
+      '<div class="pdx-rail-head"><div>' +
+        '<span class="pdx-eyebrow">' + esc(sub) + '</span>' +
+        '<h2>' + esc(title) + '</h2></div>' +
+        '<div class="pdx-rail-nav">' +
+          '<button type="button" class="pdx-rail-btn" data-rail="' + id + '" data-dir="-1" aria-label="Scroll left"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>' +
+          '<button type="button" class="pdx-rail-btn" data-rail="' + id + '" data-dir="1" aria-label="Scroll right"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="ffm-rail" id="' + id + '">' + items.map(ffmCard).join('') + '</div>' +
+    '</div></section>';
+  }
 
-    // ---- Sticky widget show/hide on scroll ----
-    // Show when hero scrolls out of view; hide again when footer becomes visible
-    // so the footer is never obscured.
-    const hero    = document.querySelector('.pd-hero');
-    const footer  = document.getElementById('site-footer');
-    const stickyW = document.getElementById('pd-sticky-widget');
+  function loadRails(p, cat) {
+    if (typeof getAllProducts !== 'function') return;
+    Promise.resolve(getAllProducts()).then(function (all) {
+      if (!Array.isArray(all) || !all.length) return;
+      var curId = String(p._id || p.id);
+      var mySalts = compositionArr(p).map(function (s) { return parseSalt(s).name.toLowerCase(); }).filter(Boolean);
 
-    if (stickyW) {
-      var heroGone     = false;
-      var footerInView = false;
+      var related = all.filter(function (x) { return x.id !== curId && x.category === cat; }).slice(0, 10);
 
-      function syncSticky() {
-        var visible = heroGone && !footerInView;
-        stickyW.classList.toggle('pd-sw-visible', visible);
-        document.body.classList.toggle('pd-sw-active', visible);
+      var relatedIds = {}; related.forEach(function (x) { relatedIds[x.id] = 1; });
+      var alsoLike = all.filter(function (x) {
+        if (x.id === curId || relatedIds[x.id]) return false;
+        var xs = (Array.isArray(x.composition) ? x.composition : []).map(function (s) { return parseSalt(s).name.toLowerCase(); });
+        return xs.some(function (s) { return mySalts.indexOf(s) >= 0; });
+      }).slice(0, 10);
+      if (alsoLike.length < 4) {
+        // top up with other in-stock products so the strip is never sparse
+        var extra = all.filter(function (x) { return x.id !== curId && !relatedIds[x.id] && alsoLike.indexOf(x) < 0; }).slice(0, 10 - alsoLike.length);
+        alsoLike = alsoLike.concat(extra);
       }
 
-      if (hero) {
-        new IntersectionObserver(function (entries) {
-          heroGone = !entries[0].isIntersecting;
-          syncSticky();
-        }, { threshold: 0 }).observe(hero);
+      var byId = {}; all.forEach(function (x) { byId[x.id] = x; });
+      var recent = readJSON('ff_recent', []).filter(function (id) { return id !== curId; })
+        .map(function (id) { return byId[id]; }).filter(Boolean).slice(0, 8);
+
+      $('pdx-rails').innerHTML =
+        railSection('pdx-rail-related', 'Related products', 'More in ' + (cat || 'this category'), related) +
+        railSection('pdx-rail-also', 'You may also like', 'Similar formulations', alsoLike) +
+        railSection('pdx-rail-recent', 'Recently viewed', 'Pick up where you left off', recent);
+
+      wireRails();
+    }).catch(function () { /* rails are enhancement only */ });
+  }
+
+  function wireRails() {
+    document.querySelectorAll('[data-rail]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var rail = $(btn.getAttribute('data-rail')); if (!rail) return;
+        rail.scrollBy({ left: Number(btn.getAttribute('data-dir')) * rail.clientWidth * 0.8, behavior: 'smooth' });
+      });
+    });
+    document.querySelectorAll('.ffm-rail').forEach(function (rail) {
+      function upd() {
+        document.querySelectorAll('[data-rail="' + rail.id + '"]').forEach(function (b) {
+          var dir = Number(b.getAttribute('data-dir'));
+          b.disabled = dir < 0 ? rail.scrollLeft <= 2 : rail.scrollLeft + rail.clientWidth >= rail.scrollWidth - 2;
+        });
       }
-
-      if (footer) {
-        new IntersectionObserver(function (entries) {
-          footerInView = entries[0].isIntersecting;
-          syncSticky();
-        }, { threshold: 0 }).observe(footer);
-      }
-    }
+      rail.addEventListener('scroll', debounce(upd, 90), { passive: true });
+      upd();
+    });
   }
 
-  // ── Helpers ───────────────────────────────────────────────────────────────
-
-  function el(id) { return document.getElementById(id); }
-
-  function elMaybe(id, fn) {
-    const node = document.getElementById(id);
-    if (node) node.addEventListener('click', fn);
-  }
-
-  function syncStickyQty(val) {
-    const swQ = document.getElementById('pd-sw-qty');
-    if (swQ) swQ.value = val;
-  }
-
-  function buildStars(rating) {
-    const full  = Math.floor(rating);
-    const half  = rating - full >= 0.5 ? 1 : 0;
-    const empty = 5 - full - half;
-    return '★'.repeat(full).split('').map(function (s) { return `<span class="pd-star pd-star-full">${s}</span>`; }).join('') +
-           (half ? '<span class="pd-star pd-star-half">★</span>' : '') +
-           '☆'.repeat(empty).split('').map(function (s) { return `<span class="pd-star pd-star-empty">${s}</span>`; }).join('');
-  }
-
-  function categoryIcon(cat) {
-    const name = cat && typeof cat === 'object' ? (cat.categoryName || '') : String(cat || '');
-    if (typeof productImageSVG === 'function') return productImageSVG(name);
-    return '<svg viewBox="0 0 48 22" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="48" height="22" rx="11" fill="#0F4C81"/><rect width="24" height="22" rx="11" fill="rgba(255,255,255,.18)"/><line x1="24" y1="2" x2="24" y2="20" stroke="rgba(255,255,255,.35)" stroke-width="1"/></svg>';
-  }
-
-  // ── State helpers ─────────────────────────────────────────────────────────
-
+  /* ================================================================
+     11 · SKELETON + STATES
+     ================================================================ */
   function showSkeleton() {
-    const sk = document.getElementById('detail-skeleton');
-    if (sk) sk.style.display = '';
-    const root = document.getElementById('detail-root');
-    if (root) root.hidden = true;
+    var sk = $('detail-skeleton');
+    if (sk) {
+      sk.style.display = '';
+      sk.innerHTML =
+        '<div class="pdx-wrap"><div class="pdx-skeleton">' +
+          '<div class="pdx-sk" style="height:14px;width:280px;margin:20px 0"></div>' +
+          '<div class="pdx-sk-hero">' +
+            '<div><div class="pdx-sk pdx-sk-gal"></div><div class="pdx-sk-thumbs">' +
+              '<div class="pdx-sk pdx-sk-thumb"></div><div class="pdx-sk pdx-sk-thumb"></div><div class="pdx-sk pdx-sk-thumb"></div><div class="pdx-sk pdx-sk-thumb"></div>' +
+            '</div></div>' +
+            '<div>' +
+              '<div class="pdx-sk" style="height:20px;width:120px"></div>' +
+              '<div class="pdx-sk" style="height:34px;width:80%;margin-top:14px"></div>' +
+              '<div class="pdx-sk" style="height:46px;width:100%;margin-top:16px;border-radius:12px"></div>' +
+              '<div class="pdx-sk" style="height:60px;width:60%;margin-top:16px"></div>' +
+              '<div class="pdx-sk" style="height:200px;width:100%;margin-top:18px;border-radius:16px"></div>' +
+            '</div>' +
+          '</div>' +
+        '</div></div>';
+    }
+    var root = $('detail-root'); if (root) root.hidden = true;
   }
+  function hideSkeleton() { var sk = $('detail-skeleton'); if (sk) sk.style.display = 'none'; }
 
-  function hideSkeleton() {
-    const sk = document.getElementById('detail-skeleton');
-    if (sk) sk.style.display = 'none';
-  }
-
-  function showError(msg) {
+  function showState(kind) {
     hideSkeleton();
-    const root = document.getElementById('detail-root');
-    if (!root) return;
-    root.innerHTML = `
-      <div style="text-align:center;padding:72px 24px;">
-        <div style="width:80px;height:80px;border-radius:24px;background:rgba(220,38,38,.08);border:1.5px dashed rgba(220,38,38,.28);display:grid;place-items:center;margin:0 auto 20px;">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="36" height="36"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-        </div>
-        <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.4rem;font-weight:800;color:#111827;margin-bottom:8px;letter-spacing:-.02em;">Unable to Load Product</h2>
-        <p style="color:#6B7280;margin-bottom:24px;font-size:.9rem;line-height:1.65;">${msg}</p>
-        <a href="product.html" style="display:inline-flex;align-items:center;gap:8px;padding:11px 26px;background:linear-gradient(135deg,#1565C0,#0F4C81);color:#fff;font-size:.85rem;font-weight:700;border-radius:10px;text-decoration:none;box-shadow:0 4px 14px rgba(15,76,129,.3);">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-          Browse Products
-        </a>
-      </div>`;
+    var root = $('detail-root'); if (!root) return;
+    var map = {
+      error:       { ico: 'err',  glyph: warnIco2(), title: 'Unable to load product', body: 'We could not load this product right now. This is usually a temporary connection problem.',
+                     actions: '<button type="button" class="pdx-btn pdx-btn-primary" onclick="location.reload()">Retry</button><a class="pdx-btn pdx-btn-ghost" href="product.html">Browse all products</a>' },
+      notfound:    { ico: 'info', glyph: searchGlyph(), title: 'Product not found', body: 'The product you are looking for does not exist or may have been removed from the catalogue.',
+                     actions: '<a class="pdx-btn pdx-btn-primary" href="product.html">Browse all products</a><a class="pdx-btn pdx-btn-ghost" href="index.html">Go home</a>' },
+      unavailable: { ico: 'warn', glyph: boxGlyph(), title: 'Product temporarily unavailable', body: 'This product is currently unavailable for ordering. Our team can help you find an equivalent or tell you when it returns.',
+                     actions: '<a class="pdx-btn pdx-btn-primary" href="contactus.html">Contact sales</a><a class="pdx-btn pdx-btn-ghost" href="product.html">Browse all products</a>' },
+      session:     { ico: 'info', glyph: lockGlyph(), title: 'Session expired', body: 'Your session has expired. Please sign in again to see your trade pricing and continue.',
+                     actions: '<a class="pdx-btn pdx-btn-primary" href="login&signup.html">Log in again</a><a class="pdx-btn pdx-btn-ghost" href="product.html">Browse products</a>' }
+    };
+    var s = map[kind] || map.error;
+    root.innerHTML = '<div class="pdx-wrap"><div class="pdx-state">' +
+      '<div class="pdx-state-ico pdx-state-ico--' + s.ico + '">' + s.glyph + '</div>' +
+      '<h2>' + esc(s.title) + '</h2><p>' + esc(s.body) + '</p>' +
+      '<div class="pdx-state-actions">' + s.actions + '</div></div></div>';
     root.hidden = false;
+    document.body.classList.remove('pdx-mbar-space');
+    ['pdx-topbar', 'pdx-mbar'].forEach(function (id) { var e = $(id); if (e) e.remove(); });
   }
-
-  function showSessionExpired() {
-    hideSkeleton();
-    const root = document.getElementById('detail-root');
-    if (!root) return;
-    root.innerHTML = `
-      <div style="text-align:center;padding:72px 24px;">
-        <div style="width:80px;height:80px;border-radius:24px;background:rgba(15,76,129,.08);border:1.5px dashed rgba(15,76,129,.25);display:grid;place-items:center;margin:0 auto 20px;">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#0F4C81" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="36" height="36"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        </div>
-        <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.4rem;font-weight:800;color:#111827;margin-bottom:8px;letter-spacing:-.02em;">Session Expired</h2>
-        <p style="color:#6B7280;margin-bottom:24px;font-size:.9rem;line-height:1.65;">Your session has expired. Please login again to continue.</p>
-        <a href="login&amp;signup.html" style="display:inline-flex;align-items:center;gap:8px;padding:11px 26px;background:linear-gradient(135deg,#1565C0,#0F4C81);color:#fff;font-size:.85rem;font-weight:700;border-radius:10px;text-decoration:none;box-shadow:0 4px 14px rgba(15,76,129,.3);">
-          Login Again
-        </a>
-      </div>`;
-    root.hidden = false;
-  }
-
-  function showUnauthorized() {
-    hideSkeleton();
-    const root = document.getElementById('detail-root');
-    if (!root) return;
-    root.innerHTML = `
-      <div style="text-align:center;padding:72px 24px;">
-        <div style="width:80px;height:80px;border-radius:24px;background:rgba(220,38,38,.06);border:1.5px dashed rgba(220,38,38,.22);display:grid;place-items:center;margin:0 auto 20px;">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="36" height="36"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
-        </div>
-        <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.4rem;font-weight:800;color:#111827;margin-bottom:8px;letter-spacing:-.02em;">Unauthorized Access</h2>
-        <p style="color:#6B7280;margin-bottom:24px;font-size:.9rem;line-height:1.65;">You don't have permission to view this product.</p>
-        <a href="index.html" style="display:inline-flex;align-items:center;gap:8px;padding:11px 26px;background:linear-gradient(135deg,#1565C0,#0F4C81);color:#fff;font-size:.85rem;font-weight:700;border-radius:10px;text-decoration:none;box-shadow:0 4px 14px rgba(15,76,129,.3);">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-          Go Home
-        </a>
-      </div>`;
-    root.hidden = false;
-  }
-
-  // ── Utilities ─────────────────────────────────────────────────────────────
-
-  function esc(str) {
-    if (!str) return '';
-    return String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
-  }
-
-  function fmtDate(val) {
-    if (!val) return '';
-    const d = new Date(val);
-    if (isNaN(d)) return String(val);
-    return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
-  }
-
-  function toast(msg) {
-    if (typeof window.toast === 'function') { window.toast(msg); return; }
-    const el2 = document.createElement('div');
-    el2.textContent = msg;
-    el2.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;padding:10px 22px;border-radius:8px;font-size:.9rem;z-index:9999;pointer-events:none;box-shadow:0 4px 16px rgba(0,0,0,.25);';
-    document.body.appendChild(el2);
-    setTimeout(function () { el2.remove(); }, 2800);
-  }
+  function warnIco2() { return '<svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h16.9a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>'; }
+  function searchGlyph() { return '<svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3M8 11h6"/></svg>'; }
+  function boxGlyph() { return '<svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m21 8-9-5-9 5 9 5 9-5zM3 8v8l9 5 9-5V8M12 13v8"/></svg>'; }
+  function lockGlyph() { return '<svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>'; }
 });

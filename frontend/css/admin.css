@@ -18,7 +18,7 @@
 }
 * { box-sizing: border-box; }
 html { height: 100%; overflow: hidden; }
-body { margin: 0; height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); overflow: hidden; }
+body { margin: 0; height: 100%; font-family: var(--ff-font-body, 'Inter', system-ui, sans-serif); background: var(--bg); color: var(--text); overflow: hidden; }
 
 /* Header */
 .ad-header { display: flex; align-items: center; justify-content: space-between; background: var(--primary); color: #fff; padding: 14px 24px; }
@@ -37,7 +37,7 @@ body { margin: 0; height: 100%; font-family: -apple-system, BlinkMacSystemFont, 
   background: #0F172A;
   position: relative;
   overflow: hidden;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: var(--ff-font-body, 'Inter', system-ui, sans-serif);
 }
 
 /* ── LEFT PANEL ── */
@@ -78,11 +78,11 @@ body { margin: 0; height: 100%; font-family: -apple-system, BlinkMacSystemFont, 
   width:52px;height:52px;
   display:flex;align-items:center;justify-content:center;flex-shrink:0;
 }
-.adl-left-co     { font-size:20px;font-weight:800;color:white;line-height:1.1;letter-spacing:-.3px; }
+.adl-left-co     { font-size:20px;font-weight: 700;color:white;line-height:1.1;letter-spacing:-.3px; }
 .adl-left-co-sub { font-size:11px;font-weight:500;color:rgba(255,255,255,.55);letter-spacing:.5px;margin-top:3px; }
 
 .adl-left-hero { position:relative;z-index:2; }
-.adl-left-h { font-size:30px;font-weight:900;color:white;line-height:1.2;letter-spacing:-1px;margin:0 0 8px; }
+.adl-left-h { font-size:30px;font-weight: 700;color:white;line-height:1.2;letter-spacing:-1px;margin:0 0 8px; }
 .adl-left-h em {
   font-style:normal;
   background:linear-gradient(90deg,#93C5FD,#C4B5FD);
@@ -178,7 +178,7 @@ body { margin: 0; height: 100%; font-family: -apple-system, BlinkMacSystemFont, 
   border:1px solid rgba(37,99,235,.12);margin-bottom:12px;
   box-shadow:0 4px 16px rgba(37,99,235,.12);
 }
-.adlc-h1  { font-size:25px;font-weight:800;color:#0F172A;margin:0 0 7px;letter-spacing:-.5px;line-height:1.2; }
+.adlc-h1  { font-size:25px;font-weight: 700;color:#0F172A;margin:0 0 7px;letter-spacing:-.5px;line-height:1.2; }
 .adlc-sub { font-size:13.5px;color:#64748B;margin:0;line-height:1.55; }
 
 /* Error message */
@@ -198,7 +198,7 @@ body { margin: 0; height: 100%; font-family: -apple-system, BlinkMacSystemFont, 
 .adlc-input {
   width:100%;height:58px;padding:24px 14px 8px 46px;
   border:1.5px solid #E2E8F0;border-radius:13px;
-  font-size:14px;font-family:'Inter',-apple-system,sans-serif;
+  font-size:14px;font-family: var(--ff-font-body, 'Inter', system-ui, sans-serif);
   color:#1E293B;background:#F8FAFC;
   transition:border-color .2s,box-shadow .2s,background .2s;
   position:relative;z-index:1;
@@ -260,7 +260,7 @@ body { margin: 0; height: 100%; font-family: -apple-system, BlinkMacSystemFont, 
 /* Submit button */
 .adl-btn {
   width:100%;height:52px;border-radius:13px;
-  font-family:'Inter',-apple-system,sans-serif;
+  font-family: var(--ff-font-body, 'Inter', system-ui, sans-serif);
   font-size:15px;font-weight:700;color:#fff;
   background:linear-gradient(135deg,#2563EB 0%,#1D4ED8 100%);
   border:none;cursor:pointer;
@@ -355,7 +355,7 @@ body { margin: 0; height: 100%; font-family: -apple-system, BlinkMacSystemFont, 
 /* Metrics */
 .ad-metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-bottom: 22px; }
 .ad-metric { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; }
-.ad-metric .v { font-size: 24px; font-weight: 800; color: var(--primary); }
+.ad-metric .v { font-size: 24px; font-weight: 700; color: var(--primary); }
 .ad-metric .l { font-size: 12px; color: var(--muted); margin-top: 2px; }
 
 /* Tabs */

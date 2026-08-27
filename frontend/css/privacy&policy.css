@@ -8,7 +8,7 @@
 body {
     background: #F4F8FF;
     color: #1F2937;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-family: var(--ff-font-body, 'Inter', system-ui, sans-serif);
     line-height: 1.7;
 }
 
@@ -113,7 +113,7 @@ body {
 
 .pp-hero h1 {
     font-size: clamp(38px, 6vw, 68px);
-    font-weight: 800;
+    font-weight: 700;
     line-height: 1.08;
     letter-spacing: -0.025em;
     margin-bottom: 18px;
@@ -177,7 +177,7 @@ body {
     gap: 8px;
     padding: 13px 26px;
     border-radius: 50px;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--ff-font-body, 'Inter', system-ui, sans-serif);
     font-size: 14.5px;
     font-weight: 600;
     text-decoration: none;
@@ -632,7 +632,7 @@ body {
     border-radius: 50px;
     background: linear-gradient(135deg, #0F4C81, #3FA9F5);
     color: #fff;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--ff-font-body, 'Inter', system-ui, sans-serif);
     font-size: 14.5px;
     font-weight: 600;
     text-decoration: none;
@@ -755,14 +755,12 @@ body {
 .pp-footer-fallback a:hover { color: #3FA9F5; }
 
 /* ── Reveal Animation ── */
+/* Reveal-on-scroll is a progressive enhancement handled via the Web
+   Animations API in privacy&policy.js. Content is fully visible by default
+   so the legal text is never hidden if JS or the IntersectionObserver fails
+   to run (and so it renders in transition-freezing preview engines); JS
+   plays the entrance animation when each card scrolls into view. */
 .reveal {
-    opacity: 0;
-    transform: translateY(28px);
-    transition: opacity 0.62s cubic-bezier(0.22, 1, 0.36, 1),
-                transform 0.62s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.reveal.active {
     opacity: 1;
     transform: none;
 }

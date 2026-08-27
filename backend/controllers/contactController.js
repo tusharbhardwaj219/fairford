@@ -5,14 +5,19 @@ const { sendAdminNotification, sendUserAutoReply } = require('../services/emailS
 // POST /api/contact — Submit contact form
 const submitContact = async (req, res, next) => {
     try {
-        const { name, email, phone, message, inquiryType } = req.body;
+        const { name, email, phone, message, inquiryType,
+                company, businessType, city, productRequirement } = req.body;
 
         const contact = await Contact.create({
             name,
             email,
             phone,
             message,
-            inquiryType: inquiryType || 'Business Inquiry',
+            inquiryType: inquiryType || 'General Inquiry',
+            company,
+            businessType,
+            city,
+            productRequirement,
             ipAddress: req.ip || req.headers['x-forwarded-for'],
             userAgent: req.headers['user-agent'],
         });

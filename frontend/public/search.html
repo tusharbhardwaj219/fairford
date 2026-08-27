@@ -21,14 +21,21 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="description" content="Search Fair Ford Pharmaceuticals' catalogue of 160+ WHO-GMP certified medicines, supplements and healthcare products by name, brand or category." />
     <title>Fair Ford — Search</title>
+    <link rel="canonical" href="https://www.fairfordpharma.com/search.html" />
+    <meta name="robots" content="index, follow" />
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <!-- Font Awesome was loaded here but this page uses no fa-* class, in the
+         markup or in search.js. The icons on it are inline SVG. -->
+
+    <link rel="stylesheet" href="/frontend/css/typography.css">
     <link rel="stylesheet" href="/frontend/css/style.css">
     <link rel="stylesheet" href="/frontend/css/search.css">
     <link rel="icon" type="image/png" href="https://res.cloudinary.com/dp4yririh/image/upload/v1782967649/fairford/site/m5d8pmtzdjr4dcgctvuc.png">
+  <!-- Page loader (see css/loader.css + js/loader.js). Not deferred:
+       the overlay must exist before first paint. -->
+  <link rel="stylesheet" href="/frontend/css/loader.css" />
+  <link rel="stylesheet" href="/frontend/css/footer.css">
+  <script src="/frontend/js/loader.js"></script>
 </head>
 
 <body><!-- Google Tag Manager (noscript) -->

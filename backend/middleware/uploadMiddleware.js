@@ -84,6 +84,14 @@ exports.uploadPrescriptionImage = prescriptionUpload.single('prescription');
 exports.uploadSingleImage    = productUpload.single('image');
 exports.uploadMultipleImages = productUpload.array('images', 5);
 
+// Gallery upload for the Super Admin 4-slot image manager. Uses .any() so the
+// controller can match uploaded files to slots by their field name (image_0..)
+// via the accompanying `imagesPlan` — and so a stray field never triggers
+// multer's "Unexpected field" error. The productUpload fileFilter (JPG/PNG/WebP
+// only) and 5 MB limit still apply per file; the controller caps the gallery at
+// four and cleans up any file left unreferenced.
+exports.uploadProductGallery = productUpload.any();
+
 exports.handleUploadError = (err, req, res, next) => {
   if (err instanceof multer.MulterError) {
     if (err.code === 'LIMIT_FILE_SIZE')  return res.status(400).json({ success: false, message: 'File size exceeds 5 MB limit.' });

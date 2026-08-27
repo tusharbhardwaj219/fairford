@@ -23,10 +23,24 @@ const contactSchema = new mongoose.Schema(
             required: [true, 'Message is required'],
             maxlength: [500, 'Message cannot exceed 500 characters']
         },
+        // Optional structured B2B lead fields captured by the redesigned
+        // business-inquiry form. All optional so older/simple submissions and
+        // any other caller keep working unchanged.
+        company: { type: String, trim: true, maxlength: 150 },
+        businessType: { type: String, trim: true, maxlength: 60 },
+        city: { type: String, trim: true, maxlength: 120 },
+        productRequirement: { type: String, trim: true, maxlength: 250 },
         inquiryType: {
             type: String,
-            enum: ['Consultation', 'Business Inquiry', 'Support'],
-            default: 'Business Inquiry'
+            // Superset: the eight business categories the contact form now
+            // offers, plus the three legacy values so existing records and the
+            // admin filter keep resolving.
+            enum: [
+                'Distributor Inquiry', 'Retailer Support', 'Hospital/Institutional Inquiry',
+                'Bulk Order', 'Product Inquiry', 'Business Partnership', 'General Inquiry', 'Other',
+                'Consultation', 'Business Inquiry', 'Support'
+            ],
+            default: 'General Inquiry'
         },
         status: {
             type: String,
