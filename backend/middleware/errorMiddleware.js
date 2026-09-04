@@ -2,6 +2,14 @@ const errorMiddleware = (err, req, res, next) => {
   let statusCode = err.statusCode || 500;
   let message    = err.message    || 'Internal Server Error';
 
+  // Log every 5xx server-side (stdout → Cloud Run logs). The client response
+  // below still hides internals in production; this only makes the failure
+  // visible to operators, which it previously was NOT (a silent 500 with no
+  // trace anywhere). 4xx are client faults and stay quiet to avoid log noise.
+  if ((err.statusCode || 500) >= 500) {
+    console.error('[error]', req.method, req.originalUrl, '→', err && (err.stack || err.message || err));
+  }
+
   if (err.name === 'ValidationError') {
     statusCode = 400;
     message = Object.values(err.errors).map(e => e.message).join(', ');
