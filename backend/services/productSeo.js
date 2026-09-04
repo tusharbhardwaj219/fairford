@@ -80,6 +80,46 @@ function buildProductSeo(p) {
   };
 }
 
+// HTML-escape for text content (between tags). Same as attr minus the quote,
+// but escaping quotes too is harmless and keeps one code path.
+const esc = attr;
+
+/* Build the server-rendered crawlable body block (a real <h1> + product facts)
+   that fills #pdx-ssr inside the loading skeleton. Only on-page facts already
+   present on the record are emitted — nothing invented. */
+function buildProductBody(p) {
+  const name = real(p.name) || 'Product';
+  const cat = catOf(p);
+  const comp = compText(p);
+  const bits = [
+    ['Composition', comp],
+    ['Category', cat],
+    ['Strength', real(p.strength)],
+    ['Pack size', real(p.packSize)],
+    ['Dosage form', real(p.dosageForm)]
+  ].filter(([, v]) => v);
+
+  const crumb = 'Home &rsaquo; <a href="/product.html" style="color:inherit;text-decoration:none;">Products</a>'
+    + (cat ? ' &rsaquo; <a href="/product.html?category=' + attr(encodeURIComponent(cat))
+        + '" style="color:inherit;text-decoration:none;">' + esc(cat) + '</a>' : '');
+
+  const summary = (name + (cat ? ' — ' + cat + '.' : '.') + (comp ? ' Composition: ' + comp + '.' : '')
+    + ' Available for B2B order from Fair Ford Pharmaceuticals.').trim();
+
+  const rows = bits.map(([k, v]) =>
+    '<div style="display:flex;gap:10px;padding:9px 0;border-top:1px solid #EAECF0;">' +
+      '<dt style="flex:0 0 128px;font:600 .85rem/1.5 system-ui,sans-serif;color:#98A2B3;">' + esc(k) + '</dt>' +
+      '<dd style="margin:0;font:600 .9rem/1.5 system-ui,sans-serif;color:#344054;">' + esc(v) + '</dd>' +
+    '</div>').join('');
+
+  return '' +
+    '<nav aria-label="Breadcrumb" style="font:600 .8rem/1.5 system-ui,sans-serif;color:#98A2B3;margin:0 0 16px;">' + crumb + '</nav>' +
+    '<h1 style="font:800 1.9rem/1.25 system-ui,sans-serif;color:#101828;margin:0 0 12px;letter-spacing:-.01em;">' + esc(name) + '</h1>' +
+    '<p style="font:500 1rem/1.6 system-ui,sans-serif;color:#475467;margin:0 0 22px;max-width:70ch;">' + esc(summary) + '</p>' +
+    (rows ? '<dl style="margin:0 0 26px;max-width:520px;">' + rows + '</dl>' : '') +
+    '<div style="color:#98A2B3;font:600 .85rem/1 system-ui,sans-serif;">Loading full product details&hellip;</div>';
+}
+
 /* Replace the value of the content/href attribute on the tag carrying id="ID".
    meta/link tags contain no '>' internally, so the tag is [^>]*. */
 function setAttrById(html, id, attrName, value) {
@@ -106,7 +146,13 @@ function injectProductSeo(html, p) {
     /(<script type="application\/ld\+json" id="pdx-jsonld">)[\s\S]*?(<\/script>)/,
     '$1' + jsonForScript(seo.jsonld) + '$2'
   );
+  // Server-render a crawlable <h1> + product facts into the skeleton so a
+  // non-JS crawler gets a real on-page heading (JS replaces it on render).
+  out = out.replace(
+    /<!--pdx-ssr-start-->[\s\S]*?<!--pdx-ssr-end-->/,
+    '<!--pdx-ssr-start-->' + buildProductBody(p).replace(/\$/g, '$$$$') + '<!--pdx-ssr-end-->'
+  );
   return out;
 }
 
-module.exports = { buildProductSeo, injectProductSeo, attr, jsonForScript, setAttrById, ORIGIN, DEFAULT_IMG };
+module.exports = { buildProductSeo, buildProductBody, injectProductSeo, attr, jsonForScript, setAttrById, ORIGIN, DEFAULT_IMG };

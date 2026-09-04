@@ -69,9 +69,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
   <main class="pdx">
     <!-- Loading skeleton (repainted by productdetail.js showSkeleton()).
-         Inline-styled so it renders correctly before any CSS-dependent JS. -->
-    <div id="detail-skeleton" aria-hidden="true">
-      <div style="max-width:1240px;margin:0 auto;padding:40px 24px;color:#98A2B3;font:600 .9rem/1 system-ui,sans-serif;">Loading product…</div>
+         Inline-styled so it renders correctly before any CSS-dependent JS.
+         #pdx-ssr is server-rendered by services/productSeo.js (injectProductBody)
+         so a crawler that does NOT run JavaScript still receives a real top-level
+         heading with the product name plus crawlable composition/category facts.
+         When JS runs, hideSkeleton() sets this container to display:none and the
+         full interactive product renders into #detail-root — no duplicate. -->
+    <div id="detail-skeleton">
+      <div id="pdx-ssr" style="max-width:1000px;margin:0 auto;padding:48px 24px;">
+        <!--pdx-ssr-start--><div style="color:#98A2B3;font:600 .9rem/1 system-ui,sans-serif;">Loading product…</div><!--pdx-ssr-end-->
+      </div>
     </div>
 
     <!-- Rendered content target -->

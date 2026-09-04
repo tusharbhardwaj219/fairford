@@ -61,7 +61,7 @@ app.use(helmet({
       baseUri:        ["'self'"],
       frameAncestors: ["'self'"],
       // Bank / 3-D Secure pages are reached by form POST during checkout.
-      formAction:     ["'self'", 'https://api.razorpay.com'],
+      formAction:     ["'self'", 'https://api.razorpay.com', 'https://www.facebook.com'], // FB Pixel /tr/ form beacon
     },
   },
 }));
@@ -205,7 +205,7 @@ app.use(express.static(path.join(__dirname, '..', 'image')));
 // deploys — read once and cache; the per-page head is injected fresh per request.
 const fs = require('fs');
 const Product = require('./models/Product');
-const { injectProductSeo } = require('./services/productSeo');
+const { injectProductSeo, ORIGIN } = require('./services/productSeo');
 const { injectCategorySeo, resolveCategory, getCategoryCounts, categoryUrl } = require('./services/categorySeo');
 
 const PUBLIC_DIR = path.join(__dirname, '..', 'frontend', 'public');
@@ -300,11 +300,13 @@ app.get(['/product-category/:slug', '/product-category/:slug/'], async (req, res
 });
 
 // ── SEO: robots.txt + sitemap.xml ───────────────────────────────────────────────
-// Prefer a real public origin; fall back to the production domain (FRONTEND_URL
-// defaults to localhost in dev, which is useless in a sitemap).
-const SITE_URL = (process.env.FRONTEND_URL && !process.env.FRONTEND_URL.includes('localhost'))
-  ? process.env.FRONTEND_URL.replace(/\/$/, '')
-  : 'https://www.fairfordpharma.com';
+// The sitemap/robots host MUST match the host declared in every page's
+// <link rel="canonical"> — otherwise the sitemap lists URLs the pages themselves
+// point away from (e.g. sitemap on the bare domain while canonicals are on www).
+// The canonical host is productSeo/categorySeo's ORIGIN, so use that single
+// source of truth rather than FRONTEND_URL (which is the non-www CORS origin in
+// production and drifted the sitemap onto the wrong host).
+const SITE_URL = ORIGIN;
 
 app.get('/robots.txt', (_req, res) => {
   res.type('text/plain').send(
