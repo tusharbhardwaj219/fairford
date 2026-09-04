@@ -18,7 +18,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="UPHAAR 3.0 — Fair Ford Pharmaceuticals' retailer rewards programme. Buy Fair Ford products, earn points and unlock premium gifts and travel experiences. Valid till 31 March 2027." />
+    <meta name="description" content="UPHAAR 3.0 — Fair Ford Pharmaceuticals' retailer rewards programme. Buy eligible Fair Ford products and unlock premium gifts across the Focus 1 &amp; Focus 2 box schemes. Valid 01 Sep 2026 – 31 Mar 2027." />
     <title>UPHAAR 3.0 — Retailer Rewards | Fair Ford Pharmaceuticals</title>
     <link rel="canonical" href="https://www.fairfordpharma.com/uphaar.html" />
     <meta name="robots" content="index, follow" />
@@ -59,12 +59,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 <span class="marquee-item"><span class="dot"></span> Dermatologically Tested &amp; Approved</span>
                 <span class="marquee-item"><span class="dot"></span> Made in India with Love And Glory</span>
                 <span class="marquee-item"><span class="dot"></span> Strong Distribution Network</span>
-                <span class="marquee-item"><span class="dot"></span> 17 States Covered</span>
+                <span class="marquee-item"><span class="dot"></span> 6 States Covered</span>
                 <span class="marquee-item"><span class="dot"></span> Building a Healthier, Stronger India Together</span>
                 <span class="marquee-item" aria-hidden="true"><span class="dot"></span> Dermatologically Tested &amp; Approved</span>
                 <span class="marquee-item" aria-hidden="true"><span class="dot"></span> Made in India with Love And Glory</span>
                 <span class="marquee-item" aria-hidden="true"><span class="dot"></span> Strong Distribution Network</span>
-                <span class="marquee-item" aria-hidden="true"><span class="dot"></span> 17 States Covered</span>
+                <span class="marquee-item" aria-hidden="true"><span class="dot"></span> 6 States Covered</span>
                 <span class="marquee-item" aria-hidden="true"><span class="dot"></span> Building a Healthier, Stronger India Together</span>
             </div>
         </div>
@@ -94,9 +94,21 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 </ul>
             </nav>
 
-            <button class="hamburger" id="hamburger" aria-label="Menu" aria-expanded="false" aria-controls="navMobile">
-                <span></span><span></span><span></span>
-            </button>
+            <div class="header-actions">
+                <!-- Premium PDF download CTA — downloads the official UPHAAR KI
+                     BAHAR 3.0 brochure (data-download → js/uphaar.js). -->
+                <button type="button" class="uh-dlpdf" data-download aria-label="Download the UPHAAR KI BAHAR 3.0 brochure (PDF)">
+                    <svg class="uh-dlpdf__doc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/>
+                        <path d="M12 12v6"/><path d="m9 15 3 3 3-3"/>
+                    </svg>
+                    <span class="uh-dlpdf__label">Download PDF</span>
+                </button>
+
+                <button class="hamburger" id="hamburger" aria-label="Menu" aria-expanded="false" aria-controls="navMobile">
+                    <span></span><span></span><span></span>
+                </button>
+            </div>
         </div>
 
         <nav class="nav-mobile" id="navMobile" aria-label="Mobile">
@@ -110,6 +122,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 <li><a href="#benefits">Why Join</a></li>
                 <li><a href="#scheme">Scheme</a></li>
                 <li><a href="#contact">Support</a></li>
+                <li><a class="uh-mob-dl" href="/uphaar-ki-bahar-3.0.pdf" download="Uphaar Ki Bahar 3.0.pdf">Download PDF <span aria-hidden="true">&darr;</span></a></li>
             </ul>
         </nav>
     </header>
@@ -142,16 +155,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <section class="uh-stats" aria-label="Programme at a glance">
         <div class="uh-shell uh-stats__grid">
             <div class="uh-stat uh-rise">
-                <p class="uh-stat__num"><span data-count="17">17</span></p>
+                <p class="uh-stat__num"><span data-count="6">6</span></p>
                 <p class="uh-stat__label">States Covered</p>
             </div>
             <div class="uh-stat uh-rise" style="--d:80ms">
-                <p class="uh-stat__num"><span data-count="13">13</span></p>
+                <p class="uh-stat__num"><span data-count="30">30</span></p>
                 <p class="uh-stat__label">Reward Slabs</p>
             </div>
             <div class="uh-stat uh-rise" style="--d:160ms">
-                <p class="uh-stat__num"><span data-count="4">4</span></p>
-                <p class="uh-stat__label">Reward Tiers</p>
+                <p class="uh-stat__num"><span data-count="2">2</span></p>
+                <p class="uh-stat__label">Reward Schemes</p>
             </div>
             <div class="uh-stat uh-rise" style="--d:240ms">
                 <p class="uh-stat__num"><span data-count="30">30</span><small>days</small></p>
@@ -243,7 +256,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 <div>
                     <p class="uh-eyebrow">The Collection</p>
                     <h2>Rewards You Can Unlock</h2>
-                    <p class="uh-head__sub">Every reward in the 2026&ndash;27 Retailer Box Scheme, highest slab first.</p>
+                    <!-- Text set by js/uphaar.js per active scheme (Focus 1 / Focus 2). -->
+                    <p class="uh-head__sub" id="uhRewardsSub">Every reward in the UPHAAR KI BAHAR 3.0 box scheme, highest slab first.</p>
                 </div>
                 <div class="uh-rw__nav">
                     <button type="button" class="uh-arrow" id="uhRwPrev" aria-label="Previous rewards">
@@ -256,6 +270,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     </button>
                 </div>
             </header>
+            <!-- Scheme switch (Focus 1 / Focus 2) — rendered by js/uphaar.js. -->
+            <div class="uh-switch-row uh-rise"><div id="uhSchemeToggle"></div></div>
         </div>
 
         <!-- Full-bleed track so cards run to the edge as they scroll. -->
@@ -269,9 +285,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <section class="uh-section uh-tiers" id="reward-tiers">
         <div class="uh-shell">
             <header class="uh-head uh-rise">
-                <p class="uh-eyebrow">Progression</p>
-                <h2>Reward Tiers</h2>
-                <p class="uh-head__sub">Bronze to Platinum &mdash; the further you go, the bigger the reward.</p>
+                <p class="uh-eyebrow">Two Reward Tracks</p>
+                <h2>Focus 1 &amp; Focus 2 Box Schemes</h2>
+                <p class="uh-head__sub">Two ladders of rewards &mdash; pick the scheme your products fall under, then climb from your very first box.</p>
             </header>
             <div class="uh-tier__grid" id="uhTierGrid"></div>
         </div>
@@ -285,7 +301,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <div class="uh-journey__copy uh-rise">
                 <p class="uh-eyebrow">Your Progress</p>
                 <h2>Your Journey to the Next Reward</h2>
-                <p class="uh-journey__count"><span id="uhJourneyCount">1,850</span> <small>Boxes Collected</small></p>
+                <p class="uh-journey__count"><span id="uhJourneyCount">110</span> <small>Boxes Collected</small></p>
                 <p class="uh-journey__away" id="uhJourneyAway"></p>
                 <div class="uh-journey__target" id="uhJourneyTarget"></div>
                 <p class="uh-journey__note">
@@ -321,13 +337,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <div class="uh-calc__box uh-rise">
                 <div class="uh-calc__in">
                     <label for="uhCalcInput">Boxes Purchased</label>
-                    <input type="number" id="uhCalcInput" min="0" step="1" value="160"
+                    <input type="number" id="uhCalcInput" min="0" step="1" value="120"
                            inputmode="numeric" autocomplete="off">
                     <div class="uh-calc__presets">
-                        <button type="button" data-calc-preset="25">25</button>
-                        <button type="button" data-calc-preset="80">80</button>
-                        <button type="button" data-calc-preset="160">160</button>
-                        <button type="button" data-calc-preset="325">325</button>
+                        <button type="button" data-calc-preset="10">10</button>
+                        <button type="button" data-calc-preset="50">50</button>
+                        <button type="button" data-calc-preset="120">120</button>
+                        <button type="button" data-calc-preset="300">300</button>
                     </div>
                 </div>
                 <div class="uh-calc__out" id="uhCalcOut" aria-live="polite"></div>
@@ -357,7 +373,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         </svg>
                     </span>
                     <h3>Instant Rewards</h3>
-                    <p>Exciting gifts available at eligible reward levels &mdash; from your third box onward.</p>
+                    <p>Exciting gifts available at eligible reward levels &mdash; from your very first box onward.</p>
                 </article>
 
                 <article class="uh-why__card uh-rise" style="--d:100ms">
@@ -409,12 +425,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <header class="uh-head uh-rise">
                 <p class="uh-eyebrow">The Detail</p>
                 <h2>Scheme &amp; Brochure</h2>
-                <p class="uh-head__sub">Retailer Box Scheme 2026&ndash;27, in full.</p>
+                <p class="uh-head__sub">The Focus 1 &amp; Focus 2 box schemes, in full.</p>
             </header>
 
             <div class="uh-scheme__cta uh-rise">
                 <div>
-                    <h3>Uphar Ki Bahar 3.0 &mdash; Official Brochure</h3>
+                    <h3>Uphaar Ki Bahar 3.0 &mdash; Official Brochure</h3>
                     <p>Every slab, reward option and condition, exactly as issued.</p>
                 </div>
                 <div class="uh-scheme__btns">
@@ -425,16 +441,17 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 </div>
             </div>
 
+            <!-- Scheme switch (Focus 1 / Focus 2) — rendered by js/uphaar.js. -->
+            <div class="uh-switch-row uh-rise"><div id="uhSchemeToggle2"></div></div>
+
             <div class="uh-table__wrap uh-rise">
                 <table class="uh-table">
-                    <caption>Retailer Box Scheme 2026&ndash;27 &mdash; all 13 slabs. Choose any one option per slab.</caption>
+                    <caption id="uhTableCaption">The Focus 1 box scheme &mdash; all slabs.</caption>
                     <thead>
                         <tr>
                             <th scope="col">Boxes</th>
-                            <th scope="col">Tier</th>
                             <th scope="col">Reward</th>
                             <th scope="col">Alternative</th>
-                            <th scope="col">Dermazest option</th>
                         </tr>
                     </thead>
                     <tbody id="uhTableBody"></tbody>
@@ -462,9 +479,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     </button>
                     <div class="uh-acc__panel">
                         <div class="uh-acc__in">
-                            <p><strong>Valid till 31 March 2027.</strong></p>
-                            <p>Applicable in Punjab, Himachal Pradesh, Jammu &amp; Kashmir, Haryana,
-                               Rajasthan, Gujarat, Madhya Pradesh and Chhattisgarh.</p>
+                            <p><strong>Valid 01 September 2026 &ndash; 31 March 2027.</strong></p>
+                            <p>Applicable in Punjab, Haryana, Rajasthan, Gujarat, Madhya Pradesh
+                               and Chhattisgarh only.</p>
                         </div>
                     </div>
                 </div>
@@ -475,9 +492,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     </button>
                     <div class="uh-acc__panel">
                         <div class="uh-acc__in">
-                            <p>At each slab you may choose <strong>any one</strong> of the options listed &mdash;
-                               the headline reward, the stated alternative where offered, or the
-                               Dermazest 6 quantity for that slab.</p>
+                            <p>Where a slab offers an alternative (marked &ldquo;or&rdquo;), you may choose
+                               <strong>either one</strong> &mdash; the headline reward or the stated alternative.</p>
                             <p>Options cannot be combined or split across slabs.</p>
                         </div>
                     </div>

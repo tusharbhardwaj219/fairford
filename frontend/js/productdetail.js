@@ -82,6 +82,12 @@ document.addEventListener('DOMContentLoaded', function () {
   var params      = new URLSearchParams(window.location.search);
   var productId   = params.get('id');
   var productSlug = params.get('slug');
+  // Clean URL form: /product/<slug> (served with 200 by server.js). No query
+  // string in that case, so read the slug off the path.
+  if (!productId && !productSlug) {
+    var pathMatch = window.location.pathname.match(/^\/product\/([^\/?#]+)\/?$/);
+    if (pathMatch) productSlug = decodeURIComponent(pathMatch[1]);
+  }
   var token       = localStorage.getItem('ff_token');
   var userRaw     = localStorage.getItem('ff_user');
 
@@ -179,7 +185,10 @@ document.addEventListener('DOMContentLoaded', function () {
     });
     var primary = p.image ? (typeof p.image === 'string' ? p.image : (p.image.url || '')) : '';
     if (primary && out.indexOf(primary) < 0) out.unshift(primary);
-    return out;
+    // The gallery is capped at 3 images product-wide (matches the admin's 3-slot
+    // manager). Legacy products that still carry a 4th image in the DB never
+    // surface it here; it is dropped on the next admin save.
+    return out.slice(0, 3);
   }
   function compositionArr(p) {
     var c = p.composition;
@@ -273,10 +282,10 @@ document.addEventListener('DOMContentLoaded', function () {
       : '<div class="pdx-gal-ph">' + (typeof productImageSVG === 'function' ? productImageSVG(cat) : I.image) +
         '<span>Product image coming soon</span></div>';
 
-    // Four thumbnail slots. Real images are clickable; the rest are labelled
+    // Three thumbnail slots. Real images are clickable; the rest are labelled
     // placeholders for photos the team will add via the admin panel.
     var thumbs = '';
-    for (var i = 0; i < 4; i++) {
+    for (var i = 0; i < 3; i++) {
       if (GAL[i]) {
         thumbs += '<button type="button" class="pdx-thumb' + (i === 0 ? ' is-on' : '') + '" data-idx="' + i + '" aria-label="View image ' + (i + 1) + '">' +
           '<span class="pdx-thumb-n">' + (i + 1) + '</span>' +
@@ -606,8 +615,65 @@ document.addEventListener('DOMContentLoaded', function () {
     function set(sel, v) { var el = document.querySelector(sel); if (el && v) el.setAttribute('content', v); }
     set('#meta-desc', desc); set('#og-title', name + ' — Fair Ford Pharmaceuticals'); set('#og-desc', desc);
     if (GAL[0]) set('#og-image', GAL[0]);
-    var canon = $('canonical-link'), pid = p.id || p._id;
-    if (canon && pid) canon.setAttribute('href', 'https://www.fairfordpharma.com/productdetail.html?id=' + encodeURIComponent(pid));
+
+    // Canonical: prefer the clean /product/<slug> URL (now served with 200 by
+    // the backend). Fall back to the ?id= form only for records without a slug
+    // (the legacy data.js demo products), which is the only URL they resolve at.
+    var url = productCanonicalURL(p);
+    var canon = $('canonical-link');
+    if (canon && url) canon.setAttribute('href', url);
+    set('#og-url', url);
+
+    buildProductJsonLd(p, cat, code, desc, url);
+  }
+
+  /* Absolute canonical URL for a product. Clean path when a slug exists. */
+  function productCanonicalURL(p) {
+    var origin = 'https://www.fairfordpharma.com';
+    if (p.slug) return origin + '/product/' + encodeURIComponent(p.slug);
+    var pid = p.id || p._id;
+    return pid ? origin + '/productdetail.html?id=' + encodeURIComponent(pid) : origin + '/product.html';
+  }
+
+  /* Product + BreadcrumbList structured data. Emits only verified, on-page
+     facts — no price, offers, availability or aggregateRating (all products
+     carry rating 0 / reviewCount 0, and B2B pricing is role-gated, so any of
+     those would be fabricated in Google's eyes). */
+  function buildProductJsonLd(p, cat, code, desc, url) {
+    var el = $('pdx-jsonld');
+    if (!el) return;
+    var product = {
+      '@type': 'Product',
+      name: p.name || 'Product',
+      description: desc,
+      url: url
+    };
+    if (GAL.length) product.image = GAL.slice(0, 3);
+    if (real(p.brand)) product.brand = { '@type': 'Brand', name: p.brand };
+    if (code) product.sku = code;
+    var comp = compositionText(p);
+    if (comp) {
+      product.additionalProperty = [{ '@type': 'PropertyValue', name: 'Composition', value: comp }];
+    }
+    if (cat) product.category = cat;
+    product.manufacturer = { '@type': 'Organization', name: 'Fair Ford Pharmaceuticals Pvt. Ltd.' };
+
+    var crumbs = [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://www.fairfordpharma.com/' },
+      { '@type': 'ListItem', position: 2, name: 'Products', item: 'https://www.fairfordpharma.com/product.html' }
+    ];
+    var pos = 3;
+    if (cat) {
+      crumbs.push({ '@type': 'ListItem', position: pos++, name: cat,
+        item: 'https://www.fairfordpharma.com/product.html?category=' + encodeURIComponent(cat) });
+    }
+    crumbs.push({ '@type': 'ListItem', position: pos, name: p.name || 'Product', item: url });
+
+    var graph = {
+      '@context': 'https://schema.org',
+      '@graph': [product, { '@type': 'BreadcrumbList', itemListElement: crumbs }]
+    };
+    try { el.textContent = JSON.stringify(graph); } catch (e) { /* leave empty */ }
   }
 
   /* ================================================================
@@ -783,7 +849,15 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   /* ---- share ---- */
-  function productURL() { return window.location.origin + '/productdetail.html?id=' + encodeURIComponent(CUR._id || CUR.id); }
+  function productURL() { return productCanonicalURL(CUR); }
+
+  /* Internal (relative) link to a product's page. Clean path when a slug
+     exists, ?id= fallback otherwise. */
+  function detailHref(o) {
+    if (o && o.slug) return '/product/' + encodeURIComponent(o.slug);
+    var id = o && (o.id || o._id);
+    return 'productdetail.html?id=' + encodeURIComponent(id || '');
+  }
   function copyText(t, ok) {
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(t).then(ok).catch(function () { window.prompt('Copy:', t); });
@@ -943,7 +1017,7 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function ffmCard(pr) {
-    var href = 'productdetail.html?id=' + encodeURIComponent(pr.id);
+    var href = detailHref(pr);
     var comp = Array.isArray(pr.composition) ? pr.composition.filter(Boolean).join(' + ') : (pr.composition || '');
     var si = { cls: pr.stockStatus === 'Out of Stock' ? 'out' : pr.stockStatus === 'Low Stock' ? 'low' : 'in', label: pr.stockStatus || 'In Stock' };
     var media = pr.image
@@ -1042,7 +1116,7 @@ document.addEventListener('DOMContentLoaded', function () {
           '<div class="pdx-sk" style="height:14px;width:280px;margin:20px 0"></div>' +
           '<div class="pdx-sk-hero">' +
             '<div><div class="pdx-sk pdx-sk-gal"></div><div class="pdx-sk-thumbs">' +
-              '<div class="pdx-sk pdx-sk-thumb"></div><div class="pdx-sk pdx-sk-thumb"></div><div class="pdx-sk pdx-sk-thumb"></div><div class="pdx-sk pdx-sk-thumb"></div>' +
+              '<div class="pdx-sk pdx-sk-thumb"></div><div class="pdx-sk pdx-sk-thumb"></div><div class="pdx-sk pdx-sk-thumb"></div>' +
             '</div></div>' +
             '<div>' +
               '<div class="pdx-sk" style="height:20px;width:120px"></div>' +

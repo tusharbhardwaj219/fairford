@@ -21,15 +21,19 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     <meta name="theme-color" content="#0F4C81" />
     <!-- SEO -->
     <title>Pharmaceutical Products — Fair Ford Pharmaceuticals</title>
-    <meta name="description"
+    <!-- title/description/canonical/OG below are the bare-catalogue defaults;
+         for /product.html?category=<Name> the backend rewrites them per category
+         (categorySeo.injectCategorySeo) and product.js re-applies the same values
+         client-side (applyCategoryMeta). ids are the injection hooks. -->
+    <meta name="description" id="meta-desc"
         content="Browse the full Fair Ford pharmaceutical catalogue for retailers, distributors and stockists. Filter by category, composition, pack size, product type and stock availability." />
     <meta name="robots" content="index, follow" />
-    <link rel="canonical" href="https://www.fairfordpharma.com/product.html" />
+    <link rel="canonical" id="canonical-link" href="https://www.fairfordpharma.com/product.html" />
     <!-- Open Graph -->
-    <meta property="og:title" content="Pharmaceutical Products — Fair Ford Pharmaceuticals" />
-    <meta property="og:description" content="Browse the full Fair Ford pharmaceutical catalogue. Filter by category, composition, pack size and stock availability." />
+    <meta property="og:title" id="og-title" content="Pharmaceutical Products — Fair Ford Pharmaceuticals" />
+    <meta property="og:description" id="og-desc" content="Browse the full Fair Ford pharmaceutical catalogue. Filter by category, composition, pack size and stock availability." />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://www.fairfordpharma.com/product.html" />
+    <meta property="og:url" id="og-url" content="https://www.fairfordpharma.com/product.html" />
     <meta property="og:image" content="https://res.cloudinary.com/dp4yririh/image/upload/v1782967649/fairford/site/m5d8pmtzdjr4dcgctvuc.png" />
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
@@ -54,7 +58,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   <link rel="stylesheet" href="/frontend/css/footer.css">
   <script src="/frontend/js/loader.js"></script>
 
-  <script type="application/ld+json">
+  <script type="application/ld+json" id="pg-jsonld">
   {
     "@context": "https://schema.org",
     "@type": "CollectionPage",

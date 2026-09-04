@@ -39,7 +39,10 @@
   function imgOf(p) { return (p.image && p.image.url) || (p.images && p.images[0] && p.images[0].url) || ''; }
   function catOf(p) { return p.categoryName || (p.category && p.category.categoryName) || 'Products'; }
   function idOf(p) { return String(p._id || p.id || ''); }
-  function href(p) { return 'productdetail.html?id=' + encodeURIComponent(idOf(p)); }
+  function href(p) {
+    if (p && p.slug) return '/product/' + encodeURIComponent(p.slug);
+    return 'productdetail.html?id=' + encodeURIComponent(idOf(p));
+  }
   // Real product descriptions can carry a structured "Product introduction"
   // header + newlines. Strip that for the short card teaser only — the data
   // itself is unchanged (the detail page still renders it in full).

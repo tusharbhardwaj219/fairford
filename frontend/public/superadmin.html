@@ -472,8 +472,67 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <!-- ══════ PAGE: PRICING CONTROL ══════ -->
   <div class="page" id="pg-pricing">
     <div class="pg-header">
-      <div><div class="pg-title">Pricing Control</div><div class="pg-sub">Set wholesale & retail margins by trade category</div></div>
-      <button class="btn btn-pri" onclick="document.getElementById('pricingForm').requestSubmit()">Save Changes</button>
+      <div><div class="pg-title">Pricing Control</div><div class="pg-sub">Set individual product prices — PTS, PTR &amp; MRP. Category margins below act as defaults.</div></div>
+    </div>
+
+    <!-- ── PRODUCT-LEVEL PRICING (per-product PTS/PTR/MRP) ── -->
+    <div class="card" style="margin-bottom:20px">
+      <div class="card-header"><span class="card-title">Product Pricing</span></div>
+      <form id="productPriceForm" onsubmit="saveProductPrice(event)" autocomplete="off">
+        <div class="card-body">
+          <div class="form-row">
+            <div class="form-group" style="position:relative">
+              <label class="form-label">Product <span style="color:var(--danger,#e5484d)">*</span></label>
+              <input class="form-input" id="ppSearch" autocomplete="off" placeholder="Search &amp; select a product…">
+              <input type="hidden" id="ppProductId">
+              <div id="ppSuggest" class="pp-suggest" hidden></div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Product Category</label>
+              <input class="form-input" id="ppCategory" readonly placeholder="—" style="background:var(--bg);cursor:not-allowed">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">PTS · Distributor (₹) <span style="color:var(--danger,#e5484d)">*</span></label><input class="form-input" id="ppPts" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0.00"></div>
+            <div class="form-group"><label class="form-label">PTR · Retailer (₹) <span style="color:var(--danger,#e5484d)">*</span></label><input class="form-input" id="ppPtr" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0.00"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">MRP (₹) <span style="color:var(--danger,#e5484d)">*</span></label><input class="form-input" id="ppMrp" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0.00"></div>
+            <div class="form-group"><label class="form-label">GST (%)</label>
+              <select class="form-input" id="ppGst"><option value="">—</option><option value="0">0%</option><option value="5">5%</option><option value="12">12%</option><option value="18">18%</option></select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Status</label>
+              <select class="form-input" id="ppStatus"><option value="active">Active</option><option value="inactive">Inactive</option><option value="archived">Archived</option></select>
+            </div>
+            <div class="form-group" style="display:flex;align-items:flex-end;gap:8px">
+              <button type="submit" class="btn btn-pri" style="flex:1">Save Price</button>
+              <button type="button" class="btn btn-ghost" onclick="resetProductPrice()">Clear</button>
+            </div>
+          </div>
+          <p style="font-size:12px;color:var(--text-3);margin:2px 0 0">Prices are saved against the selected product. Two products in the same category keep independent prices. Requires PTS ≤ PTR ≤ MRP.</p>
+        </div>
+      </form>
+    </div>
+
+    <!-- ── PRODUCT PRICING LIST ── -->
+    <div class="card" style="margin-bottom:24px">
+      <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+        <span class="card-title">Product Pricing List</span>
+        <input class="form-input" id="ppFilter" placeholder="Search product or category…" style="max-width:280px;margin:0" oninput="renderProductPricingTable()">
+      </div>
+      <div class="tbl-wrap">
+        <table class="data">
+          <thead><tr><th>Product</th><th>Category</th><th>PTS</th><th>PTR</th><th>MRP</th><th>GST</th><th>Status</th><th>Action</th></tr></thead>
+          <tbody id="pp-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── CATEGORY MARGIN DEFAULTS (existing engine, preserved) ── -->
+    <div class="pg-header" style="margin-bottom:12px">
+      <div><div class="pg-title" style="font-size:16px">Category Margin Defaults</div><div class="pg-sub">Optional category-level margin rules, used as defaults where no product price is set.</div></div>
     </div>
     <div class="grid-2">
       <div class="card">
@@ -823,16 +882,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <div class="form-group"><!-- spacer --></div>
       </div>
 
-      <!-- ══ Product Images — 4-slot gallery manager (rendered by superadmin.js) ══
-           Feeds the customer-facing 4-image product gallery. Slot 1 is the
-           primary image used across listings/search/cart; slots 2–4 are the
+      <!-- ══ Product Images — 3-slot gallery manager (rendered by superadmin.js) ══
+           Feeds the customer-facing 3-image product gallery. Slot 1 is the
+           primary image used across listings/search/cart; slots 2–3 are the
            additional detail-page views. -->
       <div class="form-group pig">
         <div class="pig-head">
           <label class="form-label" style="margin:0">Product Images</label>
-          <span class="pig-count" id="pigCount">0 / 4</span>
+          <span class="pig-count" id="pigCount">0 / 3</span>
         </div>
-        <p class="pig-help">Upload up to 4 official images for this product. Use high-quality photos with a consistent background and product scale.</p>
+        <p class="pig-help">Upload up to 3 official images for this product. Use high-quality photos with a consistent background and product scale.</p>
         <div class="pig-product" id="pigProduct" hidden>Product: <b id="pigProductName"></b></div>
         <div class="pig-grid" id="pigGrid" aria-label="Product image slots"></div>
         <!-- single hidden input reused for every slot's file picker -->

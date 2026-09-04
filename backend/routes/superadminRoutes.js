@@ -37,7 +37,7 @@ router.delete('/retailers/:id', c.deleteRetailer);
 // (the field name "image" matches the form input). JSON requests still work —
 // multer just leaves req.body alone when there's no file.
 router.get('/products', c.listProducts);
-// POST/PUT accept multipart/form-data with up to 4 slot images (image_0..image_3)
+// POST/PUT accept multipart/form-data with up to 3 slot images (image_0..image_2)
 // plus an `imagesPlan` describing the desired gallery. uploadProductGallery is
 // multer .any(); JSON-only requests (no files) still work — the controller only
 // touches images when `imagesPlan` is present.

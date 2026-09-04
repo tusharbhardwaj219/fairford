@@ -104,6 +104,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
        the overlay must exist before first paint. -->
   <link rel="stylesheet" href="/frontend/css/loader.css" />
   <link rel="stylesheet" href="/frontend/css/footer.css">
+  <!-- NUEVA VIDA launch popup (campaign) — remove this + the matching script to retire -->
+  <link rel="stylesheet" href="/frontend/css/launch-popup.css">
   <script src="/frontend/js/loader.js"></script>
 </head>
 <body><!-- Google Tag Manager (noscript) -->
@@ -437,6 +439,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
     <main id="main">
 
+    <!-- Page H1. The hero is a text-free image slider, so the homepage carried
+         no <h1> (its first heading was an <h2>). This gives the page its single,
+         keyword-bearing H1 without altering the slider design. .sr-only (style.css)
+         keeps it accessible to screen readers and crawlers. Only substantiated
+         facts — WHO-GMP, manufacturer/marketer, Faridabad — no "best/leading". -->
+    <h1 class="sr-only">Fair Ford Pharmaceuticals — WHO-GMP Pharmaceutical Manufacturer &amp; Marketer in Faridabad, India</h1>
+
     <!-- ================================================================
          HERO SLIDER — one panel, three slides
          The panel is a single contained card: rounded, elevated, with the
@@ -456,7 +465,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 <figure class="fh-slide fh-slide--ff is-active"
                         role="group" aria-roledescription="slide" aria-label="1 of 3: Fair Ford Pharmaceuticals">
                     <img class="fh-slide__art" width="1536" height="1024" fetchpriority="high" decoding="async"
-                         src="https://res.cloudinary.com/dp4yririh/image/upload/v1787375353/ChatGPT_Image_Aug_22_2026_10_38_47_AM_xbwsfh.png"
+                         src="https://res.cloudinary.com/dp4yririh/image/upload/v1787982467/ChatGPT_Image_Aug_29_2026_11_17_28_AM_cw9bfd.png"
                          alt="Fair Ford Pharmaceuticals — Trusted Care. Better Living. WHO-GMP certified medicines.">
                 </figure>
 
@@ -465,7 +474,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         role="group" aria-roledescription="slide"
                         aria-label="2 of 3: UPHAAR, the chemist's growth program" aria-hidden="true">
                     <img class="fh-slide__art" width="1672" height="941" fetchpriority="low" decoding="async"
-                         src="https://res.cloudinary.com/dp4yririh/image/upload/v1787375632/ChatGPT_Image_Aug_22_2026_10_43_12_AM_hgfxfz.png"
+                         src="https://res.cloudinary.com/dp4yririh/image/upload/v1787834447/ChatGPT_Image_Aug_27_2026_06_09_00_PM_zpfl2z.png"
                          alt="UPHAAR — thoughtfully crafted for better living. Premium rewards for chemists.">
                 </figure>
 
@@ -1011,6 +1020,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <script src="/frontend/js/script.js"></script>
     <script src="/frontend/js/home.js" defer></script>
     <script src="/frontend/js/home-products.js" defer></script>
+    <script src="/frontend/js/launch-popup.js" defer></script>
 
     <!-- Shared cart / wishlist (same storage as product pages) -->
     <script src="/frontend/js/api.js"></script>

@@ -84,7 +84,7 @@ exports.uploadPrescriptionImage = prescriptionUpload.single('prescription');
 exports.uploadSingleImage    = productUpload.single('image');
 exports.uploadMultipleImages = productUpload.array('images', 5);
 
-// Gallery upload for the Super Admin 4-slot image manager. Uses .any() so the
+// Gallery upload for the Super Admin 3-slot image manager. Uses .any() so the
 // controller can match uploaded files to slots by their field name (image_0..)
 // via the accompanying `imagesPlan` — and so a stray field never triggers
 // multer's "Unexpected field" error. The productUpload fileFilter (JPG/PNG/WebP

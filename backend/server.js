@@ -38,17 +38,25 @@ app.use(helmet({
       // every live payment running with fraud detection blocked.
       // googletagmanager.com serves BOTH the GTM container and gtag.js; without
       // it neither analytics snippet on the pages could ever execute.
-      scriptSrc:      ["'self'", "'unsafe-inline'", 'https://cdnjs.cloudflare.com', 'https://cdn.jsdelivr.net', 'https://checkout.razorpay.com', 'https://cdn.razorpay.com', 'https://www.googletagmanager.com'],
+      // connect.facebook.net = Facebook Pixel (fbevents.js). googleadservices.com
+      // + googleads.g.doubleclick.net = Google Ads conversion tracking. These
+      // tags are fired by GTM; the CSP must allow their scripts to load.
+      scriptSrc:      ["'self'", "'unsafe-inline'", 'https://cdnjs.cloudflare.com', 'https://cdn.jsdelivr.net', 'https://checkout.razorpay.com', 'https://cdn.razorpay.com', 'https://www.googletagmanager.com', 'https://connect.facebook.net', 'https://www.googleadservices.com', 'https://googleads.g.doubleclick.net'],
       scriptSrcAttr:  ["'unsafe-inline'"], // inline onclick handlers used across the pages
       styleSrc:       ["'self'", "'unsafe-inline'", 'https://api.fontshare.com', 'https://fonts.googleapis.com', 'https://cdnjs.cloudflare.com', 'https://cdn.jsdelivr.net'],
       fontSrc:        ["'self'", 'data:', 'https://cdn.fontshare.com', 'https://fonts.gstatic.com', 'https://cdnjs.cloudflare.com', 'https://cdn.jsdelivr.net'],
       imgSrc:         ["'self'", 'data:', 'https:'],
       // Checkout posts telemetry to lumberjack.* and talks to api.razorpay.com.
       // GA4/GTM beacon to google-analytics.com and googletagmanager.com.
-      connectSrc:     ["'self'", 'https://api.razorpay.com', 'https://lumberjack.razorpay.com', 'https://lumberjack-metrics.razorpay.com', 'https://www.google-analytics.com', 'https://analytics.google.com', 'https://stats.g.doubleclick.net', 'https://www.googletagmanager.com'],
+      // Facebook Pixel beacons to connect.facebook.net + www.facebook.com;
+      // Google Ads conversion beacons to google.com/ccm, *.doubleclick.net and
+      // googleadservices.com. Without these the Pixel/Ads pings are CSP-blocked.
+      connectSrc:     ["'self'", 'https://api.razorpay.com', 'https://lumberjack.razorpay.com', 'https://lumberjack-metrics.razorpay.com', 'https://www.google-analytics.com', 'https://analytics.google.com', 'https://stats.g.doubleclick.net', 'https://www.googletagmanager.com', 'https://www.google.com', 'https://connect.facebook.net', 'https://www.facebook.com', 'https://www.googleadservices.com', 'https://googleads.g.doubleclick.net', 'https://ad.doubleclick.net'],
       // Razorpay renders its modal (and bank/UPI redirects) inside iframes.
       // googletagmanager.com covers the GTM <noscript> fallback iframe.
-      frameSrc:       ["'self'", 'https://www.google.com', 'https://api.razorpay.com', 'https://checkout.razorpay.com', 'https://www.googletagmanager.com'],
+      // www.facebook.com + td.doubleclick.net cover the Pixel / Google Ads
+      // conversion-linker iframes.
+      frameSrc:       ["'self'", 'https://www.google.com', 'https://api.razorpay.com', 'https://checkout.razorpay.com', 'https://www.googletagmanager.com', 'https://www.facebook.com', 'https://td.doubleclick.net'],
       objectSrc:      ["'none'"],
       baseUri:        ["'self'"],
       frameAncestors: ["'self'"],
@@ -191,6 +199,39 @@ app.use('/api/dist-inventory', distInventoryRoutes);
 app.use('/frontend', express.static(path.join(__dirname, '..', 'frontend')));
 app.use(express.static(path.join(__dirname, '..', 'image')));
 
+// ── SEO SSR SHARED HELPERS ────────────────────────────────────────────────────
+// Product detail + category pages have their <head> server-rendered so crawlers
+// that don't run JS still get real per-page SEO. Templates are static between
+// deploys — read once and cache; the per-page head is injected fresh per request.
+const fs = require('fs');
+const Product = require('./models/Product');
+const { injectProductSeo } = require('./services/productSeo');
+const { injectCategorySeo, resolveCategory, getCategoryCounts, categoryUrl } = require('./services/categorySeo');
+
+const PUBLIC_DIR = path.join(__dirname, '..', 'frontend', 'public');
+let _detailHtml = null, _productHtml = null;
+const detailTemplate = () => (_detailHtml || (_detailHtml = fs.readFileSync(path.join(PUBLIC_DIR, 'productdetail.html'), 'utf8')));
+const productTemplate = () => (_productHtml || (_productHtml = fs.readFileSync(path.join(PUBLIC_DIR, 'product.html'), 'utf8')));
+
+// /product.html?category=<Name> → a real, self-canonical category landing page
+// with a per-category <head>. Must run BEFORE the static middleware, which would
+// otherwise serve the raw file. The bare catalogue (and any multi-facet / search
+// combination) falls through to the static default so filter permutations are
+// never indexed as distinct pages.
+app.get('/product.html', async (req, res, next) => {
+  try {
+    const cat = req.query.category;
+    const single = typeof cat === 'string' && cat && cat.indexOf(',') < 0
+      && !req.query.search && !req.query.type && !req.query.stock;
+    if (!single) return next();               // bare catalogue / faceted view → static
+    const match = resolveCategory(cat, await getCategoryCounts());
+    if (!match) return next();                // unknown category → static catalogue
+    return res.type('html').send(injectCategorySeo(productTemplate(), match.name, match.count));
+  } catch (_) {
+    return next();                            // never fail the page over SEO injection
+  }
+});
+
 // Serve the frontend pages at the site root so clean page URLs resolve —
 // /product.html, /login&signup.html, /retailer.html, /superadmin.html, etc.
 // Previously only '/' was routed, so every other page (and the post-login
@@ -211,13 +252,31 @@ app.get('/', (_req, res) =>
 // are matched on the `slug` field the Product model already generates from the
 // name; anything that no longer exists falls back to the catalogue rather than
 // 404-ing, which keeps the visitor on-site.
-const Product = require('./models/Product');
-
+// fs, Product, injectProductSeo and detailTemplate() are declared above, before
+// the static middleware (the /product.html category interceptor needs them too).
 app.get(['/product/:slug', '/product/:slug/'], async (req, res) => {
   try {
     const slug = String(req.params.slug || '').toLowerCase();
-    const hit = await Product.findOne({ slug }).select('_id slug').lean();
-    if (hit) return res.redirect(301, `/productdetail.html?slug=${encodeURIComponent(hit.slug)}`);
+    // Full record so the <head> can be server-rendered. The Product model's
+    // pre(/^find/) hook auto-populates `category` (categoryName/categorySlug).
+    const product = await Product.findOne({ slug }).lean();
+    // Live product → serve the detail page AT this clean URL with a 200 (not a
+    // redirect), with title/meta/canonical/OG and Product+BreadcrumbList JSON-LD
+    // already rendered into the HTML so crawlers that don't run JavaScript get
+    // the real per-product SEO. productdetail.js re-applies identical values on
+    // render. Dead/legacy slugs still 301 to the catalogue so no link equity is
+    // lost to a 404 and the visitor stays on-site.
+    if (product) {
+      let html;
+      try {
+        html = injectProductSeo(detailTemplate(), product);
+      } catch (e) {
+        // Never fail the page over an SEO-injection edge case — serve the
+        // static file and let client-side applyMeta populate the head.
+        return res.type('html').send(detailTemplate());
+      }
+      return res.type('html').send(html);
+    }
   } catch (_) {
     // fall through to the catalogue
   }
@@ -261,7 +320,7 @@ app.get('/robots.txt', (_req, res) => {
   );
 });
 
-app.get('/sitemap.xml', (_req, res) => {
+app.get('/sitemap.xml', async (_req, res) => {
   // Public, indexable pages only. login&signup.html is deliberately absent —
   // it carries noindex, so listing it here would contradict the page itself.
   // search.html and distributor.html were missing and are genuine landing pages.
@@ -271,9 +330,42 @@ app.get('/sitemap.xml', (_req, res) => {
   // Page names contain literal & (login&signup.html etc.), which must be
   // XML-escaped inside <loc> or the sitemap is malformed.
   const xmlEsc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  const urls = pages
-    .map(p => `  <url><loc>${xmlEsc(SITE_URL + (p === '/' ? '/' : p))}</loc></url>`)
-    .join('\n');
+  const staticUrls = pages
+    .map(p => `  <url><loc>${xmlEsc(SITE_URL + (p === '/' ? '/' : p))}</loc></url>`);
+
+  // Every active product as its clean /product/<slug> URL — these are the
+  // catalogue's real landing pages and were previously absent from the sitemap,
+  // leaving the entire product range undiscoverable through it. Each URL is the
+  // 200-serving canonical set on the page itself.
+  let productUrls = [];
+  try {
+    const products = await Product.find({ status: 'active' }).select('slug updatedAt').lean();
+    productUrls = products
+      .filter(p => p.slug)
+      .map(p => {
+        const loc = xmlEsc(`${SITE_URL}/product/${encodeURIComponent(p.slug)}`);
+        const lastmod = p.updatedAt ? `<lastmod>${new Date(p.updatedAt).toISOString().slice(0, 10)}</lastmod>` : '';
+        return `  <url><loc>${loc}</loc>${lastmod}</url>`;
+      });
+  } catch (_) {
+    // DB unreachable → still serve the static-page sitemap rather than 500.
+  }
+
+  // Category landing pages — /product.html?category=<Name>, one per category
+  // that has at least one active product (the self-canonical URL each category
+  // view now renders). Same URLSearchParams encoding as the canonical.
+  let categoryUrls = [];
+  try {
+    const counts = await getCategoryCounts();
+    categoryUrls = Object.keys(counts)
+      .filter(name => counts[name] > 0)
+      .sort()
+      .map(name => `  <url><loc>${xmlEsc(categoryUrl(name))}</loc></url>`);
+  } catch (_) {
+    // DB unreachable → omit category URLs.
+  }
+
+  const urls = staticUrls.concat(categoryUrls, productUrls).join('\n');
   res.type('application/xml').send(
     '<?xml version="1.0" encoding="UTF-8"?>\n' +
     '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +

@@ -18,6 +18,13 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 </script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- This page is ALSO served at the clean path /product/<slug> (see
+       server.js). The shared header/footer and in-page links are relative
+       (product.html, login&signup.html, …), so a root <base> keeps them
+       resolving correctly whether the URL is /productdetail.html?id=… or
+       /product/<slug>. Absolute asset/API URLs (/frontend/…, /api/…) are
+       unaffected. -->
+  <base href="/" />
   <!-- SEO (title/description are enriched by JS once the product loads) -->
   <title>Fair Ford - Product Details</title>
   <meta name="description" id="meta-desc" content="Detailed pharmaceutical product information: composition, strength, pack size, specifications and availability." />
@@ -30,7 +37,12 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   <meta property="og:title" id="og-title" content="Product Details — Fair Ford Pharmaceuticals" />
   <meta property="og:description" id="og-desc" content="Composition, strength, pack size and availability for Fair Ford pharmaceutical products." />
   <meta property="og:image" id="og-image" content="https://res.cloudinary.com/dp4yririh/image/upload/v1782967649/fairford/site/m5d8pmtzdjr4dcgctvuc.png" />
+  <meta property="og:url" id="og-url" content="https://www.fairfordpharma.com/product.html" />
   <meta name="twitter:card" content="summary_large_image" />
+  <!-- Product + BreadcrumbList JSON-LD is injected here by productdetail.js
+       (buildProductJsonLd) once the record resolves. Only verified on-page
+       fields are emitted — no price/offers/aggregateRating. -->
+  <script type="application/ld+json" id="pdx-jsonld"></script>
   <link rel="preconnect" href="https://res.cloudinary.com" crossorigin />
     <link rel="stylesheet" href="/frontend/css/typography.css">
   <link rel="stylesheet" href="/frontend/css/style.css" />

@@ -151,9 +151,19 @@ const productSchema = new mongoose.Schema(
   }
 );
 
-productSchema.pre('save', function () {
+// NOTE: async hook, so it must NOT take/call `next` (see CLAUDE.md — the
+// installed Mongoose does not pass next to async middleware). Returning
+// resolves it. The uniqueness guard prevents two products from generating the
+// same slug (e.g. a duplicated "Montufair-L"), which would otherwise collapse
+// two distinct products onto one /product/<slug> URL.
+productSchema.pre('save', async function () {
   if (this.isModified('name')) {
-    this.slug = slugify(this.name, { lower: true });
+    const base = slugify(this.name, { lower: true });
+    let slug = base, n = 2;
+    while (await this.constructor.exists({ slug, _id: { $ne: this._id } })) {
+      slug = base + '-' + (n++);
+    }
+    this.slug = slug;
   }
   if (this.stock === 0) {
     this.stockStatus = 'Out of Stock';

@@ -424,19 +424,24 @@ document.addEventListener('DOMContentLoaded', function () {
   function paintCategories() {
     var host = $('ffm-cats');
     if (!host) return;
+    // Real crawlable <a> links to each category's self-canonical landing page
+    // (/product.html?category=<Name>, SSR-rendered per category). Clicking still
+    // filters in-place (preventDefault) so the SPA stays snappy; applyCategoryMeta
+    // then syncs the <head> + URL. Non-JS crawlers just follow the href.
     host.innerHTML = CATS.map(function (c) {
-      return '<button type="button" class="ffm-cat-card" role="listitem" data-cat="' + esc(c.name) + '">' +
+      return '<a class="ffm-cat-card" role="listitem" href="' + esc(categoryHref(c.name)) + '" data-cat="' + esc(c.name) + '">' +
         '<span class="ffm-cat-ico">' + catIcon(c.name) + '</span>' +
         '<span><span class="ffm-cat-name">' + esc(c.name) + '</span>' +
         '<span class="ffm-cat-count">' + c.count + (c.count === 1 ? ' product' : ' products') + '</span></span>' +
         '<span class="ffm-cat-go">Explore products ' + I.arrow + '</span>' +
-      '</button>';
+      '</a>';
     }).join('');
 
     host.addEventListener('click', function (e) {
-      var btn = e.target.closest('[data-cat]');
-      if (!btn) return;
-      var name = btn.getAttribute('data-cat');
+      var link = e.target.closest('[data-cat]');
+      if (!link) return;
+      e.preventDefault();
+      var name = link.getAttribute('data-cat');
       state.cats = [name];
       state.q = '';
       $('ffm-search-input').value = '';
@@ -453,9 +458,60 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   /* ==================================================================
+     CATEGORY SEO — keep <head>, H1 and breadcrumb in sync with the active
+     category so a single-category view is an independently indexable page
+     (matches the server-rendered category head in backend/services/categorySeo).
+     ================================================================== */
+  var ORIGIN = 'https://www.fairfordpharma.com';
+  // Bare-catalogue defaults (mirror product.html). H1 is HTML (styled hero);
+  // the SSR category page overwrites it, so it can't be snapshotted — hardcode.
+  var SEO_DEFAULT = {
+    title: 'Pharmaceutical Products — Fair Ford Pharmaceuticals',
+    desc: 'Browse the full Fair Ford pharmaceutical catalogue for retailers, distributors and stockists. Filter by category, composition, pack size, product type and stock availability.',
+    canonical: ORIGIN + '/product.html',
+    h1: 'India\'s Trusted<br /><span class="ffm-hero-accent">B2B Pharma</span> Marketplace',
+    crumb: '<a href="index.html">Home</a><span class="ffm-crumb-sep" aria-hidden="true">/</span><span aria-current="page">Products</span>'
+  };
+  // Same URLSearchParams encoding as writeURL() and the SSR canonical.
+  function categoryHref(name) { return '/product.html?' + new URLSearchParams({ category: name }).toString(); }
+  function catCount(name) { var c = CATS.filter(function (x) { return x.name === name; })[0]; return c ? c.count : 0; }
+  function setMeta(sel, attribute, val) { var el = document.querySelector(sel); if (el) el.setAttribute(attribute, val); }
+
+  function applyCategoryMeta() {
+    var hero = $('ffm-hero-title'), crumb = document.querySelector('.ffm-crumb');
+    // A category landing page = exactly one category selected, nothing else.
+    var isCat = state.cats.length === 1 && !state.q && !state.forms.length && !state.avail.length && !state.packs.length;
+    if (isCat) {
+      var name = state.cats[0], count = catCount(name), url = ORIGIN + categoryHref(name);
+      var desc = 'Browse ' + count + ' ' + name + ' ' + (count === 1 ? 'product' : 'products') +
+        ' from Fair Ford Pharmaceuticals — available for B2B order by retailers, distributors and stockists across India. View compositions, pack sizes and specifications.';
+      document.title = name + ' — Fair Ford Pharmaceuticals';
+      setMeta('#canonical-link', 'href', url); setMeta('#og-url', 'content', url);
+      setMeta('#meta-desc', 'content', desc); setMeta('#og-desc', 'content', desc);
+      setMeta('#og-title', 'content', name + ' — Fair Ford Pharmaceuticals');
+      if (hero) hero.textContent = name;
+      if (crumb) crumb.innerHTML = '<a href="index.html">Home</a><span class="ffm-crumb-sep" aria-hidden="true">/</span>' +
+        '<a href="product.html">Products</a><span class="ffm-crumb-sep" aria-hidden="true">/</span>' +
+        '<span aria-current="page">' + esc(name) + '</span>';
+    } else {
+      document.title = SEO_DEFAULT.title;
+      setMeta('#canonical-link', 'href', SEO_DEFAULT.canonical); setMeta('#og-url', 'content', SEO_DEFAULT.canonical);
+      setMeta('#meta-desc', 'content', SEO_DEFAULT.desc); setMeta('#og-desc', 'content', SEO_DEFAULT.desc);
+      setMeta('#og-title', 'content', SEO_DEFAULT.title);
+      if (hero) hero.innerHTML = SEO_DEFAULT.h1;
+      if (crumb) crumb.innerHTML = SEO_DEFAULT.crumb;
+    }
+  }
+
+  /* ==================================================================
      10 · PRODUCT CARD
      ================================================================== */
-  function detailHref(p) { return 'productdetail.html?id=' + encodeURIComponent(p.id); }
+  // Clean /product/<slug> when the record has a slug (now served with 200 and
+  // set as the page's canonical); ?id= fallback for slug-less legacy records.
+  function detailHref(p) {
+    if (p && p.slug) return '/product/' + encodeURIComponent(p.slug);
+    return 'productdetail.html?id=' + encodeURIComponent(p.id);
+  }
 
   function mediaHTML(p, cls) {
     cls = cls || 'ffm-card-img';
@@ -838,6 +894,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (!opts.keepFilters) renderFilters();
     updateFilterCount();
     writeURL();
+    applyCategoryMeta();
   }
 
   function renderResults(list) {

@@ -481,6 +481,7 @@ function toProduct(p) {
     mrp:              num(p.mrp),
     retailerPrice:    num(p.retailerPrice),
     distributorPrice: num(p.distributorPrice),
+    gst:              num(p.gst),
     manufacturer:     str(p.brand || 'Fair Ford Pharma'),
     brand:            str(p.brand || 'Fair Ford Pharma'),
     strength:         str(p.strength || '-'),
@@ -496,7 +497,7 @@ function toProduct(p) {
 }
 
 // ── Product image gallery reconciliation ─────────────────────────────────────
-// The admin form sends `imagesPlan`: an ordered array (≤4) describing the
+// The admin form sends `imagesPlan`: an ordered array (≤3) describing the
 // desired gallery. Each entry is { keep: "<public_id>" } to retain an image the
 // product already has, or { file: "image_N" } to use a newly uploaded file
 // (matched by field name against multer's req.files). Slot 0 becomes the
@@ -520,7 +521,7 @@ function resolveGallery(req, existing) {
   let plan = [];
   try { plan = JSON.parse(req.body.imagesPlan || '[]'); } catch (_) { plan = []; }
   if (!Array.isArray(plan)) plan = [];
-  plan = plan.slice(0, 4);
+  plan = plan.slice(0, 3);
 
   // multer .any() → req.files is an array; index it by field name.
   const filesByField = {};
@@ -545,7 +546,7 @@ function resolveGallery(req, existing) {
       if (f) images.push({ url: f.path, public_id: f.filename });
     }
   }
-  const capped = images.slice(0, 4);
+  const capped = images.slice(0, 3);
   const keptIds = new Set(capped.map(i => i.public_id));
 
   // Assets to remove: uploaded-but-unused + previously-owned-but-dropped.
@@ -618,7 +619,7 @@ exports.createProduct = async (req, res) => {
       description: description || '',
       status: status || 'active',
     };
-    // Images: the form always sends `imagesPlan` (4-slot manager). Slot 0 is
+    // Images: the form always sends `imagesPlan` (3-slot manager). Slot 0 is
     // the primary, mirrored to the legacy `image` field. Legacy single-`image`
     // uploads (req.file) are still honoured if a caller ever sends one.
     if (req.body.imagesPlan !== undefined) {
@@ -639,7 +640,7 @@ exports.updateProduct = async (req, res) => {
   try {
     if (!isOid(req.params.id)) return res.status(404).json({ error: 'Product not found' });
     const {
-      name, category, mrp, retailerPrice, distributorPrice,
+      name, category, mrp, retailerPrice, distributorPrice, gst,
       manufacturer, brand, strength, packSize, dosageForm,
       stock, description, status,
     } = req.body;
@@ -648,6 +649,7 @@ exports.updateProduct = async (req, res) => {
     if (mrp !== undefined) patch.mrp = Number(mrp);
     if (retailerPrice !== undefined)    patch.retailerPrice    = Number(retailerPrice);
     if (distributorPrice !== undefined) patch.distributorPrice = Number(distributorPrice);
+    if (gst !== undefined) patch.gst = Number(gst);
     if (manufacturer !== undefined) patch.brand = manufacturer;
     else if (brand !== undefined)   patch.brand = brand;
     if (strength !== undefined)   patch.strength   = strength;
@@ -658,7 +660,7 @@ exports.updateProduct = async (req, res) => {
     if (status !== undefined) patch.status = status;
     if (category !== undefined) { patch.category = await resolveCategoryId(category); patch.categoryName = category; }
 
-    // Images: the 4-slot manager sends `imagesPlan` describing the whole
+    // Images: the 3-slot manager sends `imagesPlan` describing the whole
     // desired gallery (kept + newly uploaded, in order). resolveGallery keeps
     // `image` (primary) and `images[]` in sync and returns the Cloudinary
     // assets to destroy (dropped originals + unreferenced uploads). Keeping

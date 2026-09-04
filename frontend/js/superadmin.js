@@ -677,22 +677,24 @@ function closeProductModal() {
 }
 
 /* ══════════ PRODUCT IMAGE GALLERY MANAGER ══════════
-   Owns the 4-slot #pigGrid in the Add/Edit Product modal.
+   Owns the 3-slot #pigGrid in the Add/Edit Product modal.
    PIG_SLOTS[i] = null                                   (empty)
               | { kind:'existing', url, public_id }      (already on the product)
               | { kind:'new', file, dataUrl, lowRes }    (freshly chosen, not yet saved)
    Slot 0 is always the primary image. Deleting / reordering compacts the array
    so there are never holes and slot 0 stays primary. On save the array is turned
-   into an `imagesPlan` the backend reconciles (see resolveGallery there). */
-var PIG_SLOTS = [null, null, null, null];
-var PIG_MAX = 4;
+   into an `imagesPlan` the backend reconciles (see resolveGallery there).
+   The gallery is capped at 3 images product-wide (PIG_MAX) — the customer
+   product page renders exactly these three slots. */
+var PIG_SLOTS = [null, null, null];
+var PIG_MAX = 3;
 var _pigTargetSlot = -1;   // slot awaiting a file from the shared picker
 var _pigDragFrom = -1;
 
-var PIG_CAPTIONS = ['Main product image', 'Back / alternate view', 'Side / product view', 'Additional product image'];
+var PIG_CAPTIONS = ['Main product image', 'Back / alternate view', 'Side / product view'];
 var PIG_ALLOWED = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
 
-function pigReset() { PIG_SLOTS = [null, null, null, null]; _pigTargetSlot = -1; pigSetProductName(''); pigRender(); }
+function pigReset() { PIG_SLOTS = [null, null, null]; _pigTargetSlot = -1; pigSetProductName(''); pigRender(); }
 
 function pigSetProductName(name) {
   var box = document.getElementById('pigProduct');
@@ -703,7 +705,7 @@ function pigSetProductName(name) {
 
 /* Load an existing product's ordered gallery (from getProduct → images[]). */
 function pigLoad(images) {
-  PIG_SLOTS = [null, null, null, null];
+  PIG_SLOTS = [null, null, null];
   (images || []).slice(0, PIG_MAX).forEach(function (img, i) {
     if (img && img.url) PIG_SLOTS[i] = { kind: 'existing', url: img.url, public_id: img.public_id || '' };
   });
@@ -853,7 +855,7 @@ function pigMove(from, to) {
   if (from >= arr.length) return;
   var item = arr.splice(from, 1)[0];
   arr.splice(Math.min(to, arr.length), 0, item);
-  PIG_SLOTS = arr.concat([null, null, null, null]).slice(0, PIG_MAX);
+  PIG_SLOTS = arr.concat([null, null, null]).slice(0, PIG_MAX);
   pigRender();
 }
 
@@ -1011,8 +1013,9 @@ async function editProduct(id) {
     document.getElementById('productId').value = id;
     document.getElementById('productFormTitle').textContent = 'Edit Product';
     document.getElementById('submitBtn').textContent = 'Update Product';
-    // Load the product's existing gallery into the 4-slot manager. Kept images
-    // stay untouched server-side unless the admin removes/replaces them.
+    // Load the product's existing gallery into the 3-slot manager (pigLoad caps
+    // at PIG_MAX, so a legacy 4th image simply isn't loaded and is dropped on
+    // the next save). Kept images stay untouched unless the admin removes them.
     pigSetProductName(product.name || '');
     pigLoad(product.images || (product.imageUrl ? [{ url: product.imageUrl }] : []));
     document.getElementById('productModal').classList.add('active');
@@ -1180,6 +1183,111 @@ async function savePricingRule(e) {
     await loadPricingTable();
     toast('Pricing rule saved!');
   } catch (e) { toast(e.message, 'error'); }
+}
+
+/* ── PRODUCT-LEVEL PRICING ──────────────────────────────────────────────
+   Prices live on the Product itself (distributorPrice/retailerPrice/mrp/gst),
+   which the storefront already reads — so there is NO separate price table.
+   This panel selects a product, loads its prices, and PUTs the price fields
+   back via the existing product-update endpoint (partial patch). Category
+   margin rules (above) are untouched and act as defaults. */
+let ppProducts = [];
+
+async function loadProductPricing() {
+  try {
+    const list = await apiFetch('/products');
+    ppProducts = (list || []).map(p => ({
+      id: p.id || p._id, name: p.name,
+      category: p.category || p.categoryName || '',
+      pts: p.distributorPrice, ptr: p.retailerPrice, mrp: p.mrp, gst: p.gst,
+      status: p.status || 'active',
+    }));
+    renderProductPricingTable();
+    wireProductPriceSearch();
+  } catch (e) { console.warn('Product pricing unavailable:', e.message); }
+}
+
+function renderProductPricingTable() {
+  const tb = document.getElementById('pp-tbody');
+  if (!tb) return;
+  const q = (document.getElementById('ppFilter') ? document.getElementById('ppFilter').value : '').trim().toLowerCase();
+  const rows = ppProducts.filter(p => !q || (p.name || '').toLowerCase().includes(q) || (p.category || '').toLowerCase().includes(q));
+  if (!rows.length) { tb.innerHTML = `<tr><td colspan="8" style="text-align:center;color:var(--text-3);padding:24px">No products found</td></tr>`; return; }
+  const money = n => '₹' + Number(n || 0).toLocaleString('en-IN');
+  tb.innerHTML = rows.map(p => {
+    const sc = p.status === 'active' ? 'badge-green' : p.status === 'inactive' ? 'badge-amber' : 'badge-gray';
+    return `<tr>
+      <td><strong>${esc(p.name)}</strong></td>
+      <td>${esc(p.category || '—')}</td>
+      <td>${money(p.pts)}</td><td>${money(p.ptr)}</td><td>${money(p.mrp)}</td>
+      <td>${(p.gst != null && p.gst !== '') ? p.gst + '%' : '—'}</td>
+      <td><span class="badge ${sc}">${(p.status || 'active').charAt(0).toUpperCase() + (p.status || 'active').slice(1)}</span></td>
+      <td><button class="btn btn-ghost btn-sm" onclick="editProductPrice('${p.id}')">Edit</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function wireProductPriceSearch() {
+  const input = document.getElementById('ppSearch'), box = document.getElementById('ppSuggest');
+  if (!input || !box || input._ppWired) return;
+  input._ppWired = true;
+  input.addEventListener('input', () => {
+    const q = input.value.trim().toLowerCase();
+    if (!q) { box.hidden = true; return; }
+    const m = ppProducts.filter(p => (p.name || '').toLowerCase().includes(q)).slice(0, 8);
+    box.innerHTML = m.length
+      ? m.map(p => `<div class="pp-sug" onclick="selectPricingProduct('${p.id}')">${esc(p.name)}<span>${esc(p.category || '')}</span></div>`).join('')
+      : `<div class="pp-sug pp-sug--empty">No matching product</div>`;
+    box.hidden = false;
+  });
+  document.addEventListener('click', e => { if (!input.contains(e.target) && !box.contains(e.target)) box.hidden = true; });
+}
+
+function selectPricingProduct(id) {
+  const p = ppProducts.find(x => x.id === id);
+  if (!p) return;
+  const set = (i, v) => { const el = document.getElementById(i); if (el) el.value = v; };
+  set('ppSearch', p.name); set('ppProductId', id); set('ppCategory', p.category || '—');
+  set('ppPts', p.pts != null ? p.pts : ''); set('ppPtr', p.ptr != null ? p.ptr : ''); set('ppMrp', p.mrp != null ? p.mrp : '');
+  set('ppGst', (p.gst == null || p.gst === '') ? '' : String(p.gst));
+  set('ppStatus', p.status || 'active');
+  const box = document.getElementById('ppSuggest'); if (box) box.hidden = true;
+}
+
+function editProductPrice(id) {
+  selectPricingProduct(id);
+  const el = document.getElementById('ppSearch');
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function resetProductPrice() {
+  ['ppSearch', 'ppProductId', 'ppCategory', 'ppPts', 'ppPtr', 'ppMrp'].forEach(i => { const el = document.getElementById(i); if (el) el.value = ''; });
+  const g = document.getElementById('ppGst'); if (g) g.value = '';
+  const s = document.getElementById('ppStatus'); if (s) s.value = 'active';
+}
+
+async function saveProductPrice(e) {
+  e.preventDefault();
+  const id = document.getElementById('ppProductId').value;
+  const pts = parseFloat(document.getElementById('ppPts').value);
+  const ptr = parseFloat(document.getElementById('ppPtr').value);
+  const mrp = parseFloat(document.getElementById('ppMrp').value);
+  const gstRaw = document.getElementById('ppGst').value;
+  const status = document.getElementById('ppStatus').value;
+
+  if (!id) return toast('Please select a product first', 'error');
+  if (isNaN(pts) || isNaN(ptr) || isNaN(mrp)) return toast('PTS, PTR and MRP are required and must be numbers', 'error');
+  if (pts < 0 || ptr < 0 || mrp < 0) return toast('Prices cannot be negative', 'error');
+  if (!(pts <= ptr && ptr <= mrp)) return toast('Pricing must satisfy PTS ≤ PTR ≤ MRP', 'error');
+
+  const payload = { distributorPrice: pts, retailerPrice: ptr, mrp: mrp, status };
+  if (gstRaw !== '') payload.gst = parseFloat(gstRaw);
+  try {
+    await apiFetch('/products/' + id, { method: 'PUT', body: JSON.stringify(payload) });
+    toast('Price saved for this product');
+    await loadProductPricing();
+    selectPricingProduct(id);   // keep it selected with fresh values
+  } catch (err) { toast(err.message || 'Failed to save price', 'error'); }
 }
 
 /* ══════════════════════════════════════════
@@ -2329,6 +2437,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     loadSchemes(),
     loadDistMapping(),
     loadPricingTable(),
+    loadProductPricing(),
   ]);
   // Poll for new pending KYC approvals every 10s so the admin sees newly-signed-up
   // retailers and order requests without manually refreshing the page.

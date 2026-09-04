@@ -153,20 +153,30 @@ body:has(.pdx) { background: #F7F9FC; }
 .pdx-gal-main {
     position: relative;
     aspect-ratio: 1 / 1;
-    display: grid; place-items: center;
-    padding: 34px;
+    display: block;
+    padding: 0;
     cursor: zoom-in;
     width: 100%; border: 0; background: none;
+    overflow: hidden;   /* never let an image spill past the square */
 }
 .pdx-gal-main img {
-    max-width: 100%; max-height: 100%;
-    /* contain — pharmaceutical packaging is never cropped or stretched */
+    /* Absolutely fill the fixed 1:1 stage (inset 34px). Taking the image OUT of
+       flow is what makes the box truly uniform: a portrait/tall image can no
+       longer stretch the grid/flow and blow the container out of its 1:1 ratio
+       (the bug that made some products render huge). object-fit:contain then
+       scales ANY image — portrait, landscape, square, PNG — to fit the same
+       area, centered, without cropping or distortion. */
+    position: absolute;
+    top: 34px; left: 34px;
+    width: calc(100% - 68px);
+    height: calc(100% - 68px);
     object-fit: contain;
     transition: transform .35s var(--ez);
 }
 .pdx-gal-main:hover img { transform: scale(1.04); }
 .pdx-gal-ph {
-    display: flex; flex-direction: column; align-items: center; gap: 12px;
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;
     color: #9AA6B8; text-align: center; padding: 24px;
 }
 .pdx-gal-ph svg { width: 40%; max-width: 120px; height: auto; opacity: .5; }
@@ -183,9 +193,9 @@ body:has(.pdx) { background: #F7F9FC; }
     pointer-events: none;
 }
 
-/* thumbnails — 4 slots */
+/* thumbnails — 3 slots */
 .pdx-thumbs {
-    display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
     margin-top: 12px;
 }
 .pdx-thumb {
@@ -198,7 +208,9 @@ body:has(.pdx) { background: #F7F9FC; }
     display: grid; place-items: center;
     transition: border-color .16s var(--ez), box-shadow .16s var(--ez);
 }
-.pdx-thumb img { width: 100%; height: 100%; object-fit: contain; }
+/* Absolute-fill (like the main image) so a portrait thumb can't stretch its
+   1:1 slot; object-fit:contain keeps the whole image visible. */
+.pdx-thumb img { position: absolute; top: 8px; left: 8px; width: calc(100% - 16px); height: calc(100% - 16px); object-fit: contain; }
 .pdx-thumb:hover { border-color: #C7D5E6; }
 .pdx-thumb.is-on { border-color: var(--p); box-shadow: 0 0 0 3px rgba(30, 111, 168, .16); }
 .pdx-thumb-empty {
@@ -667,7 +679,7 @@ body:has(.pdx) { background: #F7F9FC; }
 .pdx-skeleton { padding-top: 8px; }
 .pdx-sk-hero { display: grid; grid-template-columns: minmax(0,1.05fr) minmax(0,.95fr); gap: 40px; }
 .pdx-sk-gal { aspect-ratio: 1/1; border-radius: 22px; }
-.pdx-sk-thumbs { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-top: 12px; }
+.pdx-sk-thumbs { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-top: 12px; }
 .pdx-sk-thumb { aspect-ratio: 1/1; border-radius: 12px; }
 
 .pdx-state {

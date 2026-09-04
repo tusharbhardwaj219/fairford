@@ -99,9 +99,13 @@ exports.createProduct = async (req, res, next) => {
       };
     }
 
-    // Multiple gallery images (field name: "images") — used via addProductImages route
+    // Multiple gallery images (field name: "images"). The product gallery is
+    // capped at 3 system-wide; anything beyond is discarded (and its uploaded
+    // Cloudinary asset destroyed) so no orphans accumulate.
     if (req.files && req.files.length > 0) {
-      productData.images = req.files.map(f => ({ url: f.path, public_id: f.filename }));
+      const mapped = req.files.map(f => ({ url: f.path, public_id: f.filename }));
+      productData.images = mapped.slice(0, 3);
+      await Promise.all(mapped.slice(3).map(f => destroyCloudinaryImage(f.public_id)));
     }
 
     const product = await Product.create(productData);
@@ -420,7 +424,7 @@ exports.updateProduct = async (req, res, next) => {
 };
 
 // ── @route  POST /api/products/:id/images ────────────────────────────────────
-// ── @desc   Upload up to 5 gallery images for a product
+// ── @desc   Add gallery images for a product (gallery capped at 3 total)
 // ── @access Private (Admin)
 exports.addProductImages = async (req, res, next) => {
   try {
@@ -434,13 +438,22 @@ exports.addProductImages = async (req, res, next) => {
       return res.status(400).json({ success: false, message: 'No images uploaded' });
     }
 
-    const newImages = req.files.map(f => ({ url: f.path, public_id: f.filename }));
-    product.images.push(...newImages);
+    // The product gallery is capped at 3 images system-wide. Only accept as many
+    // as there is room for; destroy any rejected uploads so no Cloudinary orphans.
+    const room = Math.max(0, 3 - (product.images ? product.images.length : 0));
+    const incoming = req.files.map(f => ({ url: f.path, public_id: f.filename }));
+    const accepted = incoming.slice(0, room);
+    const rejected = incoming.slice(room);
+    if (rejected.length) await Promise.all(rejected.map(f => destroyCloudinaryImage(f.public_id)));
+    if (!accepted.length) {
+      return res.status(400).json({ success: false, message: 'Gallery is full — a product can have at most 3 images.' });
+    }
+    product.images.push(...accepted);
     await product.save();
 
     return res.status(200).json({
       success: true,
-      message: `${newImages.length} image(s) added to gallery`,
+      message: `${accepted.length} image(s) added to gallery`,
       data: { images: product.images }
     });
   } catch (error) {

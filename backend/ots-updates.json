@@ -1,0 +1,1549 @@
+[
+ {
+  "code": "000113",
+  "name": "Aclofair-p",
+  "pts": 21.5,
+  "ptr": 26,
+  "mrp": 84,
+  "composition": [
+   "Aceclofenac 100mg",
+   "Paracetamol 325mg"
+  ]
+ },
+ {
+  "code": "000481",
+  "name": "Aclozest-SP",
+  "pts": 26.5,
+  "ptr": 32,
+  "mrp": 102,
+  "composition": [
+   "Aceclofenac 100mg",
+   "Paracetamol 325mg",
+   "Serratiopeptidase 10mg"
+  ]
+ },
+ {
+  "code": "000257",
+  "name": "Aclozest-P",
+  "pts": 14.5,
+  "ptr": 17,
+  "mrp": 80,
+  "composition": [
+   "Aceclofenac 100mg",
+   "Paracetamol 325mg"
+  ]
+ },
+ {
+  "code": "I01201",
+  "name": "Dicozox Relief-MR",
+  "pts": 20.6,
+  "ptr": 25,
+  "mrp": 77.34,
+  "composition": [
+   "Diclofenac 50mg",
+   "Paracetamol 325 mg",
+   "Chlorzoxazone 250mg"
+  ]
+ },
+ {
+  "code": "I00879",
+  "name": "Dicozox Relief",
+  "pts": 9.2,
+  "ptr": 11,
+  "mrp": 50.63,
+  "composition": [
+   "Diclofenac 50mg",
+   "Paracetamol 325 mg",
+   "Chlorzoxazone 250mg"
+  ]
+ },
+ {
+  "code": "000398",
+  "name": "Ketozeal-DT",
+  "pts": 17.5,
+  "ptr": 21,
+  "mrp": 133.13,
+  "composition": [
+   "Ketorolac 10mg"
+  ]
+ },
+ {
+  "code": "000082",
+  "name": "Nimfair-P",
+  "pts": 10.33,
+  "ptr": 12.4,
+  "mrp": 64.69,
+  "composition": [
+   "Nimesulide 100mg",
+   "Paracetamol 325mg"
+  ]
+ },
+ {
+  "code": "000198",
+  "name": "Coldfair-DS",
+  "pts": 33.2,
+  "ptr": 40,
+  "mrp": 71.25,
+  "composition": [
+   "Paracetamol 250mg",
+   "Phenylepherine 5mg",
+   "Chlorpheniramine 2mg"
+  ]
+ },
+ {
+  "code": "000233",
+  "name": "Levofair",
+  "pts": 24,
+  "ptr": 29,
+  "mrp": 86.25,
+  "composition": [
+   "Levocetirizine 2.5mg in each 5ml"
+  ]
+ },
+ {
+  "code": "000465",
+  "name": "Montufair 3D",
+  "pts": 81,
+  "ptr": 97,
+  "mrp": 290.63,
+  "composition": [
+   "Acebrophylline 200mg",
+   "Montelukast 10mg",
+   "Desloratadine 120mg"
+  ]
+ },
+ {
+  "code": "000270",
+  "name": "Mucofair-DX",
+  "pts": 27,
+  "ptr": 32.5,
+  "mrp": 117.19,
+  "composition": [
+   "Dextromethorphan 10mg",
+   "Chlorpheniramine 4mg in each 5ml"
+  ]
+ },
+ {
+  "code": "000058",
+  "name": "Aclofair-SP",
+  "pts": 27,
+  "ptr": 32,
+  "mrp": 115,
+  "composition": [
+   "Aceclofenac 100mg",
+   "Paracetamol 325mg",
+   "Serratiopeptidase 15mg"
+  ]
+ },
+ {
+  "code": "000032",
+  "name": "Neem+Tulsi Tooth paste",
+  "pts": 54.2,
+  "ptr": 65,
+  "mrp": 75.64,
+  "composition": [
+   "Neem",
+   "Tulsi"
+  ]
+ },
+ {
+  "code": "000028",
+  "name": "Sensoford toothpaste",
+  "pts": 66,
+  "ptr": 79.2,
+  "mrp": 210.94,
+  "composition": [
+   "Potassium Nitrate",
+   "Sodium Monoflurophosphate",
+   "TriclosanToothpaste"
+  ]
+ },
+ {
+  "code": "000443",
+  "name": "Jamun Karela Juice",
+  "pts": 115,
+  "ptr": 138,
+  "mrp": 257.81,
+  "composition": [
+   "Jamun 15%",
+   "Karela 20%",
+   "Neem 15%",
+   "Gudmar 5%",
+   "Methi 5% in each 10ml"
+  ]
+ },
+ {
+  "code": "I00812",
+  "name": "Dermazest 6",
+  "pts": 29,
+  "ptr": 34.5,
+  "mrp": 148,
+  "composition": [
+   "Ketoconazole",
+   "Neomycin Sulphate",
+   "clobetasol",
+   "tolnafate",
+   "Iodochlorhydroxyquinoline",
+   "Dexpanthenol 0.5mg"
+  ]
+ },
+ {
+  "code": "000351",
+  "name": "Coldfair Cold-n-Total",
+  "pts": 19.5,
+  "ptr": 23,
+  "mrp": 92.81,
+  "composition": [
+   "Paracetamol 325mg",
+   "Phenylephrine 5mg",
+   "Caffeine 30mg",
+   "Diphenhydramine 25mg"
+  ]
+ },
+ {
+  "code": "000141",
+  "name": "Mucofair-Junior",
+  "pts": 29,
+  "ptr": 35,
+  "mrp": 70.31,
+  "composition": [
+   "Dextromethorphan 10mg",
+   "Chlorpheniramine 2mg",
+   "Phenylephrine 5mg in each 5ml"
+  ]
+ },
+ {
+  "code": "000530",
+  "name": "Mucofair-LS-Junior",
+  "pts": 33.33,
+  "ptr": 40,
+  "mrp": 91.88,
+  "composition": [
+   "Levosalbutamol 0.5mg",
+   "Ambroxol 15mg",
+   "Guaiphenesin 50mg in each 5ml"
+  ]
+ },
+ {
+  "code": "000206",
+  "name": "Flybiotic Ear Drop",
+  "pts": 21,
+  "ptr": 25,
+  "mrp": 70.31,
+  "composition": [
+   "Gentamicin 0.3% w/v",
+   "Beclomethasone 0.25% w/v",
+   "Clotrimazole 2% w/v"
+  ]
+ },
+ {
+  "code": "000095",
+  "name": "CartiFair-Forte",
+  "pts": 45,
+  "ptr": 54,
+  "mrp": 275.85,
+  "composition": [
+   "Glucosamine Sulphate 750mg",
+   "Chondroitin Sulfate 100mg",
+   "MSM 250mg",
+   "Vit. D3 200 I.U."
+  ]
+ },
+ {
+  "code": "000706",
+  "name": "Histarax 25",
+  "pts": 15,
+  "ptr": 18,
+  "mrp": 88.13,
+  "composition": [
+   "Hydroxyzine Hydrochloride 25 mg"
+  ]
+ },
+ {
+  "code": "000452",
+  "name": "Hexafair Mouthwash",
+  "pts": 51.5,
+  "ptr": 61.5,
+  "mrp": 121.88,
+  "composition": [
+   "Chlorhexidine Gluconate 0.2% w/v"
+  ]
+ },
+ {
+  "code": "000262",
+  "name": "Levofair 5",
+  "pts": 6,
+  "ptr": 7.2,
+  "mrp": 81.56,
+  "composition": [
+   "Levocetirizine 5mg"
+  ]
+ },
+ {
+  "code": "000300",
+  "name": "Wax clear Ear Drops",
+  "pts": 22,
+  "ptr": 26,
+  "mrp": 62.81,
+  "composition": [
+   "Benzocaine 2.7% w/v",
+   "Chlorbutol 5% w/v",
+   "Turpentine Oil 15% w/v",
+   "Para Dichlorobenzene 2% w/v"
+  ]
+ },
+ {
+  "code": "000613",
+  "name": "Cetera-10",
+  "pts": 5.2,
+  "ptr": 6.3,
+  "mrp": 19.31,
+  "composition": [
+   "Cetirizine 10mg"
+  ]
+ },
+ {
+  "code": "000208",
+  "name": "Clotizest Dusting Powder",
+  "pts": 52,
+  "ptr": 62,
+  "mrp": 112.5,
+  "composition": [
+   "Clotrimazole 1% w/w"
+  ]
+ },
+ {
+  "code": "000298",
+  "name": "Itoford Plus",
+  "pts": 145,
+  "ptr": 174,
+  "mrp": 337.5,
+  "composition": [
+   "Itroconazole 200mg",
+   "Terbinafine 250mg"
+  ]
+ },
+ {
+  "code": "000225",
+  "name": "Itoford 200",
+  "pts": 75,
+  "ptr": 90,
+  "mrp": 95,
+  "composition": [
+   "Itraconazole 200mg"
+  ]
+ },
+ {
+  "code": "I00837",
+  "name": "Terbizest-250",
+  "pts": 41,
+  "ptr": 49.2,
+  "mrp": 232.5,
+  "composition": [
+   "Terbinafin Hydrochloride 250mg"
+  ]
+ },
+ {
+  "code": "I00771",
+  "name": "Valentine Gold",
+  "pts": 52.5,
+  "ptr": 63,
+  "mrp": 300,
+  "composition": [
+   "Dapoxetine 60mg",
+   "Sildenafil 100mg"
+  ]
+ },
+ {
+  "code": "000245",
+  "name": "Folifair",
+  "pts": 20,
+  "ptr": 24,
+  "mrp": 71.34,
+  "composition": [
+   "Folic Acid 5mg"
+  ]
+ },
+ {
+  "code": "I01244",
+  "name": "Tadozest Spray",
+  "pts": 146,
+  "ptr": 175.2,
+  "mrp": 355,
+  "composition": [
+   "Lidocaine spray"
+  ]
+ },
+ {
+  "code": "000376",
+  "name": "Aclofair-DT Tablet",
+  "pts": 28,
+  "ptr": 34,
+  "mrp": 140.63,
+  "composition": null
+ },
+ {
+  "code": "000122",
+  "name": "Argifair Schet",
+  "pts": 13.5,
+  "ptr": 16,
+  "mrp": 44.49,
+  "composition": null
+ },
+ {
+  "code": "000440",
+  "name": "B- Complex Capsule",
+  "pts": 22,
+  "ptr": 26,
+  "mrp": 84.53,
+  "composition": null
+ },
+ {
+  "code": "000232",
+  "name": "Benfozest - CD3 Tablet",
+  "pts": 58,
+  "ptr": 70,
+  "mrp": 289.19,
+  "composition": null
+ },
+ {
+  "code": "000361",
+  "name": "Calcifair -D3 60 K Soft gel Capsule",
+  "pts": 16,
+  "ptr": 19,
+  "mrp": 120,
+  "composition": null
+ },
+ {
+  "code": "I00896",
+  "name": "Calcifair - K27 Calpsule soft gel",
+  "pts": 30,
+  "ptr": 36,
+  "mrp": 277.5,
+  "composition": null
+ },
+ {
+  "code": "000352",
+  "name": "Calcifair - K27 Forte Calpsule soft gel",
+  "pts": 41,
+  "ptr": 49,
+  "mrp": 314.06,
+  "composition": null
+ },
+ {
+  "code": "I00800",
+  "name": "Calcifair- D3 Drop",
+  "pts": 25,
+  "ptr": 30,
+  "mrp": 66.74,
+  "composition": null
+ },
+ {
+  "code": "000015",
+  "name": "Calcifair- D3 Schate",
+  "pts": 7.5,
+  "ptr": 9,
+  "mrp": 36.29,
+  "composition": null
+ },
+ {
+  "code": "I00880",
+  "name": "Chymozest - D Tablet",
+  "pts": 44,
+  "ptr": 53,
+  "mrp": 182.81,
+  "composition": null
+ },
+ {
+  "code": "000482",
+  "name": "Cremofair Plus Suspension",
+  "pts": 53,
+  "ptr": 63.3,
+  "mrp": 164.06,
+  "composition": null
+ },
+ {
+  "code": "000226",
+  "name": "Cypofair Syrup ( Kiwi)",
+  "pts": 48,
+  "ptr": 57.3,
+  "mrp": 138.75,
+  "composition": null
+ },
+ {
+  "code": "000350",
+  "name": "Daily Schet",
+  "pts": 12.5,
+  "ptr": 15,
+  "mrp": 37.37,
+  "composition": null
+ },
+ {
+  "code": "000050",
+  "name": "Defo-6 Tablet",
+  "pts": 30,
+  "ptr": 36,
+  "mrp": 154.69,
+  "composition": null
+ },
+ {
+  "code": "000099",
+  "name": "Diclofair Pain relief Gel",
+  "pts": 39,
+  "ptr": 46.5,
+  "mrp": 114.38,
+  "composition": null
+ },
+ {
+  "code": "000055",
+  "name": "Digylac Capsule",
+  "pts": 40.5,
+  "ptr": 48.6,
+  "mrp": 111.23,
+  "composition": null
+ },
+ {
+  "code": "000309",
+  "name": "Digylac- Z sachet",
+  "pts": 4.4,
+  "ptr": 5.3,
+  "mrp": 40.04,
+  "composition": null
+ },
+ {
+  "code": "000291",
+  "name": "Drotifair - M",
+  "pts": 25,
+  "ptr": 30,
+  "mrp": 135.94,
+  "composition": null
+ },
+ {
+  "code": "000185",
+  "name": "Esofair - DSR Capsule",
+  "pts": 47.5,
+  "ptr": 57,
+  "mrp": 131.25,
+  "composition": null
+ },
+ {
+  "code": "000017",
+  "name": "Etoxifair -90 Tablet",
+  "pts": 35,
+  "ptr": 42,
+  "mrp": 164.06,
+  "composition": null
+ },
+ {
+  "code": "000140",
+  "name": "EVEC- 400 Capsule",
+  "pts": 23.5,
+  "ptr": 28,
+  "mrp": 37.37,
+  "composition": null
+ },
+ {
+  "code": "000395",
+  "name": "EVEC- LC Tablet",
+  "pts": 25,
+  "ptr": 30,
+  "mrp": 48.94,
+  "composition": null
+ },
+ {
+  "code": "000503",
+  "name": "Evec-600 Capsule",
+  "pts": 24,
+  "ptr": 28,
+  "mrp": 48.94,
+  "composition": null
+ },
+ {
+  "code": "I01133",
+  "name": "Fairford Foot care cream",
+  "pts": 36.3,
+  "ptr": 43.5,
+  "mrp": 117.19,
+  "composition": [
+   "Brassaca Campestris 12.5%",
+   "Bee Wax 12.5%",
+   "Triticum Sativum 1%",
+   "Cinnamomum Camphora 1%",
+   "Aloe Barbadensis 10%",
+   "Borax 0.5%",
+   "Vaseline Paraffin 62.15%"
+  ]
+ },
+ {
+  "code": "I01142",
+  "name": "Fairford Inhaler",
+  "pts": 17,
+  "ptr": 20,
+  "mrp": 54.38,
+  "composition": null
+ },
+ {
+  "code": "000311",
+  "name": "Fairford Musli Capsule",
+  "pts": 45,
+  "ptr": 54,
+  "mrp": 323.44,
+  "composition": null
+ },
+ {
+  "code": "000114",
+  "name": "Fairford Musli Jar",
+  "pts": 139,
+  "ptr": 169,
+  "mrp": 984.38,
+  "composition": null
+ },
+ {
+  "code": "000158",
+  "name": "Fairford Neem Soap",
+  "pts": 37.5,
+  "ptr": 45,
+  "mrp": 57.85,
+  "composition": null
+ },
+ {
+  "code": "000312",
+  "name": "Fairford Refresh Eye drop",
+  "pts": 24.5,
+  "ptr": 29,
+  "mrp": 145.31,
+  "composition": null
+ },
+ {
+  "code": "I01140",
+  "name": "Fairford Vaporixing Rub 10ml",
+  "pts": 19,
+  "ptr": 23,
+  "mrp": 44,
+  "composition": null
+ },
+ {
+  "code": "I01141",
+  "name": "Fairford Vaporixing Rub 25ml",
+  "pts": 39,
+  "ptr": 46.5,
+  "mrp": 110,
+  "composition": null
+ },
+ {
+  "code": "I01139",
+  "name": "Fairford Vaporixing Rub 5ml",
+  "pts": 11,
+  "ptr": 13,
+  "mrp": 25,
+  "composition": null
+ },
+ {
+  "code": "000446",
+  "name": "fairford Vitamin -C Tablet",
+  "pts": 37,
+  "ptr": 44,
+  "mrp": 82.31,
+  "composition": null
+ },
+ {
+  "code": "000204",
+  "name": "Fariford enery drink ( Orange)",
+  "pts": 37.5,
+  "ptr": 45,
+  "mrp": 79.69,
+  "composition": null
+ },
+ {
+  "code": "000102",
+  "name": "Feriford - XT Syrup",
+  "pts": 50,
+  "ptr": 60,
+  "mrp": 169.07,
+  "composition": null
+ },
+ {
+  "code": "000081",
+  "name": "Feriford - XT Tablet",
+  "pts": 35,
+  "ptr": 42,
+  "mrp": 164.06,
+  "composition": null
+ },
+ {
+  "code": "000066",
+  "name": "Fordzyme Syrup",
+  "pts": 41.5,
+  "ptr": 50,
+  "mrp": 146.82,
+  "composition": null
+ },
+ {
+  "code": "000042",
+  "name": "Panford Injection",
+  "pts": 17.5,
+  "ptr": 20.6,
+  "mrp": 51.89,
+  "composition": null
+ },
+ {
+  "code": "000170",
+  "name": "Pathri Mukti Syrup",
+  "pts": 37.5,
+  "ptr": 45,
+  "mrp": 154.69,
+  "composition": null
+ },
+ {
+  "code": "000461",
+  "name": "P-DOM-SR (Capsule)",
+  "pts": 27,
+  "ptr": 32.4,
+  "mrp": 150,
+  "composition": null
+ },
+ {
+  "code": "000273",
+  "name": "Piles Care Cream",
+  "pts": 44,
+  "ptr": 53,
+  "mrp": 78,
+  "composition": null
+ },
+ {
+  "code": "000285",
+  "name": "Platogain Plus Tablet",
+  "pts": 49,
+  "ptr": 59,
+  "mrp": 320.34,
+  "composition": null
+ },
+ {
+  "code": "000498",
+  "name": "Platogain Syrup",
+  "pts": 45.2,
+  "ptr": 54.2,
+  "mrp": 154.69,
+  "composition": null
+ },
+ {
+  "code": "000153",
+  "name": "Pragafair NT Tablet",
+  "pts": 27.5,
+  "ptr": 33,
+  "mrp": 157.73,
+  "composition": null
+ },
+ {
+  "code": "000260",
+  "name": "Pragafair Trio Tablet",
+  "pts": 56.2,
+  "ptr": 67.5,
+  "mrp": 211,
+  "composition": null
+ },
+ {
+  "code": "000171",
+  "name": "Quneed- Plus Tablet",
+  "pts": 385,
+  "ptr": 465,
+  "mrp": 111.23,
+  "composition": null
+ },
+ {
+  "code": "000060",
+  "name": "Quneed tablet",
+  "pts": 340,
+  "ptr": 408,
+  "mrp": 622.88,
+  "composition": null
+ },
+ {
+  "code": "000115",
+  "name": "Rabezo - DSR Capsule",
+  "pts": 25.14,
+  "ptr": 31,
+  "mrp": 150,
+  "composition": null
+ },
+ {
+  "code": "000610",
+  "name": "Silymin Syrup",
+  "pts": 48,
+  "ptr": 57.3,
+  "mrp": 209.11,
+  "composition": null
+ },
+ {
+  "code": "000190",
+  "name": "Softofair Powder",
+  "pts": 90,
+  "ptr": 108,
+  "mrp": 210.64,
+  "composition": null
+ },
+ {
+  "code": "000552",
+  "name": "Suprafair Tablet",
+  "pts": 29,
+  "ptr": 35,
+  "mrp": 59.17,
+  "composition": null
+ },
+ {
+  "code": "000220",
+  "name": "Tadozest -D Tablet",
+  "pts": 52.5,
+  "ptr": 63,
+  "mrp": 290.63,
+  "composition": null
+ },
+ {
+  "code": "000447",
+  "name": "Tendofair Forte Tablet",
+  "pts": 70,
+  "ptr": 84,
+  "mrp": 306.99,
+  "composition": null
+ },
+ {
+  "code": "000253",
+  "name": "Tendofair Schate",
+  "pts": 35,
+  "ptr": 42,
+  "mrp": 111.23,
+  "composition": null
+ },
+ {
+  "code": "000186",
+  "name": "Unifair-400 Tablet",
+  "pts": 90,
+  "ptr": 108,
+  "mrp": 578.39,
+  "composition": null
+ },
+ {
+  "code": "000492",
+  "name": "Ursofair -300 Tablet",
+  "pts": 260,
+  "ptr": 312,
+  "mrp": 450,
+  "composition": null
+ },
+ {
+  "code": "000387",
+  "name": "Verty-16 Tablet",
+  "pts": 19,
+  "ptr": 23,
+  "mrp": 188.44,
+  "composition": null
+ },
+ {
+  "code": "000388",
+  "name": "Verty-8 Tablet",
+  "pts": 15,
+  "ptr": 18,
+  "mrp": 146,
+  "composition": null
+ },
+ {
+  "code": "I01391",
+  "name": "Zincofair 12G Capsule",
+  "pts": 79,
+  "ptr": 95,
+  "mrp": 325,
+  "composition": [
+   "Ginseng",
+   "Green Tea Extract",
+   "Grape Seed Extract",
+   "Ginkgo Biloba",
+   "Garlic Powder",
+   "Guggul",
+   "Ginger Root Extract",
+   "Green Coffee Bean Extract",
+   "Glycyrrhiza Glabra Extract",
+   "Glutamic Acid",
+   "Glycine",
+   "Glutamine",
+   "Lycopene",
+   "Essential Amino Acid",
+   "Cyanocobalamin",
+   "Vitamins",
+   "L- Carnitine L-Tartrate & Trace Elements"
+  ]
+ },
+ {
+  "code": null,
+  "name": "Zincofair-Daily Capsule",
+  "pts": 27,
+  "ptr": 32.4,
+  "mrp": 106,
+  "composition": [
+   "Vita",
+   "B1 1.0mg",
+   "Vita. B2 1.0mg",
+   "Vita. B6 0.5mg Pantpthenic Acid 1.0mg",
+   "Iron 1.64mg",
+   "Mn 0.32mg",
+   "Potassium 0.5mg",
+   "Zn 0.18mg",
+   "Calcium Phosphate 132mg",
+   "Chromium 3.1mcg",
+   "L-Lysine 1.0mg"
+  ]
+ },
+ {
+  "code": "000384",
+  "name": "Zincozest Tablet",
+  "pts": 36.25,
+  "ptr": 43.5,
+  "mrp": 186.86,
+  "composition": null
+ },
+ {
+  "code": "000106",
+  "name": "Pregafair-M",
+  "pts": 37.5,
+  "ptr": 45,
+  "mrp": 161.25,
+  "composition": null
+ },
+ {
+  "code": "I00826",
+  "name": "Chymozest Forte",
+  "pts": 22.5,
+  "ptr": 27,
+  "mrp": 482,
+  "composition": null
+ },
+ {
+  "code": "I00762",
+  "name": "FQ- 10 gold",
+  "pts": 66,
+  "ptr": 80,
+  "mrp": 511.65,
+  "composition": null
+ },
+ {
+  "code": "000173",
+  "name": "Gabafair - NT Tablet",
+  "pts": 50,
+  "ptr": 60,
+  "mrp": 332.81,
+  "composition": null
+ },
+ {
+  "code": "000142",
+  "name": "Gasofair suspension (Mint)",
+  "pts": 50,
+  "ptr": 60,
+  "mrp": 114.38,
+  "composition": null
+ },
+ {
+  "code": "000317",
+  "name": "Germinalife Suspension",
+  "pts": 17,
+  "ptr": 20.4,
+  "mrp": 54.38,
+  "composition": null
+ },
+ {
+  "code": "000375",
+  "name": "Hepafair Schet",
+  "pts": 25,
+  "ptr": 30,
+  "mrp": 240.25,
+  "composition": null
+ },
+ {
+  "code": "000770",
+  "name": "Kesh Gloss Hair Oil",
+  "pts": 100,
+  "ptr": 120,
+  "mrp": 200.21,
+  "composition": null
+ },
+ {
+  "code": "000514",
+  "name": "L- GlutaForte Tablet",
+  "pts": 248,
+  "ptr": 298,
+  "mrp": 818.64,
+  "composition": null
+ },
+ {
+  "code": "000069",
+  "name": "Lactoford Solution 100ml",
+  "pts": 82.5,
+  "ptr": 99,
+  "mrp": 131.25,
+  "composition": null
+ },
+ {
+  "code": "000453",
+  "name": "Lactoford Solution 200ml",
+  "pts": 160,
+  "ptr": 192,
+  "mrp": 258,
+  "composition": null
+ },
+ {
+  "code": "000169",
+  "name": "Leukozest Tonic",
+  "pts": 39,
+  "ptr": 47,
+  "mrp": 159.38,
+  "composition": null
+ },
+ {
+  "code": "000075",
+  "name": "Livford - DS Syrup",
+  "pts": 39,
+  "ptr": 47,
+  "mrp": 154.69,
+  "composition": null
+ },
+ {
+  "code": "000074",
+  "name": "Lv-Zyme Syrup",
+  "pts": 42,
+  "ptr": 50,
+  "mrp": 164.06,
+  "composition": null
+ },
+ {
+  "code": "000210",
+  "name": "Lycofair Gold Capsule",
+  "pts": 40,
+  "ptr": 48,
+  "mrp": 155.72,
+  "composition": null
+ },
+ {
+  "code": "000078",
+  "name": "Lycofair Syrup",
+  "pts": 39,
+  "ptr": 47,
+  "mrp": 169.07,
+  "composition": null
+ },
+ {
+  "code": "000280",
+  "name": "M- Sore Gel",
+  "pts": 27.5,
+  "ptr": 33,
+  "mrp": 73.13,
+  "composition": null
+ },
+ {
+  "code": "000512",
+  "name": "Maglac- D3 Tablet",
+  "pts": 67.5,
+  "ptr": 81,
+  "mrp": 222.46,
+  "composition": null
+ },
+ {
+  "code": "000249",
+  "name": "Meftofair - SPAS Tablet",
+  "pts": 8.35,
+  "ptr": 10,
+  "mrp": 42.19,
+  "composition": null
+ },
+ {
+  "code": "000108",
+  "name": "Multi- Vitamin Syrup",
+  "pts": 39.6,
+  "ptr": 47.5,
+  "mrp": 62.29,
+  "composition": null
+ },
+ {
+  "code": "000486",
+  "name": "Multi- Vitamin Syrup (Sugar Free)",
+  "pts": 44.25,
+  "ptr": 53,
+  "mrp": 177.08,
+  "composition": null
+ },
+ {
+  "code": "000145",
+  "name": "Moxifair - D Eye Drop",
+  "pts": 20.8,
+  "ptr": 25,
+  "mrp": 79.69,
+  "composition": null
+ },
+ {
+  "code": "000146",
+  "name": "Moxifair - KT Eye Drop",
+  "pts": 21,
+  "ptr": 25.6,
+  "mrp": 89.06,
+  "composition": null
+ },
+ {
+  "code": "000331",
+  "name": "Mucofair - SG softgel (Capsule)",
+  "pts": 25.5,
+  "ptr": 31,
+  "mrp": 159.38,
+  "composition": null
+ },
+ {
+  "code": "I00809",
+  "name": "Mucofair 15 DMR Syrup",
+  "pts": 32.4,
+  "ptr": 39,
+  "mrp": 110,
+  "composition": null
+ },
+ {
+  "code": "000286",
+  "name": "Mycopred - 4 tablet",
+  "pts": 20,
+  "ptr": 24,
+  "mrp": 53.44,
+  "composition": null
+ },
+ {
+  "code": "000283",
+  "name": "Mycopred - 8 tablet",
+  "pts": 27.5,
+  "ptr": 33,
+  "mrp": 59.43,
+  "composition": null
+ },
+ {
+  "code": "000123",
+  "name": "Mylozet - D (Capsule)",
+  "pts": 36,
+  "ptr": 43.2,
+  "mrp": 173.52,
+  "composition": null
+ },
+ {
+  "code": "000380",
+  "name": "Nepofair -500 Tablet",
+  "pts": 92,
+  "ptr": 110,
+  "mrp": 234.38,
+  "composition": null
+ },
+ {
+  "code": "000175",
+  "name": "Neurofair- LC ( Capsule)",
+  "pts": 75.5,
+  "ptr": 91,
+  "mrp": 298.09,
+  "composition": null
+ },
+ {
+  "code": "000244",
+  "name": "Neurofair Forte Plus Table",
+  "pts": 27.5,
+  "ptr": 33,
+  "mrp": 72.97,
+  "composition": null
+ },
+ {
+  "code": "000358",
+  "name": "Neurofair gold Sachet",
+  "pts": 26.25,
+  "ptr": 31.5,
+  "mrp": 57.84,
+  "composition": null
+ },
+ {
+  "code": "000147",
+  "name": "Oflofair - D Eye Drop",
+  "pts": 18.25,
+  "ptr": 22,
+  "mrp": 51.56,
+  "composition": null
+ },
+ {
+  "code": "I00761",
+  "name": "Omega - 3-6-9 Loose",
+  "pts": 284,
+  "ptr": 341,
+  "mrp": 621.99,
+  "composition": null
+ },
+ {
+  "code": "000307",
+  "name": "Omega - 3-6-9 Strip",
+  "pts": 35,
+  "ptr": 42,
+  "mrp": 213.56,
+  "composition": null
+ },
+ {
+  "code": "000255",
+  "name": "Omefair - 20 Capsule (20X15)",
+  "pts": 19.5,
+  "ptr": 23.4,
+  "mrp": 45,
+  "composition": null
+ },
+ {
+  "code": "000303",
+  "name": "Omefair -D Capsule",
+  "pts": 20.5,
+  "ptr": 24.6,
+  "mrp": 125,
+  "composition": null
+ },
+ {
+  "code": "000132",
+  "name": "Ondfair - MD Tablet",
+  "pts": 9.4,
+  "ptr": 11.5,
+  "mrp": 45,
+  "composition": null
+ },
+ {
+  "code": "000064",
+  "name": "Panford - 40 Tablet (20X10)",
+  "pts": 15,
+  "ptr": 18,
+  "mrp": 112.5,
+  "composition": null
+ },
+ {
+  "code": "000154",
+  "name": "Panford - D Tablet",
+  "pts": 16,
+  "ptr": 19.2,
+  "mrp": 116.25,
+  "composition": null
+ },
+ {
+  "code": "I00853",
+  "name": "Fordzyme Tablet",
+  "pts": 34,
+  "ptr": 41,
+  "mrp": 66.74,
+  "composition": null
+ },
+ {
+  "code": "000412",
+  "name": "Fungizest Cream",
+  "pts": 34,
+  "ptr": 41,
+  "mrp": 117.19,
+  "composition": [
+   "Clotrimazole 1% w/w",
+   "Iodochlorhydroxyquinoline 1% w/w",
+   "Tolnaftate 1% w/w"
+  ]
+ },
+ {
+  "code": "000468",
+  "name": "NapoFair-D",
+  "pts": 80,
+  "ptr": 96,
+  "mrp": 140.62,
+  "composition": [
+   "Naproxen 500 mg",
+   "Domperidine 10mg"
+  ]
+ },
+ {
+  "code": "I01246",
+  "name": "Protifair DHA",
+  "pts": 135.3,
+  "ptr": 162.4,
+  "mrp": 475,
+  "composition": [
+   "Protien Powder"
+  ]
+ },
+ {
+  "code": null,
+  "name": "Aclofair Cold & Flu Red",
+  "pts": 18.33,
+  "ptr": 22,
+  "mrp": 76.87,
+  "composition": [
+   "Aceclofenac 100mg",
+   "Paracetamol 325mg",
+   "Phenylephrine 5mg",
+   "Cetrizine 10mg",
+   "Caffeine 25mg"
+  ]
+ },
+ {
+  "code": null,
+  "name": "ACLOFAIR COLD & FLU",
+  "pts": 22,
+  "ptr": 18.33,
+  "mrp": 78,
+  "composition": [
+   "Aceclofenac 100mg",
+   "Paracetamol 325mg",
+   "Phenylephrine 5mg",
+   "Cetrizine 10mg",
+   "Caffeine 25mg"
+  ]
+ },
+ {
+  "code": null,
+  "name": "Orthozest-Roll On",
+  "pts": 72,
+  "ptr": 86.4,
+  "mrp": 125,
+  "composition": [
+   "Ayurvedic Pain Relief Roll On"
+  ]
+ },
+ {
+  "code": null,
+  "name": "Orthozest-capsule",
+  "pts": 90,
+  "ptr": 108,
+  "mrp": 186,
+  "composition": [
+   "Ayurvedic Muscular Pain Relief Caps"
+  ]
+ },
+ {
+  "code": null,
+  "name": "Piles Care Jar",
+  "pts": 166.66,
+  "ptr": 200,
+  "mrp": 277,
+  "composition": [
+   "Ayurvedic Capsules for Piles"
+  ]
+ },
+ {
+  "code": null,
+  "name": "Piles Care Capsule",
+  "pts": 30,
+  "ptr": 36,
+  "mrp": 128,
+  "composition": [
+   "Ayurvedic Capsules for Piles"
+  ]
+ },
+ {
+  "code": null,
+  "name": "Red Onion shampoo",
+  "pts": 225,
+  "ptr": 270,
+  "mrp": 485,
+  "composition": [
+   "Red Onion shampoo"
+  ]
+ },
+ {
+  "code": null,
+  "name": "Red Onion Oil",
+  "pts": 125,
+  "ptr": 150,
+  "mrp": 325,
+  "composition": [
+   "Red Onion Oil"
+  ]
+ },
+ {
+  "code": null,
+  "name": "Calcifair-D3 Nano shots",
+  "pts": 17.5,
+  "ptr": 21,
+  "mrp": 101.25,
+  "composition": [
+   "Vitamin D3 60000 I.U. in each 5ml"
+  ]
+ },
+ {
+  "code": null,
+  "name": "Calcifair D3 nano Shot",
+  "pts": 17.05,
+  "ptr": 21,
+  "mrp": 101.25,
+  "composition": [
+   "Vitamin D3 60000 I.U. in each 5ml"
+  ]
+ },
+ {
+  "code": null,
+  "name": "Nimfair Cold and Flu",
+  "pts": 21.5,
+  "ptr": 25.8,
+  "mrp": 75,
+  "composition": [
+   "Nimesulide 100mg",
+   "Caffeine 25mg",
+   "Phenylepherine 10mg",
+   "Chlorpheniramine 4mg"
+  ]
+ },
+ {
+  "code": null,
+  "name": "Montufair-L",
+  "pts": 30,
+  "ptr": 36,
+  "mrp": 164.06,
+  "composition": [
+   "Levocetirizine 5mg",
+   "Montelukast 10mg"
+  ]
+ },
+ {
+  "code": null,
+  "name": "Nasofair Paeditatric Nasal Drops",
+  "pts": 18,
+  "ptr": 21.6,
+  "mrp": 46.93,
+  "composition": [
+   "Xylometazoline 0.05% w/v"
+  ]
+ },
+ {
+  "code": null,
+  "name": "Nasofair Adult Nasal Drops",
+  "pts": 18.75,
+  "ptr": 22.5,
+  "mrp": 57,
+  "composition": [
+   "Xylometazoline 0.1% w/v"
+  ]
+ },
+ {
+  "code": null,
+  "name": "Ketospare shampoo",
+  "pts": 75,
+  "ptr": 90,
+  "mrp": 225,
+  "composition": [
+   "Ketoconazole 2% w/v",
+   "ZPTO 1% w/v"
+  ]
+ },
+ {
+  "code": null,
+  "name": "Ketospare  soap",
+  "pts": 38,
+  "ptr": 45.6,
+  "mrp": 95,
+  "composition": [
+   "Ketoconazole 1% w/w",
+   "ZPTO 1%w/w"
+  ]
+ },
+ {
+  "code": null,
+  "name": "Ketospare tablets",
+  "pts": 40,
+  "ptr": 48,
+  "mrp": 253,
+  "composition": [
+   "Melatonin",
+   "Biotin",
+   "Amino Acids Natural Extracts",
+   "Multivitamin & Multimineral"
+  ]
+ },
+ {
+  "code": null,
+  "name": "Pegra raj",
+  "pts": 6.6,
+  "ptr": 7.92,
+  "mrp": 56.25,
+  "composition": [
+   "Pregnancy test card"
+  ]
+ },
+ {
+  "code": null,
+  "name": "Platogain",
+  "pts": 42,
+  "ptr": 50.4,
+  "mrp": 300,
+  "composition": [
+   "Extract Of Carica Papaya Leaf"
+  ]
+ },
+ {
+  "code": null,
+  "name": "Curcumin Tablet",
+  "pts": 110,
+  "ptr": 132,
+  "mrp": 658,
+  "composition": [
+   "Curcumin 600 mg",
+   "Spirullira 500mg",
+   "Boswellic Acid 125mg",
+   "Piperine 5mg",
+   "Lycopene 8mg",
+   "Beta Carotene 20mg",
+   "Zinc Sulphate 27.6 mg",
+   "Vitamin C 50 I.U."
+  ]
+ },
+ {
+  "code": null,
+  "name": "Curcumin Syrup",
+  "pts": 300,
+  "ptr": 360,
+  "mrp": 3190,
+  "composition": [
+   "Water Soluble Nano Curcumin"
+  ]
+ },
+ {
+  "code": null,
+  "name": "Zincofair 21G Capsule",
+  "pts": 180,
+  "ptr": 216,
+  "mrp": 450,
+  "composition": [
+   "Green Tea Extract",
+   "Ginkgo Biloba",
+   "Ginseng Extract",
+   "Grape Seed Extract",
+   "Garlic Extract",
+   "Guggul Extract",
+   "Ginger Root Extract",
+   "Green Coffee Bean",
+   "Green Apple Extract",
+   "Green Wheat Oil",
+   "Glycyrrhiza Glabra Extract",
+   "Gurmar Extract",
+   "Gymnnema Extract",
+   "Goji Berry",
+   "Glutamic Acid",
+   "Gubtli Extract",
+   "Gudy Extract",
+   "Gudly Chitrak",
+   "Gokshira",
+   "Guduchi",
+   "Niacinamide",
+   "Vitamin C",
+   "Vitamin E",
+   "Inositol",
+   "Calcium D- Panthothenate",
+   "Vitamin A",
+   "Vitamin B1",
+   "Vitamin B6",
+   "Vitamin K3",
+   "Folic Acid",
+   "Biotin",
+   "Vitamin D",
+   "Cyanocobalamin",
+   "Vitamin K27",
+   "Lutein",
+   "Methionine",
+   "Choline Bitartrate",
+   "Lysine",
+   "L-Carnitine L-Tartrate",
+   "Cystein",
+   "L-Arginine",
+   "Iron"
+  ]
+ }
+]

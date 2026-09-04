@@ -43,7 +43,8 @@ document.addEventListener('DOMContentLoaded', function () {
       if (!picks.length) { host.parentNode.parentNode.style.display = 'none'; return; }
 
       host.innerHTML = picks.map(function (p) {
-        var href = 'productdetail.html?id=' + encodeURIComponent(p.id);
+        var href = p.slug ? '/product/' + encodeURIComponent(p.slug)
+                          : 'productdetail.html?id=' + encodeURIComponent(p.id);
         // NB: data-fallback-class must NOT be `abx-prod-img` — the img already
         // lives inside that box, so reusing it would nest .abx-prod-img inside
         // itself for any product whose Cloudinary asset was removed, breaking
