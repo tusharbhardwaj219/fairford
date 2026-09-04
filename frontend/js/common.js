@@ -49,6 +49,7 @@ const ICONS = {
    category from data-cat and the wrapper class from data-fallback-class.
    Referenced from inline onerror handlers across the storefront. */
 function productImgFallback(img) {
+<<<<<<< HEAD
   if (!img || img.dataset.fellBack) return;   // guard against loops (SVG stage only)
   // Two-stage fallback: if a `data-alt-src` is present (e.g. the product's
   // primary `image` when this <img> was showing a stale/broken `images[]`
@@ -64,6 +65,9 @@ function productImgFallback(img) {
     img.src = alt;
     return;
   }
+=======
+  if (!img || img.dataset.fellBack) return;   // guard against loops
+>>>>>>> 7b815741 (final version all change done by tushar)
   img.dataset.fellBack = '1';
   img.onerror = null;
   var cat  = img.getAttribute('data-cat') || '';
