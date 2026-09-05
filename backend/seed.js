@@ -91,6 +91,23 @@ async function seed() {
   console.log('\n🌱  MediBridge — Seed Script\n' + '─'.repeat(42));
 
   if (FRESH) {
+    // SAFETY GUARD: --fresh DELETES every collection (products, admins, orders…).
+    // Running it against a remote/production database is what wiped the catalogue
+    // before. Refuse unless the target is clearly local, or an explicit override
+    // flag is given. This is the single most important guard against "the products
+    // disappeared / login stopped working" recurring.
+    const uri = process.env.MONGO_URI || '';
+    const isLocal = /localhost|127\.0\.0\.1/.test(uri);
+    const forced = process.argv.includes('--force-prod');
+    if (!isLocal && !forced) {
+      const host = uri.replace(/^.*@/, '').replace(/[/?].*$/, '').split(',')[0] || '(unknown)';
+      console.error('\n🛑  REFUSING to run --fresh: MONGO_URI points to a NON-LOCAL database.');
+      console.error('    --fresh DELETES ALL collections (products, admins, orders, retailers…).');
+      console.error('    target host: ' + host);
+      console.error('    This is a production/remote cluster. If you REALLY intend to wipe it,');
+      console.error('    re-run explicitly:  node seed.js --fresh --force-prod\n');
+      process.exit(1);
+    }
     console.log('⚠   --fresh: clearing all collections...');
     await Promise.all([
       Category.deleteMany({}),
