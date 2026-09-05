@@ -16,18 +16,9 @@
   } catch (e) {}
 })();
 
-<<<<<<< HEAD
 var $ = function (id) { return document.getElementById(id); };
 var PRODUCTS = [], PROFILE = null, ORDERS = [], ORDER_MAP = {};
 var CART = readCart(), searchTimer, ONLINE_PAY_ON = false;
-=======
-const $ = (id) => document.getElementById(id);
-let PRODUCTS = [];
-let PROFILE = null;
-let CART = readCart();          // [{ id, qty }]
-let ORDERS = {};                // id → order (for Buy Again / View Details)
-let searchTimer;
->>>>>>> 7b815741 (final version all change done by tushar)
 
 function readCart() { try { return JSON.parse(localStorage.getItem('ff_cart') || '[]'); } catch (e) { return []; } }
 function writeCart() { localStorage.setItem('ff_cart', JSON.stringify(CART)); }
@@ -261,95 +252,11 @@ function viewOrder(id) {
     '<div class="pf-od-sec"><strong>Payment</strong><p style="font-size:.85rem">' + esc(o.paymentMethod || 'cash') + ' · ' + esc(o.paymentStatus || 'unpaid') + '</p></div>';
   el.style.display = 'block';
 }
-<<<<<<< HEAD
 function cancelOrder(id) {
-=======
-
-/* ── Orders ── */
-async function loadOrders() {
-  try {
-    const data = await apiFetch('/orders?limit=50');
-    renderOrders(data.orders || []);
-  } catch (e) {
-    // Pending (un-activated) accounts can't list orders yet — show neutral state
-    $('rtOrders').innerHTML = '<p class="rt-empty">No orders yet.</p>';
-  }
-}
-
-function renderOrders(orders) {
-  const box = $('rtOrders');
-  ORDERS = {};
-  if (!orders.length) { box.innerHTML = '<p class="rt-empty">No orders yet.</p>'; return; }
-  box.innerHTML = orders.map((o) => {
-    ORDERS[o._id] = o;
-    const items = (o.items || []).map((i) => esc(i.productName) + ' ×' + i.quantity).join(', ');
-    const dist = o.distributor ? (o.distributor.businessName || o.distributor.name) : '—';
-    const when = o.createdAt
-      ? new Date(o.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: '2-digit' }) : '';
-    const canCancel = ['pending', 'approved'].includes(o.status);
-    const paid = o.paymentStatus === 'paid';
-    return '<div class="rt-order">' +
-      '<div class="rt-order-top">' +
-        '<span class="rt-order-id">' + esc(o.orderNumber || '') + '</span>' +
-        '<span class="badge ' + esc(o.status) + '">' + esc(o.status) + '</span>' +
-      '</div>' +
-      '<p class="rt-order-items">' + (items || 'Items') + '</p>' +
-      '<p class="rt-order-meta">' + inr(o.totalAmount) + ' · COD · ' +
-        (paid ? 'Paid' : 'Payment pending') + ' · routed to ' + esc(dist) + ' · ' + when + '</p>' +
-      '<div class="rt-order-actions">' +
-        '<button class="btn btn-ghost btn-sm" data-again="' + o._id + '">Buy Again</button>' +
-        '<button class="btn btn-ghost btn-sm" data-view="' + o._id + '">View Details</button>' +
-        (canCancel ? '<button class="btn btn-danger btn-sm" data-cancel="' + o._id + '">Cancel</button>' : '') +
-      '</div>' +
-      '<div class="rt-order-detail" id="ordDet-' + o._id + '" style="display:none"></div>' +
-    '</div>';
-  }).join('');
-}
-
-/* Add every item from a past order back into the cart ("Add More" / reorder). */
-function buyAgain(id) {
-  const o = ORDERS[id];
-  if (!o || !o.items || !o.items.length) return;
-  o.items.forEach((it) => {
-    const pid = String(it.product);
-    const ex = CART.find((c) => String(c.id) === pid);
-    if (ex) ex.qty += it.quantity; else CART.push({ id: pid, qty: it.quantity });
-  });
-  writeCart(); updateCartUI();
-  toast('Items added to cart — review & place order');
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-/* Expand/collapse an inline breakdown for a past order. */
-function viewOrder(id) {
-  const el = $('ordDet-' + id);
-  if (!el) return;
-  if (el.style.display !== 'none') { el.style.display = 'none'; return; }
-  const o = ORDERS[id];
-  const addr = o.deliveryAddress || {};
-  const addrLine = [addr.street, addr.city, addr.state, addr.pincode].filter(Boolean).join(', ');
-  const lines = (o.items || []).map((i) =>
-    '<div class="rt-od-line"><span>' + esc(i.productName) + ' ×' + i.quantity + '</span><span>' + inr(i.totalPrice) + '</span></div>'
-  ).join('');
-  const tl = (o.timeline || []).slice().reverse().map((t) =>
-    '<div class="rt-od-tl">' + esc(t.status) + (t.note ? ' — ' + esc(t.note) : '') + '</div>'
-  ).join('');
-  el.innerHTML =
-    '<div class="rt-od-sec"><strong>Items</strong>' + lines +
-      '<div class="rt-od-line rt-od-total"><span>Total (COD)</span><span>' + inr(o.totalAmount) + '</span></div></div>' +
-    '<div class="rt-od-sec"><strong>Deliver to</strong><p>' + (esc(addrLine) || '—') + '</p></div>' +
-    '<div class="rt-od-sec"><strong>Payment</strong><p>' + esc((o.paymentMethod || 'cash')) + ' · ' + esc((o.paymentStatus || 'unpaid')) + '</p></div>' +
-    (tl ? '<div class="rt-od-sec"><strong>Status history</strong>' + tl + '</div>' : '');
-  el.style.display = 'block';
-}
-
-async function cancelOrder(id) {
->>>>>>> 7b815741 (final version all change done by tushar)
   if (!confirm('Cancel this order?')) return;
   api('/orders/' + id + '/cancel', { method: 'PUT', body: JSON.stringify({ reason: 'Cancelled by retailer' }) }).then(function () { toast('Order cancelled'); loadOrders(); }).catch(function (e) { toast('⚠ ' + e.message); });
 }
 
-<<<<<<< HEAD
 /* ================= REWARDS + WALLET (Uphaar) ================= */
 // Uphaar box slabs — mirrors js/uphaar.js RETAILER_SCHEMES (source of truth:
 // the "Retailer Box Scheme 2026-27" PDF). Minimal copy for the progress widget;
@@ -527,23 +434,6 @@ document.addEventListener('click', function (e) {
   var again = t.closest('[data-again]'); if (again) { buyAgain(again.getAttribute('data-again')); return; }
   var view = t.closest('[data-view]'); if (view) { viewOrder(view.getAttribute('data-view')); return; }
   var cancel = t.closest('[data-cancel]'); if (cancel) { cancelOrder(cancel.getAttribute('data-cancel')); return; }
-=======
-/* ── Events ── */
-document.addEventListener('click', (e) => {
-  const t = e.target;
-  if (t.dataset.add) addToCart(t.dataset.add);
-  else if (t.dataset.plus) { const it = CART.find((c) => String(c.id) === t.dataset.plus); setQty(t.dataset.plus, (it ? it.qty : 0) + 1); }
-  else if (t.dataset.minus) { const it = CART.find((c) => String(c.id) === t.dataset.minus); setQty(t.dataset.minus, (it ? it.qty : 1) - 1); }
-  else if (t.dataset.del) setQty(t.dataset.del, 0);
-  else if (t.dataset.cancel) cancelOrder(t.dataset.cancel);
-  else if (t.dataset.again) buyAgain(t.dataset.again);
-  else if (t.dataset.view) viewOrder(t.dataset.view);
-});
-$('rtSearch').addEventListener('input', (e) => {
-  clearTimeout(searchTimer);
-  const v = e.target.value.trim();
-  searchTimer = setTimeout(() => loadProducts(v), 300);
->>>>>>> 7b815741 (final version all change done by tushar)
 });
 $('rtSearch').addEventListener('input', function (e) { clearTimeout(searchTimer); var v = e.target.value.trim(); searchTimer = setTimeout(function () { loadProducts(v); }, 300); });
 $('afSave').addEventListener('click', saveAddress);

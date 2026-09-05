@@ -1,0 +1,2846 @@
+[
+ {
+  "name": "Aclofair- P Tablet",
+  "code": "000113",
+  "prod": {
+   "status": "ok",
+   "file": "Aclofair-P.png",
+   "all": [
+    "Aclofair-P.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "Aclofair-P.jpg",
+   "all": [
+    "Aclofair-P.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Aclozest -SP Tablet",
+  "code": "000481",
+  "prod": {
+   "status": "ok",
+   "file": "Aclozest-SP.png",
+   "all": [
+    "Aclozest-SP.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "ACLOZEST-SP.jpg",
+   "all": [
+    "ACLOZEST-SP.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Aclozest -P Tablet",
+  "code": "000257",
+  "prod": {
+   "status": "ok",
+   "file": "Aclozest-P.png",
+   "all": [
+    "Aclozest-P.png"
+   ]
+  },
+  "comp": {
+   "status": "missing",
+   "file": null,
+   "all": []
+  }
+ },
+ {
+  "name": "Dicozox Relief MR Tablet",
+  "code": "I01201",
+  "prod": {
+   "status": "ok",
+   "file": "Dicozox Relief-Mr.png",
+   "all": [
+    "Dicozox Relief-Mr.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "Dicozox Relief-MR.jpg",
+   "all": [
+    "Dicozox Relief-MR.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Dicozox Relief Tablet",
+  "code": "I00879",
+  "prod": {
+   "status": "ok",
+   "file": "Dicozox Relief.png",
+   "all": [
+    "Dicozox Relief.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "Dicozox Relief.jpg",
+   "all": [
+    "Dicozox Relief.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Ketozeal - DT",
+  "code": "000398",
+  "prod": {
+   "status": "ok",
+   "file": "Ketozeal-DT.png",
+   "all": [
+    "Ketozeal-DT.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "KETOZEAL-DT.jpg",
+   "all": [
+    "KETOZEAL-DT.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Nimfair -P",
+  "code": "000082",
+  "prod": {
+   "status": "ok",
+   "file": "Nimfair-P.png",
+   "all": [
+    "Nimfair-P.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "NIMFAIR-P TAB.jpg",
+   "all": [
+    "NIMFAIR-P TAB.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Coldfair- DS Syrup",
+  "code": "000198",
+  "prod": {
+   "status": "ok",
+   "file": "Coldfair-DS.png",
+   "all": [
+    "Coldfair-DS.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "Coldfair-DS 60ml.jpg",
+   "all": [
+    "Coldfair-DS 60ml.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Levofair Syrup",
+  "code": "000233",
+  "prod": {
+   "status": "ok",
+   "file": "Levofair Syrup.png",
+   "all": [
+    "Levofair Syrup.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "Levofair Syrup.jpg",
+   "all": [
+    "Levofair Syrup.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Montufair -3D",
+  "code": "000465",
+  "prod": {
+   "status": "ok",
+   "file": "Montufair 3D Tablet.png",
+   "all": [
+    "Montufair 3D Tablet.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "MONTUFAIR-3D.jpg",
+   "all": [
+    "MONTUFAIR-3D.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Mucofair DX Syrup",
+  "code": "000270",
+  "prod": {
+   "status": "ok",
+   "file": "Mucofair-DX Syrup.png",
+   "all": [
+    "Mucofair-DX Syrup.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "MUCOFAIR-DX SYRUP.jpg",
+   "all": [
+    "MUCOFAIR-DX SYRUP.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Aclofair- SP",
+  "code": "000058",
+  "prod": {
+   "status": "ok",
+   "file": "Aclofair-SP.png",
+   "all": [
+    "Aclofair-SP.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "ACLOFAIR-SP.jpg",
+   "all": [
+    "ACLOFAIR-SP.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Neem + Tulsi Tooth paste",
+  "code": "000032",
+  "prod": {
+   "status": "ok",
+   "file": "Neem+Tulsi Toothpaste.png",
+   "all": [
+    "Neem+Tulsi Toothpaste.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "NEEM+TULSI TOOTHPASTE.jpg",
+   "all": [
+    "NEEM+TULSI TOOTHPASTE.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Sensoford Tooth paste",
+  "code": "000028",
+  "prod": {
+   "status": "ok",
+   "file": "Sensoford Toothpaste.png",
+   "all": [
+    "Sensoford Toothpaste.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "SENSOFORD TOOTHPASTE.jpg",
+   "all": [
+    "SENSOFORD TOOTHPASTE.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Jamun Karela Juice",
+  "code": "000443",
+  "prod": {
+   "status": "ok",
+   "file": "Jamun Karela Juice.png",
+   "all": [
+    "Jamun Karela Juice.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "JAMUN KARELA JUICE.jpg",
+   "all": [
+    "JAMUN KARELA JUICE.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Dermazest 6",
+  "code": "I00812",
+  "prod": {
+   "status": "ok",
+   "file": "Dermazest 6.png",
+   "all": [
+    "Dermazest 6.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "Dermazest-6.jpg",
+   "all": [
+    "Dermazest-6.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Coldfair Cold -n- Total Tablet",
+  "code": "000351",
+  "prod": {
+   "status": "ok",
+   "file": "Coldfair Cold-n-Total.png",
+   "all": [
+    "Coldfair Cold-n-Total.png"
+   ]
+  },
+  "comp": {
+   "status": "missing",
+   "file": null,
+   "all": []
+  }
+ },
+ {
+  "name": "Mucofair Junior Syrup",
+  "code": "000141",
+  "prod": {
+   "status": "ok",
+   "file": "Mucofair Junior.png",
+   "all": [
+    "Mucofair Junior.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "MUCOFAIR JUNIOR SYRUP.jpg",
+   "all": [
+    "MUCOFAIR JUNIOR SYRUP.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Mucofair- LS Junior Syrup",
+  "code": "000530",
+  "prod": {
+   "status": "ok",
+   "file": "Mucofair-LS Junior.png",
+   "all": [
+    "Mucofair-LS Junior.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "MUCOFAIR LS JUNIOR.jpg",
+   "all": [
+    "MUCOFAIR LS JUNIOR.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Flybiotic Ear Drop",
+  "code": "000206",
+  "prod": {
+   "status": "ok",
+   "file": "Flybiotic Drop.png",
+   "all": [
+    "Flybiotic Drop.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "FLYBIOTIC DROP.jpg",
+   "all": [
+    "FLYBIOTIC DROP.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Cartifair forte Tablet",
+  "code": "000095",
+  "prod": {
+   "status": "ok",
+   "file": "Cartifair-Forte.png",
+   "all": [
+    "Cartifair-Forte.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "Cartifair-Forte.jpg",
+   "all": [
+    "Cartifair-Forte.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Histarax - 25 Tablet",
+  "code": "000706",
+  "prod": {
+   "status": "ok",
+   "file": "Histarax 25.png",
+   "all": [
+    "Histarax 25.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "HISTARAX-25.jpg",
+   "all": [
+    "HISTARAX-25.jpg"
+   ]
+  }
+ },
+ {
+  "name": "HexaFair Mouth wash",
+  "code": "000452",
+  "prod": {
+   "status": "ok",
+   "file": "Hexafair Mouthwash.png",
+   "all": [
+    "Hexafair Mouthwash.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "Hexafair Mouthwash.jpg",
+   "all": [
+    "Hexafair Mouthwash.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Levofair - 5",
+  "code": "000262",
+  "prod": {
+   "status": "ok",
+   "file": "Levofair 5.png",
+   "all": [
+    "Levofair 5.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "LEVOFAIR-5 TABLET.jpg",
+   "all": [
+    "LEVOFAIR-5 TABLET.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Wax clear Ear Drops",
+  "code": "000300",
+  "prod": {
+   "status": "ok",
+   "file": "Wax Clear Drop.png",
+   "all": [
+    "Wax Clear Drop.png"
+   ]
+  },
+  "comp": {
+   "status": "missing",
+   "file": null,
+   "all": []
+  }
+ },
+ {
+  "name": "Cetera-10 Tablet",
+  "code": "000613",
+  "prod": {
+   "status": "ok",
+   "file": "Cetera-10.png",
+   "all": [
+    "Cetera-10.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "CETERA-10.jpg",
+   "all": [
+    "CETERA-10.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Clotizest Dusting Powder",
+  "code": "000208",
+  "prod": {
+   "status": "ok",
+   "file": "Clotizest Powder.png",
+   "all": [
+    "Clotizest Powder.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "Clotizest.jpg",
+   "all": [
+    "Clotizest.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Itoford Plus Tablet",
+  "code": "000298",
+  "prod": {
+   "status": "ok",
+   "file": "Itoford Plus.png",
+   "all": [
+    "Itoford Plus.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "Itoford-Plus Tablet.jpg",
+   "all": [
+    "Itoford-Plus Tablet.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Itoford - 200 Tablet",
+  "code": "000225",
+  "prod": {
+   "status": "ok",
+   "file": "Itoford-200.png",
+   "all": [
+    "Itoford-200.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "Itoford-200 Caps.jpg",
+   "all": [
+    "Itoford-200 Caps.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Terbizest - 250",
+  "code": "I00837",
+  "prod": {
+   "status": "ok",
+   "file": "Terbizest-250.png",
+   "all": [
+    "Terbizest-250.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "TERBIZEST 250.jpg",
+   "all": [
+    "TERBIZEST 250.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Valentine Gold",
+  "code": "I00771",
+  "prod": {
+   "status": "ok",
+   "file": "Valentine Gold.png",
+   "all": [
+    "Valentine Gold.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "VALENTINE GOLD.jpg",
+   "all": [
+    "VALENTINE GOLD.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Folifair Tablet",
+  "code": "000245",
+  "prod": {
+   "status": "ok",
+   "file": "FOLIFAIR.png",
+   "all": [
+    "FOLIFAIR.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "FOLIFAIR TAB.jpg",
+   "all": [
+    "FOLIFAIR TAB.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Tadozest Spray",
+  "code": "I01244",
+  "prod": {
+   "status": "ok",
+   "file": "Tadozest Spray.png",
+   "all": [
+    "Tadozest Spray.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "TADOZEST Spray.jpg",
+   "all": [
+    "TADOZEST Spray.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Aclofair-DT Tablet",
+  "code": "000376",
+  "prod": {
+   "status": "ok",
+   "file": "Aclofair-DT.png",
+   "all": [
+    "Aclofair-DT.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "ACLOFAIR-DT.jpg",
+   "all": [
+    "ACLOFAIR-DT.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Argifair Sachet",
+  "code": "000122",
+  "prod": {
+   "status": "ok",
+   "file": "Argifair Sachet.png",
+   "all": [
+    "Argifair Sachet.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "Argifair Sachet.jpg",
+   "all": [
+    "Argifair Sachet.jpg"
+   ]
+  }
+ },
+ {
+  "name": "B- Complex Capsule",
+  "code": "000440",
+  "prod": {
+   "status": "ok",
+   "file": "B-Complex.png",
+   "all": [
+    "B-Complex.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "B-Complex.jpg",
+   "all": [
+    "B-Complex.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Benfozest - CD3 Tablet",
+  "code": "000232",
+  "prod": {
+   "status": "missing",
+   "file": null,
+   "all": []
+  },
+  "comp": {
+   "status": "missing",
+   "file": null,
+   "all": []
+  }
+ },
+ {
+  "name": "Calcifair -D3 60 K Soft gel Capsule",
+  "code": "000361",
+  "prod": {
+   "status": "ok",
+   "file": "Calcifair-D3 60K.png",
+   "all": [
+    "Calcifair-D3 60K.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "Calcifair-D3 60K.jpg",
+   "all": [
+    "Calcifair-D3 60K.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Calcifair - K27 Calpsule soft gel",
+  "code": "I00896",
+  "prod": {
+   "status": "ok",
+   "file": "Calcifair K27.png",
+   "all": [
+    "Calcifair K27.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "CALCIFAIR-K27.jpg",
+   "all": [
+    "CALCIFAIR-K27.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Calcifair - K27 Forte Calpsule soft gel",
+  "code": "000352",
+  "prod": {
+   "status": "ok",
+   "file": "Calcifair-K27 Forte.png",
+   "all": [
+    "Calcifair-K27 Forte.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "Calcifair K27 FORTE.jpg",
+   "all": [
+    "Calcifair K27 FORTE.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Calcifair- D3 Drop",
+  "code": "I00800",
+  "prod": {
+   "status": "ok",
+   "file": "Calcifair-D3 Drop.png",
+   "all": [
+    "Calcifair-D3 Drop.png",
+    "Calcifair-D3 Sachet.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "Calcifair-D3 Drop.jpg",
+   "all": [
+    "Calcifair-D3 Drop.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Calcifair- D3 Schate",
+  "code": "000015",
+  "prod": {
+   "status": "ok",
+   "file": "Calcifair-D3 Sachet.png",
+   "all": [
+    "Calcifair-D3 Drop.png",
+    "Calcifair-D3 Sachet.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "Calcifair-D3 Drop.jpg",
+   "all": [
+    "Calcifair-D3 Drop.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Chymozest - D Tablet",
+  "code": "I00880",
+  "prod": {
+   "status": "ok",
+   "file": "Chymozest-D.png",
+   "all": [
+    "Chymozest-D.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "CHYMOZEST-D TAB.jpg",
+   "all": [
+    "CHYMOZEST-D TAB.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Cremofair Plus Suspension",
+  "code": "000482",
+  "prod": {
+   "status": "ok",
+   "file": "Cremofair Plus.png",
+   "all": [
+    "Cremofair Plus.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "CREMOFAIR PLUS.jpg",
+   "all": [
+    "CREMOFAIR PLUS.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Cypofair Syrup ( Kiwi)",
+  "code": "000226",
+  "prod": {
+   "status": "ok",
+   "file": "Cypofair.png",
+   "all": [
+    "Cypofair.png"
+   ]
+  },
+  "comp": {
+   "status": "missing",
+   "file": null,
+   "all": []
+  }
+ },
+ {
+  "name": "Daily Sachet",
+  "code": "000350",
+  "prod": {
+   "status": "ok",
+   "file": "Daily Sachet.png",
+   "all": [
+    "Daily Sachet.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "Daily Sachet.jpg",
+   "all": [
+    "Daily Sachet.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Defo-6 Tablet",
+  "code": "000050",
+  "prod": {
+   "status": "ok",
+   "file": "DEFO-6.png",
+   "all": [
+    "DEFO-6.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "DEFO-6.jpg",
+   "all": [
+    "DEFO-6.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Diclofair Pain relief Gel",
+  "code": "000099",
+  "prod": {
+   "status": "ok",
+   "file": "Diclofair Gel.png",
+   "all": [
+    "Diclofair Gel.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "DICLOFAIR GEL.jpg",
+   "all": [
+    "DICLOFAIR GEL.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Digylac Capsule",
+  "code": "000055",
+  "prod": {
+   "status": "ok",
+   "file": "DIGYLAC.png",
+   "all": [
+    "DIGYLAC.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "Digylac Capsule.jpg",
+   "all": [
+    "Digylac Capsule.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Digylac- Z sachet",
+  "code": "000309",
+  "prod": {
+   "status": "ambiguous",
+   "file": null,
+   "all": [
+    "Digylac-Z Sachte.png",
+    "DIGYLAC.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "Digylac Z sachet.jpg",
+   "all": [
+    "Digylac Z sachet.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Drotifair - M Tablet",
+  "code": "000291",
+  "prod": {
+   "status": "ok",
+   "file": "Drotifair-M.png",
+   "all": [
+    "Drotifair-M.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "DROTIFAIR-M.jpg",
+   "all": [
+    "DROTIFAIR-M.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Esofair - DSR Capsule",
+  "code": "000185",
+  "prod": {
+   "status": "ok",
+   "file": "ESOFAIR-DSR.png",
+   "all": [
+    "ESOFAIR-DSR.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "ESOFAIR-DSR.jpg",
+   "all": [
+    "ESOFAIR-DSR.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Etoxifair -90 Tablet",
+  "code": "000017",
+  "prod": {
+   "status": "ok",
+   "file": "Etoxifair-90.png",
+   "all": [
+    "Etoxifair-90.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "Etoxifair-90 Blister.jpg",
+   "all": [
+    "Etoxifair-90 Blister.jpg"
+   ]
+  }
+ },
+ {
+  "name": "EVEC-",
+  "code": "000140",
+  "prod": {
+   "status": "ambiguous",
+   "file": null,
+   "all": [
+    "EVEC-400.png",
+    "EVEC-600.png",
+    "EVEC-LC.png"
+   ]
+  },
+  "comp": {
+   "status": "ambiguous",
+   "file": null,
+   "all": [
+    "EVEC-400.jpg",
+    "EVEC-600.jpg",
+    "EVEC-LC Tablet.jpg"
+   ]
+  }
+ },
+ {
+  "name": "EVEC- LC Tablet",
+  "code": "000395",
+  "prod": {
+   "status": "ok",
+   "file": "EVEC-LC.png",
+   "all": [
+    "EVEC-LC.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "EVEC-LC Tablet.jpg",
+   "all": [
+    "EVEC-LC Tablet.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Evec-600 Capsule",
+  "code": "000503",
+  "prod": {
+   "status": "ok",
+   "file": "EVEC-600.png",
+   "all": [
+    "EVEC-600.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "EVEC-600.jpg",
+   "all": [
+    "EVEC-600.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Fairford Foot care cream",
+  "code": "I01133",
+  "prod": {
+   "status": "missing",
+   "file": null,
+   "all": []
+  },
+  "comp": {
+   "status": "ok",
+   "file": "FAIR FORD INHALER.jpg",
+   "all": [
+    "FAIR FORD INHALER.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Fairford Inhaler",
+  "code": "I01142",
+  "prod": {
+   "status": "ok",
+   "file": "FAIRFORD CURCUMIN TABLET.png",
+   "all": [
+    "FAIRFORD CURCUMIN TABLET.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "FAIR FORD INHALER.jpg",
+   "all": [
+    "FAIR FORD INHALER.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Fairford Musli Capsule",
+  "code": "000311",
+  "prod": {
+   "status": "missing",
+   "file": null,
+   "all": []
+  },
+  "comp": {
+   "status": "ok",
+   "file": "FAIRFORD MUSLI CAPSULE.jpg",
+   "all": [
+    "FAIRFORD MUSLI CAPSULE.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Fairford Musli Capsule",
+  "code": "000114",
+  "prod": {
+   "status": "missing",
+   "file": null,
+   "all": []
+  },
+  "comp": {
+   "status": "ok",
+   "file": "FAIRFORD MUSLI CAPSULE.jpg",
+   "all": [
+    "FAIRFORD MUSLI CAPSULE.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Fairford Neem Soap",
+  "code": "000158",
+  "prod": {
+   "status": "missing",
+   "file": null,
+   "all": []
+  },
+  "comp": {
+   "status": "ok",
+   "file": "FAIRFORD Neem Soap.jpg",
+   "all": [
+    "FAIRFORD Neem Soap.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Fairford Refresh Eye drop",
+  "code": "000312",
+  "prod": {
+   "status": "missing",
+   "file": null,
+   "all": []
+  },
+  "comp": {
+   "status": "ok",
+   "file": "FAIRFORD-REFRESH DROP.jpg",
+   "all": [
+    "FAIR FORD INHALER.jpg",
+    "FAIRFORD-REFRESH DROP.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Fairford Vaporixing Rub",
+  "code": "I01140",
+  "prod": {
+   "status": "missing",
+   "file": null,
+   "all": []
+  },
+  "comp": {
+   "status": "ok",
+   "file": "FAIR FORD INHALER.jpg",
+   "all": [
+    "FAIR FORD INHALER.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Fairford Vaporixing Rub",
+  "code": "I01141",
+  "prod": {
+   "status": "missing",
+   "file": null,
+   "all": []
+  },
+  "comp": {
+   "status": "ok",
+   "file": "FAIR FORD INHALER.jpg",
+   "all": [
+    "FAIR FORD INHALER.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Fairford Vaporixing Rub",
+  "code": "I01139",
+  "prod": {
+   "status": "missing",
+   "file": null,
+   "all": []
+  },
+  "comp": {
+   "status": "ok",
+   "file": "FAIR FORD INHALER.jpg",
+   "all": [
+    "FAIR FORD INHALER.jpg"
+   ]
+  }
+ },
+ {
+  "name": "fairford Vitamin -C Tablet",
+  "code": "000446",
+  "prod": {
+   "status": "missing",
+   "file": null,
+   "all": []
+  },
+  "comp": {
+   "status": "ok",
+   "file": "FAIR FORD VITAMIN-C.jpg",
+   "all": [
+    "FAIR FORD VITAMIN-C.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Fairford energy drink ( Orange)",
+  "code": "000204",
+  "prod": {
+   "status": "missing",
+   "file": null,
+   "all": []
+  },
+  "comp": {
+   "status": "ok",
+   "file": "Fair Ford Energy (Orange).jpg",
+   "all": [
+    "Fair Ford Energy (Orange).jpg"
+   ]
+  }
+ },
+ {
+  "name": "Feriford - XT Syrup",
+  "code": "000102",
+  "prod": {
+   "status": "ok",
+   "file": "FERIFORD-XT.png",
+   "all": [
+    "FERIFORD-XT.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "FERIFORD-XT TABLET.jpg",
+   "all": [
+    "FERIFORD-XT TABLET.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Feriford - XT Tablet",
+  "code": "000081",
+  "prod": {
+   "status": "ok",
+   "file": "FERIFORD-XT.png",
+   "all": [
+    "FERIFORD-XT.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "FERIFORD-XT TABLET.jpg",
+   "all": [
+    "FERIFORD-XT TABLET.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Fordzyme Syrup",
+  "code": "000066",
+  "prod": {
+   "status": "ok",
+   "file": "Fordzyme Syrup.png",
+   "all": [
+    "Fordzyme Syrup.png",
+    "Fordzyme Tablet.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "Fordzyme Syrup.jpg",
+   "all": [
+    "Fordzyme Syrup.jpg",
+    "FORDZYME TABLET.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Panford Injection",
+  "code": "000042",
+  "prod": {
+   "status": "ok",
+   "file": "Panford Injection.png",
+   "all": [
+    "Panford Injection.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "PANFORD INJ..jpg",
+   "all": [
+    "PANFORD INJ..jpg"
+   ]
+  }
+ },
+ {
+  "name": "Pathri Mukti Syrup",
+  "code": "000170",
+  "prod": {
+   "status": "ok",
+   "file": "PATHRI MUKTI.png",
+   "all": [
+    "PATHRI MUKTI.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "Pathri Mukt.jpg",
+   "all": [
+    "Pathri Mukt.jpg"
+   ]
+  }
+ },
+ {
+  "name": "P-DOM-SR (Capsule)",
+  "code": "000461",
+  "prod": {
+   "status": "ok",
+   "file": "P-DOM-SR.png",
+   "all": [
+    "P-DOM-SR.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "P-DOM-SR.jpg",
+   "all": [
+    "P-DOM-SR.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Fair Ford Piles Care Cream",
+  "code": "000273",
+  "prod": {
+   "status": "missing",
+   "file": null,
+   "all": []
+  },
+  "comp": {
+   "status": "ok",
+   "file": "FAIR FORD INHALER.jpg",
+   "all": [
+    "FAIR FORD INHALER.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Platogain Plus Tablet",
+  "code": "000285",
+  "prod": {
+   "status": "ok",
+   "file": "Platogain Plus Tablet.png",
+   "all": [
+    "Platogain Plus Tablet.png"
+   ]
+  },
+  "comp": {
+   "status": "ambiguous",
+   "file": null,
+   "all": [
+    "Platogain Syrup.jpg",
+    "PLATOGAIN-PLUS TAB.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Platogain Syrup",
+  "code": "000498",
+  "prod": {
+   "status": "ok",
+   "file": "Platogain Syrup.png",
+   "all": [
+    "Platogain Syrup.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "Platogain Syrup.jpg",
+   "all": [
+    "Platogain Syrup.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Pragafair NT Tablet",
+  "code": "000153",
+  "prod": {
+   "status": "missing",
+   "file": null,
+   "all": []
+  },
+  "comp": {
+   "status": "missing",
+   "file": null,
+   "all": []
+  }
+ },
+ {
+  "name": "Pragafair Trio Tablet",
+  "code": "000260",
+  "prod": {
+   "status": "missing",
+   "file": null,
+   "all": []
+  },
+  "comp": {
+   "status": "missing",
+   "file": null,
+   "all": []
+  }
+ },
+ {
+  "name": "Quneed- Plus Tablet",
+  "code": "000171",
+  "prod": {
+   "status": "ok",
+   "file": "Quneed Plus.png",
+   "all": [
+    "Quneed Plus.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "Quneed-Plus.jpg",
+   "all": [
+    "Quneed-Plus.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Quneed tablet",
+  "code": "000060",
+  "prod": {
+   "status": "ok",
+   "file": "Quneed.png",
+   "all": [
+    "Quneed.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "Quneed TABLET.jpg",
+   "all": [
+    "Quneed TABLET.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Rabezo - DSR Capsule",
+  "code": "000115",
+  "prod": {
+   "status": "ok",
+   "file": "Rabezo-DSR.png",
+   "all": [
+    "Rabezo-DSR.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "RABEZO-DSR.jpg",
+   "all": [
+    "RABEZO-DSR.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Silymin Syrup",
+  "code": "000610",
+  "prod": {
+   "status": "ok",
+   "file": "SILYMIN SYRUP.png",
+   "all": [
+    "SILYMIN SYRUP.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "Silymin Syrup.jpg",
+   "all": [
+    "Silymin Syrup.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Softofair Powder",
+  "code": "000190",
+  "prod": {
+   "status": "ok",
+   "file": "Softofair.png",
+   "all": [
+    "Softofair.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "SOFTOFAIR POWDER.jpg",
+   "all": [
+    "SOFTOFAIR POWDER.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Suprafair Tablet",
+  "code": "000552",
+  "prod": {
+   "status": "ok",
+   "file": "SUPRAFAIR.png",
+   "all": [
+    "SUPRAFAIR.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "Suprafair Tab.jpg",
+   "all": [
+    "Suprafair Tab.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Tadozest -D Tablet",
+  "code": "000220",
+  "prod": {
+   "status": "ok",
+   "file": "Tadozest-D.png",
+   "all": [
+    "Tadozest-D.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "TADOZEST-D.jpg",
+   "all": [
+    "TADOZEST-D.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Tendofair Forte Tablet",
+  "code": "000447",
+  "prod": {
+   "status": "ok",
+   "file": "Tendofair Forte.png",
+   "all": [
+    "Tendofair Forte.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "Tendofair-Forte.jpg",
+   "all": [
+    "Tendofair-Forte.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Tendofair Schate",
+  "code": "000253",
+  "prod": {
+   "status": "ok",
+   "file": "Tendofair Sachet.png",
+   "all": [
+    "Tendofair Sachet.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "TENDOFAIR SACHET.jpg",
+   "all": [
+    "TENDOFAIR SACHET.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Unifair-400 Tablet",
+  "code": "000186",
+  "prod": {
+   "status": "ok",
+   "file": "UNIFAIR-400.png",
+   "all": [
+    "UNIFAIR-400.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "Unifair 400.jpg",
+   "all": [
+    "Unifair 400.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Ursofair -300 Tablet",
+  "code": "000492",
+  "prod": {
+   "status": "ok",
+   "file": "URSOFAIR-300.png",
+   "all": [
+    "URSOFAIR-300.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "URSOFAIR 300 TABLETS.jpg",
+   "all": [
+    "URSOFAIR 300 TABLETS.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Verty-16 Tablet",
+  "code": "000387",
+  "prod": {
+   "status": "ok",
+   "file": "Verty-16.png",
+   "all": [
+    "Verty-16.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "VERTY-16.jpg",
+   "all": [
+    "VERTY-16.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Verty-8 Tablet",
+  "code": "000388",
+  "prod": {
+   "status": "ok",
+   "file": "Verty-8.png",
+   "all": [
+    "Verty-8.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "VERTY-8.jpg",
+   "all": [
+    "VERTY-8.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Zincofair 12 G Capsule",
+  "code": "I01391",
+  "prod": {
+   "status": "ok",
+   "file": "Zincofair-12G.png",
+   "all": [
+    "Zincofair-12G.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "ZINCOFAIR-12G.jpg",
+   "all": [
+    "ZINCOFAIR-12G.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Zincofair-Daily Capsule",
+  "code": null,
+  "prod": {
+   "status": "ok",
+   "file": "Zincofair-Daily.png",
+   "all": [
+    "Zincofair-Daily.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "ZINCOFAIR-DAILY.jpg",
+   "all": [
+    "ZINCOFAIR-DAILY.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Zincozest Tablet",
+  "code": "000384",
+  "prod": {
+   "status": "ok",
+   "file": "ZIncozest.png",
+   "all": [
+    "ZIncozest.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "Zincozest Tablet.jpg",
+   "all": [
+    "Zincozest Tablet.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Pregafair-M",
+  "code": "000106",
+  "prod": {
+   "status": "ok",
+   "file": "Pregafair-M.png",
+   "all": [
+    "Pregafair-M.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "PREGAFAIR-M.jpg",
+   "all": [
+    "PREGAFAIR-M.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Chymozest Forte",
+  "code": "I00826",
+  "prod": {
+   "status": "ok",
+   "file": "Chymozest-Forte.png",
+   "all": [
+    "Chymozest-Forte.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "CHYMOZEST-FORTE.jpg",
+   "all": [
+    "CHYMOZEST-FORTE.jpg"
+   ]
+  }
+ },
+ {
+  "name": "FQ- 10 gold Forte ( Soft Gel Capsule)",
+  "code": "I00762",
+  "prod": {
+   "status": "ok",
+   "file": "FQ-10 GOLD.png",
+   "all": [
+    "FQ-10 GOLD.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "FQ-10 Gold.jpg",
+   "all": [
+    "FQ-10 Gold.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Gabafair - NT Tablet",
+  "code": "000173",
+  "prod": {
+   "status": "ok",
+   "file": "Gabafair-NT.png",
+   "all": [
+    "Gabafair-NT.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "Gabafair-NT.jpg",
+   "all": [
+    "Gabafair-NT.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Gasofair suspension (Mint)",
+  "code": "000142",
+  "prod": {
+   "status": "ok",
+   "file": "Gasofair Suspension.png",
+   "all": [
+    "Gasofair Suspension.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "GASOFAIR.jpg",
+   "all": [
+    "GASOFAIR.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Germinalife Suspension",
+  "code": "000317",
+  "prod": {
+   "status": "ok",
+   "file": "GERMINALIFE.png",
+   "all": [
+    "GERMINALIFE.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "GERMINALIFE.jpg",
+   "all": [
+    "GERMINALIFE.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Hepafair Sachet",
+  "code": "000375",
+  "prod": {
+   "status": "ok",
+   "file": "HEPAFAIR SACHET.png",
+   "all": [
+    "HEPAFAIR SACHET.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "Hepafair Sachet.jpg",
+   "all": [
+    "Hepafair Sachet.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Kesh Gloss Hair Oil 100+",
+  "code": "000770",
+  "prod": {
+   "status": "missing",
+   "file": null,
+   "all": []
+  },
+  "comp": {
+   "status": "missing",
+   "file": null,
+   "all": []
+  }
+ },
+ {
+  "name": "L- GlutaForte Tablet",
+  "code": "000514",
+  "prod": {
+   "status": "ok",
+   "file": "L-Gluta Forte.png",
+   "all": [
+    "L-Gluta Forte.png"
+   ]
+  },
+  "comp": {
+   "status": "missing",
+   "file": null,
+   "all": []
+  }
+ },
+ {
+  "name": "Lactoford Solution",
+  "code": "000069",
+  "prod": {
+   "status": "ambiguous",
+   "file": null,
+   "all": [
+    "Lactoford Solution 100ml.png",
+    "Lactoford Solution 200ml.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "LACTOFORD 100ml.jpg",
+   "all": [
+    "LACTOFORD 100ml.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Lactoford Solution",
+  "code": "000453",
+  "prod": {
+   "status": "ambiguous",
+   "file": null,
+   "all": [
+    "Lactoford Solution 100ml.png",
+    "Lactoford Solution 200ml.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "LACTOFORD 100ml.jpg",
+   "all": [
+    "LACTOFORD 100ml.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Leukozest Tonic",
+  "code": "000169",
+  "prod": {
+   "status": "ok",
+   "file": "LEUKOZEST.png",
+   "all": [
+    "LEUKOZEST.png"
+   ]
+  },
+  "comp": {
+   "status": "missing",
+   "file": null,
+   "all": []
+  }
+ },
+ {
+  "name": "Livford - DS Syrup",
+  "code": "000075",
+  "prod": {
+   "status": "ok",
+   "file": "LIVFORD-DS.png",
+   "all": [
+    "LIVFORD-DS.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "Livford-DS SYRUP.jpg",
+   "all": [
+    "Livford-DS SYRUP.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Lv-Zyme Syrup",
+  "code": "000074",
+  "prod": {
+   "status": "ok",
+   "file": "LV-ZYME SYRUP.png",
+   "all": [
+    "LV-ZYME SYRUP.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "LV-ZYME SYRUP.jpg",
+   "all": [
+    "LV-ZYME SYRUP.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Lycofair Gold Capsule",
+  "code": "000210",
+  "prod": {
+   "status": "ok",
+   "file": "Lycofair Gold.png",
+   "all": [
+    "Lycofair Gold.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "LYCOFAIR GOLD.jpg",
+   "all": [
+    "LYCOFAIR GOLD.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Lycofair Syrup",
+  "code": "000078",
+  "prod": {
+   "status": "ok",
+   "file": "Lycofair Syrup.png",
+   "all": [
+    "Lycofair Syrup.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "LYCOFAIR SYRUP.jpg",
+   "all": [
+    "LYCOFAIR SYRUP.jpg"
+   ]
+  }
+ },
+ {
+  "name": "M- Sore Gel",
+  "code": "000280",
+  "prod": {
+   "status": "ok",
+   "file": "M-SORE GEL.png",
+   "all": [
+    "M-SORE GEL.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "M-SORE GEL.jpg",
+   "all": [
+    "M-SORE GEL.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Maglac- D3 Tablet",
+  "code": "000512",
+  "prod": {
+   "status": "missing",
+   "file": null,
+   "all": []
+  },
+  "comp": {
+   "status": "missing",
+   "file": null,
+   "all": []
+  }
+ },
+ {
+  "name": "Meftofair - SPAS Tablet",
+  "code": "000249",
+  "prod": {
+   "status": "ok",
+   "file": "MEFTOFAIR-SPAS.png",
+   "all": [
+    "MEFTOFAIR-SPAS.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "Meftofair-SPAS.jpg",
+   "all": [
+    "Meftofair-SPAS.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Multi- Vitamin Syrup",
+  "code": "000108",
+  "prod": {
+   "status": "ok",
+   "file": "Multivitamin Syrup.png",
+   "all": [
+    "Multivitamin Syrup.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "Multi-Vitamin Syrup.jpg",
+   "all": [
+    "Multi-Vitamin Syrup.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Multi- Vitamin Syrup (Sugar Free)",
+  "code": "000486",
+  "prod": {
+   "status": "ok",
+   "file": "Multivitamin Syrup.png",
+   "all": [
+    "Multivitamin Syrup.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "Multi-Vitamin Syrup.jpg",
+   "all": [
+    "Multi-Vitamin Syrup.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Moxifair - D Eye Drop",
+  "code": "000145",
+  "prod": {
+   "status": "ok",
+   "file": "Moxifair-D Eye Drop.png",
+   "all": [
+    "Moxifair-D Eye Drop.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "MOXIFAIR-D DROP.jpg",
+   "all": [
+    "MOXIFAIR-D DROP.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Moxifair - KT Eye Drop",
+  "code": "000146",
+  "prod": {
+   "status": "ok",
+   "file": "MOXIFAIR-KT.png",
+   "all": [
+    "MOXIFAIR-KT.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "MOXIFAIR-KT DROP.jpg",
+   "all": [
+    "MOXIFAIR-KT DROP.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Mucofair - SG softgel (Capsule)",
+  "code": "000331",
+  "prod": {
+   "status": "ok",
+   "file": "Mucofair-Sg.png",
+   "all": [
+    "Mucofair-Sg.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "Mucofair-SG Capsule.jpg",
+   "all": [
+    "Mucofair-SG Capsule.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Mucofair 15 DMR Syrup",
+  "code": "I00809",
+  "prod": {
+   "status": "missing",
+   "file": null,
+   "all": []
+  },
+  "comp": {
+   "status": "missing",
+   "file": null,
+   "all": []
+  }
+ },
+ {
+  "name": "Mycopred - 4 tablet",
+  "code": "000286",
+  "prod": {
+   "status": "ok",
+   "file": "Mycopred-4.png",
+   "all": [
+    "Mycopred-4.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "Mycopred-4 Tablet.jpg",
+   "all": [
+    "Mycopred-4 Tablet.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Mycopred - 8 tablet",
+  "code": "000283",
+  "prod": {
+   "status": "ok",
+   "file": "Mycopred-8.png",
+   "all": [
+    "Mycopred-8.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "MYCOPRED-8 TABLET.jpg",
+   "all": [
+    "MYCOPRED-8 TABLET.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Mylozet - D (Capsule)",
+  "code": "000123",
+  "prod": {
+   "status": "ok",
+   "file": "Mylozet-D.png",
+   "all": [
+    "Mylozet-D.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "Mylozet-D.jpg",
+   "all": [
+    "Mylozet-D.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Nepofair -500 Tablet",
+  "code": "000380",
+  "prod": {
+   "status": "missing",
+   "file": null,
+   "all": []
+  },
+  "comp": {
+   "status": "missing",
+   "file": null,
+   "all": []
+  }
+ },
+ {
+  "name": "Neurofair- LC ( Capsule)",
+  "code": "000175",
+  "prod": {
+   "status": "ok",
+   "file": "Neurofair-LC.png",
+   "all": [
+    "Neurofair-LC.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "NEUROFAIR-LC.jpg",
+   "all": [
+    "NEUROFAIR-LC.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Neurofair Forte Plus Table",
+  "code": "000244",
+  "prod": {
+   "status": "ok",
+   "file": "Neurofair Forte+.png",
+   "all": [
+    "Neurofair Forte+.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "Neurofair Forte +.jpg",
+   "all": [
+    "Neurofair Forte +.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Neurofair gold Sachet",
+  "code": "000358",
+  "prod": {
+   "status": "ok",
+   "file": "Neurofair-Gold Sachte.png",
+   "all": [
+    "Neurofair-Gold Sachte.png"
+   ]
+  },
+  "comp": {
+   "status": "missing",
+   "file": null,
+   "all": []
+  }
+ },
+ {
+  "name": "Oflofair - D Eye Drop",
+  "code": "000147",
+  "prod": {
+   "status": "ok",
+   "file": "Oflofair-D.png",
+   "all": [
+    "Oflofair-D.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "OFLOFAIR-D DROP.jpg",
+   "all": [
+    "OFLOFAIR-D DROP.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Omega - 3-6-9",
+  "code": "I00761",
+  "prod": {
+   "status": "ok",
+   "file": "OMEGA 3-6-9 Capsule.png",
+   "all": [
+    "OMEGA 3-6-9 Capsule.png"
+   ]
+  },
+  "comp": {
+   "status": "ambiguous",
+   "file": null,
+   "all": [
+    "OMEGA 3-6-9 curve.jpg",
+    "OMEGA 369 FISH OIL JAR.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Omega - 3-6-9 Strip",
+  "code": "000307",
+  "prod": {
+   "status": "ok",
+   "file": "OMEGA 3-6-9 Capsule.png",
+   "all": [
+    "OMEGA 3-6-9 Capsule.png"
+   ]
+  },
+  "comp": {
+   "status": "ambiguous",
+   "file": null,
+   "all": [
+    "OMEGA 3-6-9 curve.jpg",
+    "OMEGA 369 FISH OIL JAR.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Omefair -",
+  "code": "000255",
+  "prod": {
+   "status": "ambiguous",
+   "file": null,
+   "all": [
+    "OMEFAIR-20.png",
+    "Omefair-D.png"
+   ]
+  },
+  "comp": {
+   "status": "ambiguous",
+   "file": null,
+   "all": [
+    "OMEFAIR-20 CAPSULE.jpg",
+    "OMEFAIR-D.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Omefair -D Capsule",
+  "code": "000303",
+  "prod": {
+   "status": "ok",
+   "file": "Omefair-D.png",
+   "all": [
+    "Omefair-D.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "OMEFAIR-D.jpg",
+   "all": [
+    "OMEFAIR-D.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Ondfair - MD Tablet",
+  "code": "000132",
+  "prod": {
+   "status": "ok",
+   "file": "Ondfair-MD.png",
+   "all": [
+    "Ondfair-MD.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "Ondfair-MD Tablet.jpg",
+   "all": [
+    "Ondfair-MD Tablet.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Panford - 40 Tablet (20X10)",
+  "code": "000064",
+  "prod": {
+   "status": "ambiguous",
+   "file": null,
+   "all": [
+    "Panford Injection.png",
+    "Panford-40.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "PANFORD-40 Tablet.jpg",
+   "all": [
+    "PANFORD INJ..jpg",
+    "PANFORD-40 Tablet.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Panford - D Tablet",
+  "code": "000154",
+  "prod": {
+   "status": "ok",
+   "file": "Panford-D.png",
+   "all": [
+    "Panford-D.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "Panford-D.jpg",
+   "all": [
+    "Panford-D.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Fordzyme Tablet",
+  "code": "I00853",
+  "prod": {
+   "status": "ok",
+   "file": "Fordzyme Tablet.png",
+   "all": [
+    "Fordzyme Syrup.png",
+    "Fordzyme Tablet.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "FORDZYME TABLET.jpg",
+   "all": [
+    "Fordzyme Syrup.jpg",
+    "FORDZYME TABLET.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Fungizest Cream",
+  "code": "000412",
+  "prod": {
+   "status": "ok",
+   "file": "Fungizest Cream.png",
+   "all": [
+    "Fungizest Cream.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "FUNGIZEST CREAM.jpg",
+   "all": [
+    "FUNGIZEST CREAM.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Napofair -D Tablet",
+  "code": "000468",
+  "prod": {
+   "status": "ok",
+   "file": "Napofair-D.png",
+   "all": [
+    "Napofair-D.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "Napofair-D.jpg",
+   "all": [
+    "Napofair-D.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Protifair DHA",
+  "code": "I01246",
+  "prod": {
+   "status": "ok",
+   "file": "PROTIFAIR DHA.png",
+   "all": [
+    "PROTIFAIR DHA.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "PROTIFAIR DHA.jpg",
+   "all": [
+    "PROTIFAIR DHA.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Aclofair Cold & Flu Red",
+  "code": null,
+  "prod": {
+   "status": "ok",
+   "file": "Aclofair Cold & flu Red.png",
+   "all": [
+    "Aclofair Cold & flu Red.png"
+   ]
+  },
+  "comp": {
+   "status": "missing",
+   "file": null,
+   "all": []
+  }
+ },
+ {
+  "name": "ACLOFAIR COLD & FLU",
+  "code": null,
+  "prod": {
+   "status": "ok",
+   "file": "ACLOFAIR COLD & FLU strips.jpg",
+   "all": [
+    "ACLOFAIR COLD & FLU strips.jpg"
+   ]
+  },
+  "comp": {
+   "status": "missing",
+   "file": null,
+   "all": []
+  }
+ },
+ {
+  "name": "Orthozest-Roll On",
+  "code": null,
+  "prod": {
+   "status": "ok",
+   "file": "Orthozest Roll on.png",
+   "all": [
+    "Orthozest Roll on.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "Orthozest Roll On.jpg",
+   "all": [
+    "Orthozest Roll On.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Orthozest-capsule",
+  "code": null,
+  "prod": {
+   "status": "ok",
+   "file": "Orthozest Capsule.png",
+   "all": [
+    "Orthozest Capsule.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "Orthozest Capsules.jpg",
+   "all": [
+    "Orthozest Capsules.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Piles Care Jar",
+  "code": null,
+  "prod": {
+   "status": "ok",
+   "file": "Piles Care Jar Capsule.png",
+   "all": [
+    "Piles Care Capsule.png",
+    "Piles Care Cream.png",
+    "Piles Care Jar Capsule.png"
+   ]
+  },
+  "comp": {
+   "status": "ambiguous",
+   "file": null,
+   "all": [
+    "Piles Care Capsule Jar.jpg",
+    "Piles Care Capsule.jpg",
+    "Piles Care Cream.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Piles Care Capsule",
+  "code": null,
+  "prod": {
+   "status": "ok",
+   "file": "Piles Care Capsule.png",
+   "all": [
+    "Piles Care Capsule.png",
+    "Piles Care Cream.png",
+    "Piles Care Jar Capsule.png"
+   ]
+  },
+  "comp": {
+   "status": "ambiguous",
+   "file": null,
+   "all": [
+    "Piles Care Capsule Jar.jpg",
+    "Piles Care Capsule.jpg",
+    "Piles Care Cream.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Red Onion shampoo",
+  "code": null,
+  "prod": {
+   "status": "ok",
+   "file": "RED ONION SHAMPOO.png",
+   "all": [
+    "RED ONION SHAMPOO.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "RED ONION Shampoo.jpg",
+   "all": [
+    "RED ONION Shampoo.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Red Onion Oil",
+  "code": null,
+  "prod": {
+   "status": "ok",
+   "file": "RED ONION OIL.png",
+   "all": [
+    "RED ONION OIL.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "RED ONION OIL.jpg",
+   "all": [
+    "RED ONION OIL.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Calcifair-D3 Nano shots",
+  "code": null,
+  "prod": {
+   "status": "ambiguous",
+   "file": null,
+   "all": [
+    "Calcifair-D3 Drop.png",
+    "Calcifair-D3 Sachet.png"
+   ]
+  },
+  "comp": {
+   "status": "ambiguous",
+   "file": null,
+   "all": [
+    "CALCIFAIR SACHET.jpg",
+    "Calcifair-D3 Drop.jpg",
+    "Calcifair-D3 SHOTS (Butter).jpg",
+    "Calcifair-D3 SHOTS (ORANGE).jpg"
+   ]
+  }
+ },
+ {
+  "name": "Calcifair D3 nano Shot",
+  "code": null,
+  "prod": {
+   "status": "ambiguous",
+   "file": null,
+   "all": [
+    "Calcifair-D3 Drop.png",
+    "Calcifair-D3 Sachet.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "Calcifair-D3 Drop.jpg",
+   "all": [
+    "Calcifair-D3 Drop.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Nimfair Cold and Flu",
+  "code": null,
+  "prod": {
+   "status": "missing",
+   "file": null,
+   "all": []
+  },
+  "comp": {
+   "status": "missing",
+   "file": null,
+   "all": []
+  }
+ },
+ {
+  "name": "Montufair-L",
+  "code": null,
+  "prod": {
+   "status": "ambiguous",
+   "file": null,
+   "all": [
+    "Montufair-L Syrup.png",
+    "Montufair-L Tablet.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "Montufair-L.jpg",
+   "all": [
+    "Montufair-L.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Nasofair Paeditatric Nasal Drops",
+  "code": null,
+  "prod": {
+   "status": "missing",
+   "file": null,
+   "all": []
+  },
+  "comp": {
+   "status": "missing",
+   "file": null,
+   "all": []
+  }
+ },
+ {
+  "name": "Nasofair Adult Nasal Drops",
+  "code": null,
+  "prod": {
+   "status": "ok",
+   "file": "Nasofair Adult.png",
+   "all": [
+    "Nasofair Adult.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "Nasofair Adult.jpg",
+   "all": [
+    "Nasofair Adult.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Ketospare shampoo",
+  "code": null,
+  "prod": {
+   "status": "ok",
+   "file": "Ketospare Shampoo.png",
+   "all": [
+    "Ketospare Shampoo.png",
+    "Ketospare Soap.png",
+    "Ketospare Tablet.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "KETOSPARE SHAMPOO.jpg",
+   "all": [
+    "KETOSPARE SHAMPOO.jpg",
+    "KETOSPARE SOAP.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Ketospare soap",
+  "code": null,
+  "prod": {
+   "status": "ok",
+   "file": "Ketospare Soap.png",
+   "all": [
+    "Ketospare Shampoo.png",
+    "Ketospare Soap.png",
+    "Ketospare Tablet.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "KETOSPARE SOAP.jpg",
+   "all": [
+    "KETOSPARE SHAMPOO.jpg",
+    "KETOSPARE SOAP.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Ketospare tablets",
+  "code": null,
+  "prod": {
+   "status": "ok",
+   "file": "Ketospare Tablet.png",
+   "all": [
+    "Ketospare Shampoo.png",
+    "Ketospare Soap.png",
+    "Ketospare Tablet.png"
+   ]
+  },
+  "comp": {
+   "status": "ambiguous",
+   "file": null,
+   "all": [
+    "KETOSPARE SHAMPOO.jpg",
+    "KETOSPARE SOAP.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Pegra raj",
+  "code": null,
+  "prod": {
+   "status": "missing",
+   "file": null,
+   "all": []
+  },
+  "comp": {
+   "status": "missing",
+   "file": null,
+   "all": []
+  }
+ },
+ {
+  "name": "Platogain",
+  "code": null,
+  "prod": {
+   "status": "ok",
+   "file": "Platogain Syrup.png",
+   "all": [
+    "Platogain Syrup.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "Platogain Syrup.jpg",
+   "all": [
+    "Platogain Syrup.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Curcumin Tablet",
+  "code": null,
+  "prod": {
+   "status": "ok",
+   "file": "CURCUMIN SYRUP.png",
+   "all": [
+    "CURCUMIN SYRUP.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "CURCUMIN SYRUP.jpg",
+   "all": [
+    "CURCUMIN SYRUP.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Curcumin Syrup",
+  "code": null,
+  "prod": {
+   "status": "ok",
+   "file": "CURCUMIN SYRUP.png",
+   "all": [
+    "CURCUMIN SYRUP.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "CURCUMIN SYRUP.jpg",
+   "all": [
+    "CURCUMIN SYRUP.jpg"
+   ]
+  }
+ },
+ {
+  "name": "Zincofair 21G Capsule",
+  "code": null,
+  "prod": {
+   "status": "ok",
+   "file": "ZINCOFAIR-21 G.png",
+   "all": [
+    "ZINCOFAIR-21 G.png"
+   ]
+  },
+  "comp": {
+   "status": "ok",
+   "file": "ZINCOFAIR-21G.jpg",
+   "all": [
+    "ZINCOFAIR-21G.jpg"
+   ]
+  }
+ }
+]
