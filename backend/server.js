@@ -154,9 +154,16 @@ app.use(express.urlencoded({ limit: '10mb', extended: true }));
 app.use(cookieParser());
 
 // ── RATE LIMITING ─────────────────────────────────────────────────────────────
+// General /api/ cap, per client IP (req.ip is the real client via trust proxy).
+// Raised 200 → 1000 per 15 min: a shared office/NAT IP (several distributor/
+// hospital/retailer staff on one connection) legitimately makes many catalogue
+// and order API calls, and 200/15min (~13/min) produced JSON "Too many requests"
+// errors for them. 1000/15min keeps a sane abuse ceiling while clearing normal
+// shared-IP usage. Auth endpoints keep their own strict limiter below, and the
+// edge Cloud Armor policy still guards /api at 300/min per IP.
 app.use('/api/', rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 200,
+  max: 1000,
   message: { success: false, message: 'Too many requests. Please try again later.' },
   standardHeaders: true,
   legacyHeaders:   false,
