@@ -52,11 +52,21 @@ function resolveCategory(value, map) {
   return hit ? { name: hit, count: map[hit] } : null;
 }
 
+// On-page category intro paragraph (visible hero copy). Kept BYTE-IDENTICAL to
+// categoryIntro() in frontend/js/product.js so the SSR and JS-applied text agree.
+// Deliberately worded differently from the meta description above to avoid
+// duplicating it verbatim on the page.
+function categoryIntro(name, count) {
+  return "Explore Fair Ford Pharmaceuticals' range of " + count + ' ' + name +
+    ' — WHO-GMP formulations for B2B supply to retailers, distributors, stockists and hospitals across India, each listed with composition, strength, dosage form and pack size.';
+}
+
 function buildCategorySeo(name, count) {
   const canonical = categoryUrl(name);
   const title = name + ' — Fair Ford Pharmaceuticals';
   const description = ('Browse ' + count + ' ' + name + ' ' + (count === 1 ? 'product' : 'products') +
     ' from Fair Ford Pharmaceuticals — available for B2B order by retailers, distributors and stockists across India. View compositions, pack sizes and specifications.').slice(0, 300);
+  const intro = categoryIntro(name, count);
   const jsonld = {
     '@context': 'https://schema.org',
     '@type': 'CollectionPage',
@@ -73,7 +83,7 @@ function buildCategorySeo(name, count) {
       ]
     }
   };
-  return { title, description, canonical, jsonld };
+  return { title, description, canonical, jsonld, intro };
 }
 
 /** Inject category SEO into a product.html string. */
@@ -87,6 +97,8 @@ function injectCategorySeo(html, name, count) {
   out = setAttrById(out, 'og-url', 'content', attr(seo.canonical));
   // H1 matches the page topic for non-JS crawlers.
   out = out.replace(/(<h1 id="ffm-hero-title">)[\s\S]*?(<\/h1>)/, '$1' + attr(name) + '$2');
+  // Per-category intro prose (visible hero subtitle) for content depth.
+  out = out.replace(/(<p[^>]*id="ffm-hero-sub"[^>]*>)[\s\S]*?(<\/p>)/, '$1' + attr(seo.intro) + '$2');
   out = out.replace(
     /(<script type="application\/ld\+json" id="pg-jsonld">)[\s\S]*?(<\/script>)/,
     '$1' + jsonForScript(seo.jsonld) + '$2'

@@ -546,7 +546,7 @@ function renderHeader(active) {
       </li>
     </ul>
     <div class="topbar__actions">
-      <a href="distributor.html" class="topbar__cta">
+      <a href="become-a-distributor" class="topbar__cta">
         <span>Become a distributor</span>
         <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
       </a>
@@ -1063,7 +1063,10 @@ function renderFooter() {
           <h3 class="footer-title">Quick Links</h3>
           <ul class="footer-links">
             <li><a href="index.html" class="link-item">Home</a></li>
+            <li><a href="product.html" class="link-item">Products</a></li>
             <li><a href="About.html" class="link-item">About Us</a></li>
+            <li><a href="become-a-distributor" class="link-item">Become a Distributor</a></li>
+            <li><a href="hospital-procurement" class="link-item">Hospital Procurement</a></li>
             <li><a href="contactus.html" class="link-item">Contact</a></li>
           </ul>
         </div>

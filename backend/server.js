@@ -21,6 +21,24 @@ const app = express();
 // IPs are useless. Trust the first proxy hop so req.ip = the real client IP.
 app.set('trust proxy', 1);
 
+// ── CANONICAL HOST (301 apex → www) ───────────────────────────────────────────
+// Both the apex (fairfordpharma.com) and the www host resolve and return 200 for
+// every URL, which splits crawl signals and duplicates the whole site across two
+// hosts. Every on-page <link rel="canonical">, every og:url, the sitemap and
+// robots.txt already declare the WWW host, so make the server agree: permanently
+// redirect the apex to www, preserving the exact path + query string.
+//
+// Scoped to the bare apex host only — the Cloud Run *.run.app URL, the www host
+// itself and localhost are left untouched, so health checks and local dev are
+// unaffected. GET/HEAD only: a 301 must never silently turn an API POST into a
+// GET on the other host (req.hostname already has any :port stripped).
+app.use((req, res, next) => {
+  if ((req.method === 'GET' || req.method === 'HEAD') && req.hostname === 'fairfordpharma.com') {
+    return res.redirect(301, 'https://www.fairfordpharma.com' + req.originalUrl);
+  }
+  next();
+});
+
 // ── SECURITY ─────────────────────────────────────────────────────────────────
 // Content-Security-Policy tuned for this static, inline-heavy frontend:
 // 'unsafe-inline' is required because the pages use inline <script> blocks,
@@ -232,6 +250,26 @@ app.get('/product.html', async (req, res, next) => {
   }
 });
 
+// ── B2B LANDING PAGES (clean URLs) ────────────────────────────────────────────
+// Indexable partnership landing pages served at clean, extensionless URLs.
+// These are the SEO entry points; the private KYC signup form (distributor.html)
+// stays noindex. The routes run BEFORE express.static so the clean URL is the one
+// served; the matching .html is 301'd to the clean URL to avoid a duplicate 200.
+// A single URL segment at the site root means relative links resolve against '/'
+// (no <base> needed).
+const LANDING_PAGES = {
+  '/become-a-distributor': 'become-a-distributor.html',
+  '/hospital-procurement': 'hospital-procurement.html',
+};
+Object.keys(LANDING_PAGES).forEach((cleanPath) => {
+  const file = LANDING_PAGES[cleanPath];
+  app.get([cleanPath, cleanPath + '/'], (_req, res) =>
+    res.sendFile(path.join(PUBLIC_DIR, file))
+  );
+  // 301 the raw .html form to the clean canonical URL (prevents a duplicate page).
+  app.get('/' + file, (_req, res) => res.redirect(301, cleanPath));
+});
+
 // Serve the frontend pages at the site root so clean page URLs resolve —
 // /product.html, /login&signup.html, /retailer.html, /superadmin.html, etc.
 // Previously only '/' was routed, so every other page (and the post-login
@@ -323,12 +361,19 @@ app.get('/robots.txt', (_req, res) => {
 });
 
 app.get('/sitemap.xml', async (_req, res) => {
-  // Public, indexable pages only. login&signup.html is deliberately absent —
-  // it carries noindex, so listing it here would contradict the page itself.
-  // search.html and distributor.html were missing and are genuine landing pages.
-  const pages = ['/', '/product.html', '/About.html', '/contactus.html', '/uphaar.html', '/nueva-vida.html',
-                 '/registration.html', '/distributor.html', '/search.html',
-                 '/privacy&policy.html', '/T&C.html'];
+  // Public, indexable pages only. A sitemap must list ONLY URLs that are
+  // themselves index-able and self-canonical, or it contradicts the pages.
+  // Deliberately absent:
+  //   • login&signup.html   — carries noindex
+  //   • registration.html   — retailer signup FORM, carries noindex,nofollow
+  //   • distributor.html    — distributor KYC signup FORM, noindex + robots Disallow
+  // (Both signup forms were previously listed here while carrying noindex — a
+  //  sitemap-vs-meta contradiction. A future marketing "become a distributor"
+  //  landing page would be indexable and belongs here; the raw form does not.)
+  const pages = ['/', '/product.html', '/About.html', '/contactus.html',
+                 '/become-a-distributor', '/hospital-procurement',
+                 '/uphaar.html', '/nueva-vida.html',
+                 '/search.html', '/privacy&policy.html', '/T&C.html'];
   // Page names contain literal & (login&signup.html etc.), which must be
   // XML-escaped inside <loc> or the sitemap is malformed.
   const xmlEsc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');

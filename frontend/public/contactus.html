@@ -43,13 +43,45 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
-    "@type": "Organization",
-    "name": "Fair Ford Pharmaceuticals Pvt. Ltd.",
-    "url": "https://www.fairfordpharma.com/",
-    "email": "info@fairfordpharma.com",
-    "telephone": "+91-9958584228",
-    "contactPoint": { "@type": "ContactPoint", "telephone": "+91-9958584228", "contactType": "customer service", "areaServed": "IN", "availableLanguage": ["en","hi"] },
-    "address": { "@type": "PostalAddress", "streetAddress": "Fair Ford Tower, Gali No-07, Main Road, Anangpur Village", "addressLocality": "Faridabad", "addressRegion": "Haryana", "postalCode": "121003", "addressCountry": "IN" }
+    "@graph": [
+      {
+        "@type": "ContactPage",
+        "@id": "https://www.fairfordpharma.com/contactus.html#contactpage",
+        "url": "https://www.fairfordpharma.com/contactus.html",
+        "name": "Contact Fair Ford Pharmaceuticals",
+        "description": "Contact details and business-inquiry form for Fair Ford Pharmaceuticals — distribution, retailer support and hospital/institutional procurement.",
+        "isPartOf": { "@id": "https://www.fairfordpharma.com/#website" },
+        "about": { "@id": "https://www.fairfordpharma.com/#organization" },
+        "breadcrumb": {
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://www.fairfordpharma.com/" },
+            { "@type": "ListItem", "position": 2, "name": "Contact", "item": "https://www.fairfordpharma.com/contactus.html" }
+          ]
+        }
+      },
+      {
+        "@type": ["Organization", "LocalBusiness"],
+        "@id": "https://www.fairfordpharma.com/#organization",
+        "name": "Fair Ford Pharmaceuticals Pvt. Ltd.",
+        "legalName": "Fair Ford Pharmaceuticals Pvt. Ltd.",
+        "alternateName": "Fair Ford Pharmaceuticals",
+        "url": "https://www.fairfordpharma.com/",
+        "logo": "https://res.cloudinary.com/dp4yririh/image/upload/v1782967649/fairford/site/m5d8pmtzdjr4dcgctvuc.png",
+        "image": "https://res.cloudinary.com/dp4yririh/image/upload/v1782967649/fairford/site/m5d8pmtzdjr4dcgctvuc.png",
+        "email": "info@fairfordpharma.com",
+        "telephone": "+91-9958584228",
+        "areaServed": "IN",
+        "contactPoint": { "@type": "ContactPoint", "telephone": "+91-9958584228", "email": "info@fairfordpharma.com", "contactType": "customer service", "areaServed": "IN", "availableLanguage": ["English", "Hindi"] },
+        "address": { "@type": "PostalAddress", "streetAddress": "Fair Ford Tower, Gali No-07, Main Road, Anangpur Village, Opposite Mount Kailash Factory", "addressLocality": "Faridabad", "addressRegion": "Haryana", "postalCode": "121003", "addressCountry": "IN" },
+        "sameAs": [
+          "https://www.facebook.com/profile.php?id=61550892159031",
+          "https://www.linkedin.com/company/fairfordpharma",
+          "https://www.instagram.com/fairfordpharma/",
+          "https://www.youtube.com/@user-jm4zy6du8f"
+        ]
+      }
+    ]
   }
   </script>
 </head>
@@ -330,7 +362,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <div class="cx-aud-ico"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div>
             <h3>Distributors</h3>
             <p>Territory partnerships, trade pricing and product availability across the catalogue.</p>
-            <a class="cx-link" href="distributor.html">Become a distributor <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+            <a class="cx-link" href="become-a-distributor">Become a distributor <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
           </article>
           <article class="cx-aud cx-reveal">
             <div class="cx-aud-ico"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V8l9-5 9 5v13"/><rect x="8" y="13" width="8" height="8"/></svg></div>

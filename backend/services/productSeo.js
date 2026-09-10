@@ -73,9 +73,16 @@ function buildProductSeo(p) {
 
   const jsonld = { '@context': 'https://schema.org', '@graph': [product, { '@type': 'BreadcrumbList', itemListElement: crumbs }] };
 
+  // Title leads with the product name + its composition/strength (the terms
+  // people actually search), then the brand — instead of the old brand-first
+  // "Fair Ford — <name>". Unique per product and aligned to product+composition
+  // search intent. buildProductSeo's title MUST stay identical to the client
+  // computation in productdetail.js applyMeta().
+  const titleQualifier = comp || real(p.strength) || '';
+  const title = name + (titleQualifier ? ' – ' + titleQualifier : '') + ' | Fair Ford Pharmaceuticals';
   return {
-    title: 'Fair Ford — ' + name,
-    ogTitle: name + ' — Fair Ford Pharmaceuticals',
+    title,
+    ogTitle: name + ' | Fair Ford Pharmaceuticals',
     description, canonical, ogImage, jsonld, active
   };
 }

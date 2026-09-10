@@ -470,15 +470,23 @@ document.addEventListener('DOMContentLoaded', function () {
     desc: 'Browse the full Fair Ford pharmaceutical catalogue for retailers, distributors and stockists. Filter by category, composition, pack size, product type and stock availability.',
     canonical: ORIGIN + '/product.html',
     h1: 'India\'s Trusted<br /><span class="ffm-hero-accent">B2B Pharma</span> Marketplace',
+    sub: 'Source the complete Fair Ford formulation range — tablets, capsules, syrups, injectables, dermatology and nutraceuticals — with trade pricing, GST-compliant billing and orders routed to your nearest serviceable stockist.',
     crumb: '<a href="index.html">Home</a><span class="ffm-crumb-sep" aria-hidden="true">/</span><span aria-current="page">Products</span>'
   };
+
+  // Per-category intro prose. Kept BYTE-IDENTICAL to categoryIntro() in
+  // backend/services/categorySeo.js so the SSR and JS-applied text match.
+  function categoryIntro(name, count) {
+    return "Explore Fair Ford Pharmaceuticals' range of " + count + ' ' + name +
+      ' — WHO-GMP formulations for B2B supply to retailers, distributors, stockists and hospitals across India, each listed with composition, strength, dosage form and pack size.';
+  }
   // Same URLSearchParams encoding as writeURL() and the SSR canonical.
   function categoryHref(name) { return '/product.html?' + new URLSearchParams({ category: name }).toString(); }
   function catCount(name) { var c = CATS.filter(function (x) { return x.name === name; })[0]; return c ? c.count : 0; }
   function setMeta(sel, attribute, val) { var el = document.querySelector(sel); if (el) el.setAttribute(attribute, val); }
 
   function applyCategoryMeta() {
-    var hero = $('ffm-hero-title'), crumb = document.querySelector('.ffm-crumb');
+    var hero = $('ffm-hero-title'), crumb = document.querySelector('.ffm-crumb'), sub = $('ffm-hero-sub');
     // A category landing page = exactly one category selected, nothing else.
     var isCat = state.cats.length === 1 && !state.q && !state.forms.length && !state.avail.length && !state.packs.length;
     if (isCat) {
@@ -490,6 +498,7 @@ document.addEventListener('DOMContentLoaded', function () {
       setMeta('#meta-desc', 'content', desc); setMeta('#og-desc', 'content', desc);
       setMeta('#og-title', 'content', name + ' — Fair Ford Pharmaceuticals');
       if (hero) hero.textContent = name;
+      if (sub) sub.textContent = categoryIntro(name, count);
       if (crumb) crumb.innerHTML = '<a href="index.html">Home</a><span class="ffm-crumb-sep" aria-hidden="true">/</span>' +
         '<a href="product.html">Products</a><span class="ffm-crumb-sep" aria-hidden="true">/</span>' +
         '<span aria-current="page">' + esc(name) + '</span>';
@@ -499,6 +508,7 @@ document.addEventListener('DOMContentLoaded', function () {
       setMeta('#meta-desc', 'content', SEO_DEFAULT.desc); setMeta('#og-desc', 'content', SEO_DEFAULT.desc);
       setMeta('#og-title', 'content', SEO_DEFAULT.title);
       if (hero) hero.innerHTML = SEO_DEFAULT.h1;
+      if (sub) sub.textContent = SEO_DEFAULT.sub;
       if (crumb) crumb.innerHTML = SEO_DEFAULT.crumb;
     }
   }

@@ -607,13 +607,16 @@ document.addEventListener('DOMContentLoaded', function () {
   /* ---- per-product <head> metadata ---- */
   function applyMeta(p, cat, code) {
     var name = p.name || 'Product';
-    document.title = 'Fair Ford — ' + name;
     var comp = compositionText(p);
+    // Product-name-first title (matches the server render in productSeo.js so the
+    // SSR and JS-applied <title> are identical): "<name> – <composition> | brand".
+    var titleQualifier = comp || real(p.strength) || '';
+    document.title = name + (titleQualifier ? ' – ' + titleQualifier : '') + ' | Fair Ford Pharmaceuticals';
     var bits = [real(p.strength), real(p.packSize), real(p.dosageForm), comp].filter(Boolean);
     var desc = (name + (cat ? ' — ' + cat : '') + '. ' + (bits.length ? bits.join(' · ') + '. ' : '') +
       'Available for B2B order from Fair Ford Pharmaceuticals.').slice(0, 300);
     function set(sel, v) { var el = document.querySelector(sel); if (el && v) el.setAttribute('content', v); }
-    set('#meta-desc', desc); set('#og-title', name + ' — Fair Ford Pharmaceuticals'); set('#og-desc', desc);
+    set('#meta-desc', desc); set('#og-title', name + ' | Fair Ford Pharmaceuticals'); set('#og-desc', desc);
     if (GAL[0]) set('#og-image', GAL[0]);
 
     // Canonical: prefer the clean /product/<slug> URL (now served with 200 by
